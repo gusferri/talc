@@ -198,7 +198,7 @@ export class ReportesComponent implements OnInit {
     this.asistenciaProfesionalOptions = {
       series: [],
       chart: {
-        height: 350,
+        height: 500,
         type: 'bar',
         stacked: true,
         stackType: '100%',
@@ -208,7 +208,12 @@ export class ReportesComponent implements OnInit {
       },
       xaxis: { type: 'category', categories: [] },
       yaxis: {},
-      plotOptions: { bar: { columnWidth: '40%', barHeight: '40%' } },
+      plotOptions: {
+        bar: {
+          columnWidth: '25%',
+          barHeight: '40%'
+        }
+      },
       dataLabels: { enabled: false },
       grid: { show: true, strokeDashArray: 0, borderColor: 'rgba(0,0,0,0.1)' },
       colors: ['#06d79c', '#e53935', '#FFAE1F', '#398bf7'],
@@ -345,19 +350,28 @@ export class ReportesComponent implements OnInit {
 
     // Barras apiladas: porcentaje de asistencia por profesional
     const estadosAsistencia = ['Asistido', 'Cancelado', 'Ausente', 'Agendado'];
-    const topProfesionales = profNames;
+    // Filtrar y limpiar nombres de profesionales
+    const topProfesionales = profNames.map(name => {
+      if (!name || typeof name !== 'string' || name.trim() === '') return 'Sin nombre';
+      return name;
+    });
+    console.log('Profesionales eje X:', topProfesionales);
     const seriesAsistencia = estadosAsistencia.map(estado => ({
       name: estado,
       data: topProfesionales.map(prof => turnosFiltrados.filter(t => t.Profesional === prof && t.Estado === estado).length)
     }));
     this.asistenciaProfesionalOptions.series = seriesAsistencia;
-    this.asistenciaProfesionalOptions.xaxis.categories = topProfesionales;
-    this.asistenciaProfesionalOptions.xaxis.labels = {
-      show: true,
-      rotate: -45,
-      style: { fontSize: '12px' },
-      formatter: (val: string) => val
+    this.asistenciaProfesionalOptions.xaxis = {
+      type: 'category',
+      categories: topProfesionales,
+      labels: {
+        show: true,
+        rotate: -60,
+        style: { fontSize: '12px' },
+        formatter: (val: string) => val
+      }
     };
+    this.asistenciaProfesionalOptions.chart.width = 1100;
   }
 
   limpiarFechas() {
