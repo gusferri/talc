@@ -6,6 +6,7 @@ import { NuevoPacienteComponent } from './pacientes/nuevo-paciente/nuevo-pacient
 import { DetallePacienteComponent } from './pacientes/detalle-paciente/detalle-paciente.component';
 import { NuevoTurnoComponent } from './turnos/nuevo-turno.component';
 import { CalendarioComponent } from './turnos/calendario/calendario.component';
+import { ReportesComponent } from './turnos/reportes.component';
 
 export const PagesRoutes: Routes = [
   {
@@ -109,6 +110,18 @@ export const PagesRoutes: Routes = [
         { title: 'Dashboard', url: '/dashboard' },
         { title: 'Turnos', url: '/turnos' },
         { title: 'Calendario' }
+      ],
+    },
+  },
+  {
+    path: 'turnos/reportes',
+    component: ReportesComponent,
+    data: {
+      title: 'Reportes de Turnos',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Turnos', url: '/turnos' },
+        { title: 'Reportes' }
       ],
     },
   },
