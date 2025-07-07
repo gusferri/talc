@@ -1,0 +1,48 @@
+.sidebar-item {
+  font-size: 20px;
+  padding: 10px;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 200px;
+    background-color: #C1C1C1;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+.logo {
+  display: flex;
+  align-items: center;
+  height:250px;
+  margin-bottom: -150px;
+  justify-content: center;
+}
+
+.logo img {
+  margin-left: 380px;
+  height: 500px;
+  width: auto;
+  object-fit: contain;
+}
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  nav ul li {
+    margin-bottom: 16px;
+  }
+  
+  nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: block;
+  }

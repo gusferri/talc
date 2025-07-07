@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Adjuntar Archivo</h2>
+
+<mat-dialog-content style="margin-top: 20px;">
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px; font-size: 12px;">
+    <button mat-stroked-button color="primary" style="border-radius: 6px; background-color: rgb(237, 236, 236);" (click)="fileInput.click()">
+      Seleccionar archivo
+    </button>
+    <input
+      #fileInput
+      type="file"
+      style="display: none"
+      (change)="onFileSelected($event)"
+    />
+    <mat-form-field appearance="fill" style="flex: 1; margin-top: 0;">
+      <mat-label>Descripción del archivo</mat-label>
+      <input matInput [(ngModel)]="descripcionArchivo" placeholder="Ej: DNI, certificado, etc.">
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="file" style="margin-top: 20px; font-size: 14px;">
+    <p><strong>Archivo seleccionado:</strong> {{ file.name }}</p>
+    <p><strong>Tamaño:</strong> {{ file.size / 1024 | number:'1.0-2' }} KB</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <div style="padding: 8px 16px; display: flex; gap: 16px;">
+        <button
+            mat-raised-button
+            style="background-color: #d0cfcf; border-radius: 6px; max-width: 200px; width: 100%;"
+            (click)="onCancelar()">Cancelar</button>
+        <button
+            mat-raised-button
+            style="background-color: #d0cfcf; border-radius: 6px; max-width: 200px; width: 100%;"
+            color="primary"
+            [disabled]="!file || !descripcionArchivo.trim()"
+            (click)="onGuardar()">Guardar</button>
+    </div>
+</mat-dialog-actions>

@@ -1,0 +1,20 @@
+
+<div class="login-container">
+
+
+  <div class="texto-bienvenida">
+    <h1>Bienvenido a TALC Gestión</h1>
+  </div>
+  <div class="texto-login">
+    <h1>Iniciar Sesión</h1>
+  </div>
+
+    <form (ngSubmit)="login()">
+    <input type="text" placeholder="Usuario" [(ngModel)]="username" name="username" required />
+    <input type="password" placeholder="Contraseña" [(ngModel)]="password" name="password" required />
+
+    <button type="submit">Ingresar</button>
+
+      <div *ngIf="loginError" class="error-message">{{ loginError }}</div>
+    </form>
+</div>

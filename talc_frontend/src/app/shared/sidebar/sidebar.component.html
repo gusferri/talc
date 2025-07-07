@@ -1,0 +1,24 @@
+<div class="sidebar">
+  <div class="logo">
+    <img src="assets/img/logo_talc.png" alt="Logo TALC" />
+  </div>
+  <mat-nav-list>
+    <ng-container *ngIf="esRutaTurnos">
+      <a mat-list-item class="sidebar-item" routerLink="/turnos/calendario" routerLinkActive="active">📅 Calendario</a>
+      <a mat-list-item class="sidebar-item" routerLink="/turnos/nuevo-turno" routerLinkActive="active">➕ Nuevo Turno</a>
+      <a mat-list-item class="sidebar-item" routerLink="/turnos/reportes" routerLinkActive="active">📊 Reportes</a>
+    </ng-container>
+
+    <ng-container *ngIf="esRutaPacientes">
+      <a *ngIf="esProfesional" mat-list-item class="sidebar-item" routerLink="/pacientes" routerLinkActive="active">👤 Mis Pacientes</a>
+      <a mat-list-item class="sidebar-item" routerLink="/pacientes/nuevo-paciente" routerLinkActive="active">➕ Nuevo Paciente</a>
+      <a mat-list-item class="sidebar-item" routerLink="/pacientes/editar-paciente" routerLinkActive="active">📋 Ver Pacientes</a>
+      <a mat-list-item class="sidebar-item" routerLink="/pacientes/agenda" routerLinkActive="active">📆 Agenda</a>
+      <a mat-list-item class="sidebar-item" routerLink="/pacientes/notas-voz" routerLinkActive="active">🎤 Notas de Voz</a>
+      <a mat-list-item class="sidebar-item" routerLink="/pacientes/seguimiento-evolutivo" routerLinkActive="active">📈 Evolución</a>
+      <a mat-list-item class="sidebar-item" routerLink="/pacientes/anexar-documentos" routerLinkActive="active">📎 Documentación</a>
+    </ng-container>
+
+    <a mat-list-item class="sidebar-item" routerLink="/" routerLinkActive="active">🔙 Menú Principal</a>
+  </mat-nav-list>
+</div>

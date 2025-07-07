@@ -1,0 +1,35 @@
+# Python
+venv/
+*.pyc
+__pycache__/
+*.pyo
+
+# Node/Angular
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+
+# Angular cache
+talc_frontend_v2/.angular/
+talc_frontend_v2/.angular/cache/
+talc_frontend/.angular/
+talc_frontend/.angular/cache/
+
+# Credenciales y archivos sensibles
+.env
+credentials.json
+talc_backend/credentials.json
+
+# Archivos temporales y backups
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Otros (opcional, si tienes archivos de entorno de Angular)
+talc_frontend_v2/src/environments/*.ts
+!talc_frontend_v2/src/environments/environment.ts
+modernize-angular-v5-0/
+talc_backend/app/routers/ai.py 

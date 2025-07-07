@@ -1,0 +1,277 @@
+<div class="form-container">
+    <div class="form-left" style="margin-top: 50px;">
+      <div class="form-row">
+        <mat-form-field class="boxcustom1" appearance="fill" style="width: 100%; max-width: 100px;">
+          <mat-label>DNI</mat-label>
+          <input type="text" matInput [formControl]="dniControl" [matAutocomplete]="autoDni" (input)="filtrarPacientesPorDni()">
+          <mat-autocomplete #autoDni="matAutocomplete" autoActiveFirstOption [panelWidth]="'300px'" (optionSelected)="seleccionarPaciente($event.option.value)">
+              <mat-option *ngFor="let paciente of pacientesFiltradosDni" [value]="paciente">
+                  {{ paciente.DNI }}
+              </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field class="boxcustom2" appearance="fill" style="width: 100%; max-width: 400px;">
+          <mat-label>Apellido y Nombre</mat-label>
+          <input type="text"
+                 matInput
+                 [formControl]="apellidoNombreControl"
+                 [matAutocomplete]="autoApellidoNombre"
+                 (input)="filtrarPacientesPorApellidoNombre()">
+          <mat-autocomplete #autoApellidoNombre="matAutocomplete" autoActiveFirstOption [panelWidth]="'300px'" (optionSelected)="seleccionarPaciente($event.option.value)">
+            <mat-option *ngFor="let paciente of pacientesFiltradosApellidoNombre" [value]="paciente">
+              {{ paciente.Apellido }}, {{ paciente.Nombre }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+  
+      <div class="form-row">
+        <mat-form-field class="boxcustom2" appearance="fill">
+          <mat-label>Fecha de Nacimiento</mat-label>
+          <input matInput
+            [matDatepicker]="picker"
+            [formControl]="fechaNacimientoControl"
+            [matDatepickerFilter]="validarFechaNacimiento">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-slide-toggle
+          class="custom-toggle"
+          (change)="editarFechaNacimiento($event)"
+          [formControl]="editarFechaNacimientoControl">
+        </mat-slide-toggle>
+      
+        <mat-form-field class="boxcustom2" appearance="fill">
+          <mat-label>Género</mat-label>
+          <mat-select [formControl]="generoControl">
+            <mat-option *ngFor="let genero of generos" [value]="genero">
+              {{ genero.Genero }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-slide-toggle
+          class="custom-toggle"
+          [formControl]="editarGeneroControl"
+          (change)="editarGenero($event)">
+        </mat-slide-toggle>
+      </div>
+  
+      <div class="form-row">
+        <mat-form-field class="boxcustom2" appearance="fill">
+          <mat-label>Provincia</mat-label>
+          <input type="text"
+            matInput
+            [formControl]="provinciaControl"
+            [matAutocomplete]="autoProvincia"
+            (input)="filtrarProvincias()"
+            (blur)="validarProvincia()">
+          <mat-autocomplete
+            #autoProvincia="matAutocomplete"
+            [displayWith]="mostrarNombreProvincia"
+            (optionSelected)="seleccionarProvincia($event.option.value)">
+            <mat-option *ngFor="let provincia of provinciasFiltradas" [value]="provincia">
+              {{ provincia.Provincia }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-slide-toggle
+          class="custom-toggle"
+          [formControl]="editarProvinciaControl"
+          (change)="editarProvincia($event)">
+        </mat-slide-toggle>
+  
+        <mat-form-field class="boxcustom2" appearance="fill">
+          <mat-label>Ciudad</mat-label>
+          <input type="text"
+            matInput
+            [formControl]="ciudadControl"
+            [matAutocomplete]="autoCiudad"
+            (input)="filtrarCiudades()"
+            (blur)="validarCiudad()"
+            [disabled]="true">
+          <mat-autocomplete
+            #autoCiudad="matAutocomplete"
+            [displayWith]="mostrarNombreCiudad"
+            autoActiveFirstOption
+            [panelWidth]="'300px'"
+            (optionSelected)="seleccionarCiudad($event.option.value)">
+            <mat-option *ngFor="let ciudad of ciudadesFiltradas" [value]="ciudad">
+              {{ ciudad.Ciudad }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-slide-toggle
+          class="custom-toggle"
+          [formControl]="editarCiudadControl"
+          [checked]="ciudadToggleChecked"
+          (change)="editarCiudad($event)">
+        </mat-slide-toggle>
+      </div>
+  
+      <div class="form-row" style="gap: 30px;">
+        <mat-slide-toggle class="custom-toggle" [formControl]="estaEscolarizadoControl" (change)="editarEscolarizado($event)">
+          ¿Está escolarizado?
+        </mat-slide-toggle>
+  
+        <div class="form-row boxcustom3" style="gap: 10px;">
+          <mat-form-field class="boxcustom3" appearance="fill">
+            <mat-label>Escuela</mat-label>
+            <input type="text"
+              matInput
+              [formControl]="escuelaControl"
+              [matAutocomplete]="autoEscuela"
+              (input)="filtrarEscuelas()"
+              (blur)="validarEscuela()">
+            <mat-autocomplete
+              #autoEscuela="matAutocomplete"
+              [displayWith]="mostrarNombreEscuela"
+              autoActiveFirstOption
+              [panelWidth]="'300px'"
+              (optionSelected)="seleccionarEscuela($event.option.value)">
+              <mat-option *ngFor="let escuela of escuelasFiltradas" [value]="escuela">
+                {{ escuela.Nombre }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <mat-slide-toggle
+            class="custom-toggle"
+            (change)="editarEscuela($event)"
+            [formControl]="editarEscuelaControl">
+          </mat-slide-toggle>
+        </div>
+      </div>
+  
+      <div class="form-row" style="gap: 30px;">
+        <mat-slide-toggle class="custom-toggle" [formControl]="tieneObraSocialControl" (change)="editarTieneObraSocial($event)">
+          ¿Tiene obra social?
+        </mat-slide-toggle>
+        <div class="form-row boxcustom3" style="gap: 10px;">
+          <mat-form-field class="boxcustom3" appearance="fill">
+            <mat-label>Obra Social</mat-label>
+            <input type="text"
+              matInput
+              [formControl]="obraSocialControl"
+              [matAutocomplete]="autoObraSocial"
+              (input)="filtrarObrasSociales()"
+              (blur)="validarObraSocial()">
+            <mat-autocomplete
+              #autoObraSocial="matAutocomplete"
+              [displayWith]="mostrarNombreObraSocial"
+              autoActiveFirstOption
+              [panelWidth]="'300px'"
+              (optionSelected)="seleccionarObraSocial($event.option.value)">
+              <mat-option *ngFor="let obra of obrasSocialesFiltradas" [value]="obra">
+                {{ obra.Nombre }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <mat-slide-toggle
+            class="custom-toggle"
+            (change)="editarObraSocial($event)"
+            [formControl]="editarObraSocialControl">
+          </mat-slide-toggle>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field class="boxcustom1 placeholder-small" style="width: 100%; max-width: 130px;" appearance="fill">
+          <mat-label>Teléfono</mat-label>
+          <input matInput
+            type="number"
+            [formControl]="telefonoControl"
+            placeholder="Cod. Área Sin 0 y Nro. Sin 15"
+            step="1">
+        </mat-form-field>
+
+        <mat-slide-toggle
+          class="custom-toggle"
+          [formControl]="editarTelefonoControl"
+          (change)="editarTelefono($event)">
+        </mat-slide-toggle>
+  
+        <mat-form-field class="boxcustom2" appearance="fill" style="max-width: 240px;">
+          <mat-label>Mail</mat-label>
+          <input matInput
+            type="text"
+            [formControl]="mailControl"
+            placeholder="Ej: usuario@dominio.com">
+          <mat-error *ngIf="mailControl.hasError('email') && !mailControl.hasError('required')">
+            El correo debe tener un formato válido (ejemplo: usuario&#64;dominio.com).
+          </mat-error>
+        </mat-form-field>
+        <mat-slide-toggle
+          class="custom-toggle"
+          [formControl]="editarMailControl"
+          (change)="editarMail($event)">
+        </mat-slide-toggle>
+      </div>
+    </div>
+  
+    <div class="form-right" style="margin-top: 50px;">
+
+
+      <!-- Observaciones -->
+      <div class="form-row">
+      <mat-form-field class="boxcustom2" appearance="fill" style="max-width: 700px;">
+        <mat-label>Observaciones</mat-label>
+        <textarea matInput
+                  rows="15"
+                  [formControl]="observacionesControl"
+                  placeholder="Observaciones relevantes del paciente">
+        </textarea>
+      </mat-form-field>
+      <mat-slide-toggle
+        class="custom-toggle"
+        [formControl]="editarObservacionesControl"
+        (change)="editarObservaciones($event)">
+      </mat-slide-toggle>
+      </div>
+  
+      <!-- Botones -->
+      <div style="display: flex; gap: 40px; margin-top: 30px; justify-content: center;">
+        <button
+          mat-raised-button
+          color="primary"
+          class="mat-elevation-z2 boton-accion"
+          [disabled]="!guardarPacienteHabilitado"
+          (click)="guardarPaciente()">
+          Guardar
+        </button>
+        <button mat-raised-button 
+                color="accent" 
+                class="mat-elevation-z2 boton-accion" 
+                (click)="limpiarFormulario()">
+          Limpiar
+        </button>
+        <button mat-raised-button 
+                color="warn" 
+                class="mat-elevation-z2 boton-accion" 
+                (click)="cancelar()">
+          Cancelar
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 40px; margin-top: 30px; justify-content: center;">
+        <button
+          mat-raised-button
+          color="primary"
+          class="mat-elevation-z2 boton-accion"
+          [disabled]="!adjuntarArchivoHabilitado"
+          (click)="abrirDialogoAdjunto()">
+          Adjuntar Archivo
+        </button>
+        <button mat-raised-button 
+          color="accent" 
+          class="mat-elevation-z2 boton-accion">
+          Ver Adjuntos
+        </button>
+      </div>
+    </div>
+  </div>

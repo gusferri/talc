@@ -1,0 +1,33 @@
+<mat-toolbar color="primary" *ngIf="shouldShowToolbar()">
+  <span class="notificacion-campana" (click)="abrirNotificaciones()" style="position: relative; margin-right: 12px; cursor: pointer;">
+    <mat-icon>notifications</mat-icon>
+    <span *ngIf="cantidadNoLeidas > 0" class="badge" style="position: absolute; top: -3px; right: -3px; background: #e53935; color: white; border-radius: 50%; padding: 0 5px; font-size: 12px; min-width: 16px; text-align: center;">
+      {{ cantidadNoLeidas }}
+    </span>
+  </span>
+  <button mat-button [matMenuTriggerFor]="menuUsuario" class="usuario-button">
+    {{ nombreUsuario }}
+    <mat-icon>settings</mat-icon>
+  </button>
+  <mat-menu #menuUsuario="matMenu">
+    <button mat-menu-item (click)="abrirDialogoCambioContrasena()">
+      Cambiar contraseña
+    </button>
+    <button mat-menu-item (click)="cerrarSesion()">
+      Cerrar sesión
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<ng-container *ngIf="shouldShowSidebar()">
+  <app-sidebar></app-sidebar>
+  <div style="margin-left: 240px; padding: 20px;">
+    <router-outlet></router-outlet>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="!shouldShowSidebar()">
+  <div style="padding: 20px;">
+    <router-outlet></router-outlet>
+  </div>
+</ng-container>

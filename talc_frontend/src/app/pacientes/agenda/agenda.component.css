@@ -1,0 +1,50 @@
+.contenedor-autocomplete {
+  margin-bottom: 1rem;
+}
+.campo-autocomplete {
+  width: 100%;
+  max-width: 400px;
+}
+
+.calendar-container {
+  margin-top: 1px;
+}
+
+.fc-col-header-cell {
+  background-color: #e0e0e0; /* Color de fondo base */
+  color: #333; /* Color del texto */
+  font-weight: bold; /* Texto en negrita */
+  text-align: center; /* Centrar el texto */
+  border-bottom: 1px solid #ccc; /* Línea divisoria */
+}
+
+.fc-timegrid-slot-label {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
+
+.fc .fc-view-harness {
+  background-color: #F1ECE6; /* Reemplaza con el color deseado */
+  overflow: auto !important; /* Permite el scrollbar solo en el área de FullCalendar */
+}
+
+.fc-header-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e0e0e0 !important;
+  color: black;
+  padding: 8px;
+  border-radius: 0;
+  border-bottom: 1px solid #444;
+  border-top: 1px solid #444;
+  height: 35px;
+  font-size: 12px;
+}
+
+/* Color botones */
+.fc .fc-button {
+  background-color: #070707;
+  color: white;
+  border: none;
+}

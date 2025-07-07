@@ -1,0 +1,32 @@
+/* Estilo para el título del diálogo */
+.titulo-dialogo {
+    text-align: center; /* Centrar el texto */
+    font-weight: bold; /* Texto en negrita */
+    font-size: 20px; /* Tamaño de fuente */
+    margin-bottom: 10px; /* Espaciado inferior */
+}
+
+.estilo-boton {
+    background-color: #d0cfcf; /* Color de fondo */
+    height: 40px; /* altura del botón */
+    color: #333; /* Color del texto */
+    border: 2px solid #444;
+    border-radius: 6px;
+    padding: 0 20px; /* Espaciado interno horizontal */
+    text-align: center; /* Centrar el texto horizontalmente */
+    text-decoration: none; /* Sin subrayado */
+    display: flex; /* Flexbox para centrar contenido */
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
+    font-size: 16px; /* Tamaño de fuente */
+    margin: 4px 2px; /* Espaciado externo */
+    cursor: pointer; /* Cambiar cursor al pasar por encima */
+    width: 100px !important; /* Ancho mínimo */
+}
+
+.contenido-dialogo {
+    padding: 20px; /* Espaciado interno */
+    background-color: #f9f9f9; /* Color de fondo */
+    border-radius: 5px; /* Bordes redondeados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+}

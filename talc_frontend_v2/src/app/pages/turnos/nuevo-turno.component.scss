@@ -1,0 +1,195 @@
+// Fondo general institucional
+.nuevo-turno-bg {
+  min-height: 100vh;
+  background: #f5f1eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nuevo-turno-card {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 22px;
+  box-shadow: 0 6px 32px rgba(170, 38, 43, 0.10), 0 1.5px 6px rgba(44,44,44,0.08);
+  background: #fff;
+  padding: 40px 40px 32px 40px;
+  margin: 18px 0 32px 0;
+}
+
+.nuevo-turno-header {
+  text-align: left;
+  margin-bottom: 18px;
+}
+
+.nuevo-turno-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #aa262b;
+  margin-bottom: 12px;
+  letter-spacing: -1px;
+}
+
+.nuevo-turno-subtitle {
+  font-size: 1.08rem;
+  color: #7a7a7a;
+  margin-bottom: 18px;
+  margin-top: 0;
+}
+
+.nuevo-turno-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-field {
+  width: 100%;
+  font-size: 1.13rem;
+}
+
+.mat-form-field {
+  background: #f5f1eb;
+  border-radius: 8px;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #aa262b;
+}
+
+.mat-form-field.mat-focused .mat-form-field-outline {
+  color: #aa262b;
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #aa262b !important;
+}
+
+.mat-form-field.mat-focused .mat-input-element {
+  color: #aa262b;
+}
+
+.mat-form-field-infix {
+  min-height: 56px !important;
+  font-size: 1.13rem !important;
+}
+
+.mat-input-element, .mat-select-value-text {
+  font-size: 1.13rem !important;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.btn-guardar {
+  font-weight: 700;
+  border-radius: 8px;
+  background: #aa262b;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(170,38,43,0.08);
+  transition: background 0.2s;
+}
+
+.btn-guardar:hover {
+  background: #d32f2f;
+}
+
+.btn-cancelar {
+  font-weight: 600;
+  border-radius: 8px;
+  color: #aa262b;
+  border-color: #aa262b;
+}
+
+// Grid para el formulario
+.grid-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 22px;
+}
+.form-row:last-child {
+  margin-bottom: 0;
+}
+// Hora ocupa toda la fila
+.form-row:nth-child(3) {
+  grid-template-columns: 1fr;
+}
+
+.form-row.hora-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+.form-row.hora-row .form-field {
+  max-width: 200px;
+  min-width: 160px;
+  width: 100%;
+}
+
+.row-2-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 22px;
+}
+.row-3-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 22px;
+}
+
+.wide-cols {
+  grid-template-columns: 1fr 1fr;
+}
+
+.hora-row-right {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 22px;
+}
+.hora-container {
+  width: 100%;
+  max-width: none;
+}
+.hora-field {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+@media (max-width: 1100px) {
+  .nuevo-turno-card {
+    max-width: 98vw;
+    padding: 18px 4vw 18px 4vw;
+  }
+  .wide-cols, .row-2-cols {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .hora-row-right {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .nuevo-turno-card {
+    max-width: 98vw;
+    padding: 18px 4vw 18px 4vw;
+  }
+  .nuevo-turno-title {
+    font-size: 1.4rem;
+  }
+} 

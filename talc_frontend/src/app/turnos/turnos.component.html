@@ -1,0 +1,11 @@
+<h2>Listado de Turnos</h2>
+
+<div class="card-container">
+  <div class="turno-card" *ngFor="let turno of turnos">
+    <h3>{{ turno.Paciente }}</h3>
+    <p><strong>Profesional:</strong> {{ turno.Profesional }}</p>
+    <p><strong>Especialidad:</strong> {{ turno.Especialidad }}</p>
+    <p><strong>Fecha y Hora:</strong> {{ turno.FechaHora | date: 'short' }}</p>
+    <p><strong>Estado:</strong> {{ turno.Estado }}</p>
+  </div>
+</div>

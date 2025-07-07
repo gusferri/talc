@@ -1,0 +1,15 @@
+.layout {
+    display: flex;
+    height: 100%;
+}
+
+.contenido {
+    flex: 1;
+    padding: 30px;
+    background-color: #fff;
+}
+
+:host ::ng-deep app-sidebar {
+  height: 100vh;
+  display: block;
+}
