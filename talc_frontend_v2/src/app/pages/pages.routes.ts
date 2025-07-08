@@ -55,6 +55,18 @@ export const PagesRoutes: Routes = [
     },
   },
   {
+    path: 'pacientes/notasvoz',
+    loadComponent: () => import('./pacientes/notas-voz-por-paciente/notas-voz-por-paciente.component').then(m => m.NotasVozPorPacienteComponent),
+    data: {
+      title: 'Notas de Voz por Paciente',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Pacientes', url: '/pacientes' },
+        { title: 'Notas de Voz' }
+      ],
+    },
+  },
+  {
     path: 'pacientes/:id',
     component: DetallePacienteComponent,
     data: {

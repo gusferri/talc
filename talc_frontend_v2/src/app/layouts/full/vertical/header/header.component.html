@@ -34,6 +34,17 @@
     <i-tabler name="search" class="icon-20 d-flex"></i-tabler>
   </button>
 
+  <button
+    mat-icon-button
+    [routerLink]="['/turnos/reportes']"
+    matTooltip="Ver reportes de turnos"
+    class="d-flex justify-content-center"
+    style="margin-left: 4px;"
+    *ngIf="isTurnosRoute"
+  >
+    <i-tabler name="chart-bar" class="icon-20 d-flex"></i-tabler>
+  </button>
+
   @if(isTurnosRoute) {
     
   }

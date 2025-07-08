@@ -5,6 +5,7 @@ import {
   Input,
   signal,
   ViewEncapsulation,
+  OnInit,
 } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,13 +13,14 @@ import { navItems } from '../sidebar/sidebar-data';
 import { TranslateService } from '@ngx-translate/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { NotificacionesDialogComponent } from 'src/app/shared/notificaciones-dialog.component';
+import { filter } from 'rxjs/operators';
 
 interface notifications {
   id: number;
@@ -61,7 +63,7 @@ interface quicklinks {
   templateUrl: './header.component.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   @Input() showToggle = true;
   @Input() toggleChecked = false;
   @Output() toggleMobileNav = new EventEmitter<void>();
@@ -76,6 +78,8 @@ export class HeaderComponent {
   notificaciones: any[] = [];
   cantidadNoLeidas: number = 0;
 
+  isTurnosRoute = false;
+
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -86,6 +90,13 @@ export class HeaderComponent {
   ) {
     translate.setDefaultLang('en');
     this.cargarNotificaciones();
+  }
+
+  ngOnInit(): void {
+    this.checkTurnosRoute();
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+      this.checkTurnosRoute();
+    });
   }
 
   options = this.settings.getOptions();
@@ -303,8 +314,8 @@ export class HeaderComponent {
     });
   }
 
-  get isTurnosRoute(): boolean {
-    return this.router.url.startsWith('/turnos');
+  checkTurnosRoute() {
+    this.isTurnosRoute = this.router.url.includes('/turnos');
   }
 }
 
