@@ -13,6 +13,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogNotaVozComponent } from './dialog-nota-voz.component';
+import { NotasVozService } from '../../../services/notas-voz.service';
 
 @Component({
   selector: 'app-notas-voz-por-paciente',
@@ -45,6 +48,12 @@ export class NotasVozPorPacienteComponent implements OnInit {
   sesionSeleccionada: any = null;
   transcripcion: string = '';
   idNotaVoz: number | null = null;
+  private dialog: MatDialog;
+  private notasVozService = inject(NotasVozService);
+
+  constructor(dialog: MatDialog) {
+    this.dialog = dialog;
+  }
 
   ngOnInit(): void {
     const shortname = localStorage.getItem('username');
@@ -128,5 +137,41 @@ export class NotasVozPorPacienteComponent implements OnInit {
     this.transcripcion = '';
     this.idNotaVoz = null;
     this.sesionSeleccionada = null;
+  }
+
+  abrirDialogNotaVoz(turno: any) {
+    // Determinar el ID correcto de la nota de voz
+    const idNotaVoz = turno.ID_NotaVoz || turno.id_nota_voz;
+    console.log('Intentando obtener nota de voz para ID:', idNotaVoz, 'Turno:', turno);
+    if (!idNotaVoz) {
+      alert('No hay nota de voz asociada a este turno.');
+      return;
+    }
+    // Mostrar loading mientras se obtiene la nota
+    const dialogRef = this.dialog.open(DialogNotaVozComponent, {
+      data: {
+        turno,
+        paciente: this.pacienteSeleccionado,
+        transcripcion: '',
+        loading: true
+      },
+      width: '600px'
+    });
+    this.notasVozService.obtenerNotaVoz(idNotaVoz).subscribe({
+      next: (resp: any) => {
+        console.log('Respuesta obtenerNotaVoz:', resp);
+        dialogRef.componentInstance.transcripcion = resp.texto || resp.transcripcion || resp.text || '';
+        dialogRef.componentInstance.loading = false;
+      },
+      error: () => {
+        dialogRef.componentInstance.transcripcion = '';
+        dialogRef.componentInstance.loading = false;
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.transcripcion !== undefined) {
+        turno.transcripcion = result.transcripcion;
+      }
+    });
   }
 } 
