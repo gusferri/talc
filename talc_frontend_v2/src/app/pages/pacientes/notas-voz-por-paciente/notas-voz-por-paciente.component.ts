@@ -11,6 +11,8 @@ import { debounceTime, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-notas-voz-por-paciente',
@@ -26,7 +28,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatTableModule,
     ReactiveFormsModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    FormsModule,
+    MatButtonModule
   ]
 })
 export class NotasVozPorPacienteComponent implements OnInit {
@@ -38,6 +42,9 @@ export class NotasVozPorPacienteComponent implements OnInit {
   displayedColumns = ['fecha', 'hora', 'notaVoz', 'acciones'];
   isLoading: boolean = false;
   private pacienteService = inject(PacienteService);
+  sesionSeleccionada: any = null;
+  transcripcion: string = '';
+  idNotaVoz: number | null = null;
 
   ngOnInit(): void {
     const shortname = localStorage.getItem('username');
@@ -92,5 +99,34 @@ export class NotasVozPorPacienteComponent implements OnInit {
 
   editarNotaVoz(turno: any) {
     // Lógica para editar la nota de voz
+  }
+
+  cargarNotaVoz(idNotaVoz: number, sesion?: any) {
+    if (!idNotaVoz) return;
+    if (sesion) {
+      this.sesionSeleccionada = sesion;
+    }
+    // Aquí deberías llamar a tu servicio de notas de voz para obtener la transcripción
+    // Ejemplo:
+    // this.notasVozService.obtenerNotaVoz(idNotaVoz).subscribe(resp => {
+    //   this.transcripcion = resp.texto;
+    //   this.idNotaVoz = idNotaVoz;
+    // });
+    // Por ahora, simula:
+    this.transcripcion = 'Transcripción de ejemplo para la nota de voz.';
+    this.idNotaVoz = idNotaVoz;
+  }
+
+  guardarEdicionNotaVoz() {
+    if (!this.idNotaVoz || !this.transcripcion) return;
+    // Aquí deberías llamar a tu servicio para guardar la transcripción editada
+    // this.notasVozService.actualizarNotaVoz(this.idNotaVoz, this.transcripcion).subscribe(...)
+    alert('Transcripción guardada (simulado)');
+  }
+
+  limpiarFormulario() {
+    this.transcripcion = '';
+    this.idNotaVoz = null;
+    this.sesionSeleccionada = null;
   }
 } 

@@ -86,4 +86,31 @@
       </table>
     </div>
   </mat-card>
+</div>
+
+<div class="notasvoz-layout">
+  <div class="col-izq">
+    <!-- Todo el contenido actual de búsqueda y tabla aquí -->
+    <!-- ... -->
+  </div>
+  <div class="col-der" *ngIf="sesionSeleccionada">
+    <h3>
+      Transcripción de la nota de la sesión de
+      <span *ngIf="pacienteSeleccionado">{{ pacienteSeleccionado.Nombre }} {{ pacienteSeleccionado.Apellido }}</span>
+      <ng-container *ngIf="sesionSeleccionada">
+        con fecha <span>{{ (sesionSeleccionada.Fecha || sesionSeleccionada.fecha) | date:'dd/MM/yyyy' }}</span>
+      </ng-container>
+    </h3>
+    <mat-form-field appearance="outline" class="textarea-transcripcion">
+      <textarea matInput rows="12" [(ngModel)]="transcripcion"></textarea>
+    </mat-form-field>
+    <div style="display: flex; gap: 12px; margin-top: 12px;">
+      <button mat-raised-button color="primary" (click)="guardarEdicionNotaVoz()" class="botones">
+        <mat-icon>save</mat-icon> Guardar Edición
+      </button>
+      <button mat-raised-button color="primary" (click)="limpiarFormulario()" class="botones">
+        <mat-icon>clear</mat-icon> Limpiar
+      </button>
+    </div>
+  </div>
 </div> 
