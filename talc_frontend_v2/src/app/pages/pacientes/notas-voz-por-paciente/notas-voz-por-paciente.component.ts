@@ -16,6 +16,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogNotaVozComponent } from './dialog-nota-voz.component';
 import { NotasVozService } from '../../../services/notas-voz.service';
+import { DialogGrabarNotaVozComponent } from './dialog-grabar-nota-voz.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-notas-voz-por-paciente',
@@ -50,9 +52,11 @@ export class NotasVozPorPacienteComponent implements OnInit {
   idNotaVoz: number | null = null;
   private dialog: MatDialog;
   private notasVozService = inject(NotasVozService);
+  private route: ActivatedRoute;
 
-  constructor(dialog: MatDialog) {
+  constructor(dialog: MatDialog, route: ActivatedRoute) {
     this.dialog = dialog;
+    this.route = route;
   }
 
   ngOnInit(): void {
@@ -61,6 +65,17 @@ export class NotasVozPorPacienteComponent implements OnInit {
       this.pacienteService.obtenerPacientesPorProfesional(shortname).subscribe((pacientes: any[]) => {
         this.pacientes = pacientes;
         this.pacientesFiltrados = pacientes;
+        // Selección automática por query param
+        this.route.queryParams.subscribe(params => {
+          const pacienteId = params['pacienteId'];
+          if (pacienteId) {
+            const paciente = pacientes.find(p => p.ID == pacienteId || p.id == pacienteId);
+            if (paciente) {
+              this.pacienteControl.setValue(paciente);
+              this.onPacienteSeleccionado({ option: { value: paciente } });
+            }
+          }
+        });
       });
     }
     this.pacienteControl.valueChanges
@@ -171,6 +186,29 @@ export class NotasVozPorPacienteComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.transcripcion !== undefined) {
         turno.transcripcion = result.transcripcion;
+      }
+    });
+  }
+
+  onGrabarNotaVoz(turno: any) {
+    const dialogRef = this.dialog.open(DialogGrabarNotaVozComponent, {
+      data: {
+        turno,
+        paciente: this.pacienteSeleccionado
+      },
+      width: '500px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Si se grabó una nota de voz, refrescar los turnos del paciente
+        if (this.pacienteSeleccionado && this.pacienteSeleccionado.ID) {
+          this.pacienteService.obtenerTurnosPorPaciente(this.pacienteSeleccionado.ID).subscribe((turnos: any[]) => {
+            this.turnos = (turnos || []).map(t => ({
+              ...t,
+              tieneNotaVoz: !!(t.ID_NotaVoz || t.id_nota_voz)
+            }));
+          });
+        }
       }
     });
   }

@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -31,7 +32,8 @@ import { FormsModule } from '@angular/forms';
     MatTooltipModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    RouterModule
   ],
 })
 export class PacientesComponent implements OnInit, AfterViewInit {
@@ -176,6 +178,17 @@ export class PacientesComponent implements OnInit, AfterViewInit {
 
   seguimientoPaciente(paciente: any): void {
     this.router.navigate(['/pacientes/seguimiento', paciente.DNI]);
+  }
+
+  irANotasVoz(paciente: any, event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/pacientes/notasvoz'], { queryParams: { pacienteId: paciente.ID || paciente.id } });
+  }
+
+  irATurnos(paciente: any, event: Event) {
+    event.stopPropagation();
+    const nombreCompleto = `${paciente.Nombre} ${paciente.Apellido}`;
+    this.router.navigate(['/turnos'], { queryParams: { paciente: nombreCompleto } });
   }
 
   aplicarFiltro(event: Event): void {

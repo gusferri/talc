@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -51,9 +52,18 @@ export class TurnosComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private router: Router, private turnosService: TurnosService, private snackBar: MatSnackBar) {}
+  constructor(private router: Router, private turnosService: TurnosService, private snackBar: MatSnackBar, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['paciente']) {
+        this.searchTerm = params['paciente'];
+        this.filtroFecha = 'todos'; // Selecciona el filtro 'Todos'
+        setTimeout(() => {
+          this.aplicarFiltro({ target: { value: this.searchTerm } } as any);
+        });
+      }
+    });
     this.cargarTurnos();
   }
 
