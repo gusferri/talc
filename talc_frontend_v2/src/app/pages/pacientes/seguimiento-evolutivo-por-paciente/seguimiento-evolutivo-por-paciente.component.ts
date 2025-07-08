@@ -17,6 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { DialogInformeEvolutivoComponent } from './dialog-informe-evolutivo.component';
 import { InformesService } from '../../../services/informes.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-seguimiento-evolutivo-por-paciente',
@@ -51,7 +52,7 @@ export class SeguimientoEvolutivoPorPacienteComponent implements OnInit {
   private dialog: MatDialog;
   private route: ActivatedRoute;
 
-  constructor(dialog: MatDialog, route: ActivatedRoute) {
+  constructor(dialog: MatDialog, route: ActivatedRoute, private snackBar: MatSnackBar) {
     this.dialog = dialog;
     this.route = route;
   }
@@ -108,15 +109,23 @@ export class SeguimientoEvolutivoPorPacienteComponent implements OnInit {
     this.informeSeleccionado = null;
     if (paciente && paciente.ID) {
       this.isLoading = true;
-      this.informesService.getInformesPorPaciente(paciente.ID).subscribe({
-        next: (informes: any) => {
-          this.informes = Array.isArray(informes) ? informes : (informes && (informes as any).informes ? (informes as any).informes : []);
-          this.isLoading = false;
-        },
-        error: () => {
-          this.informes = [];
-          this.isLoading = false;
-        }
+      const username = localStorage.getItem('username');
+      this.pacienteService.obtenerProfesionalPorUsername(username || '').subscribe((profesional: any) => {
+        const idProfesional = profesional?.ID;
+        this.informesService.getInformesPorPaciente(paciente.ID).subscribe({
+          next: (informes: any) => {
+            const lista = Array.isArray(informes) ? informes : (informes && (informes as any).informes ? (informes as any).informes : []);
+            // Filtrar: interdisciplinarios (TipoInforme === 2) de cualquiera, específicos (TipoInforme === 1) solo del profesional logueado
+            this.informes = lista.filter((i: any) =>
+              (i.TipoInforme === 2) || (i.TipoInforme === 1 && i.ID_Profesional === idProfesional)
+            );
+            this.isLoading = false;
+          },
+          error: () => {
+            this.informes = [];
+            this.isLoading = false;
+          }
+        });
       });
     } else {
       this.informes = [];
@@ -141,5 +150,35 @@ export class SeguimientoEvolutivoPorPacienteComponent implements OnInit {
 
   limpiarFormulario() {
     this.informeSeleccionado = null;
+  }
+
+  generarInforme(tipo: 'area' | 'interdisciplinario') {
+    if (!this.pacienteSeleccionado) {
+      this.snackBar.open('Selecciona un paciente primero.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    const username = localStorage.getItem('username');
+    this.pacienteService.obtenerProfesionalPorUsername(username || '').subscribe((profesional: any) => {
+      const idProfesional = profesional?.ID;
+      if (!idProfesional) {
+        this.snackBar.open('No se pudo obtener el profesional logueado.', 'Cerrar', { duration: 3000 });
+        return;
+      }
+      const payload = {
+        ID_Paciente: this.pacienteSeleccionado.ID,
+        ID_Profesional: idProfesional,
+        TipoInforme: tipo
+      };
+      this.informesService.createInformeIA(payload).subscribe({
+        next: (res) => {
+          this.snackBar.open('Informe generado correctamente.', 'Cerrar', { duration: 2500 });
+          // Recargar informes
+          this.onPacienteSeleccionado({ option: { value: this.pacienteSeleccionado } });
+        },
+        error: (err) => {
+          this.snackBar.open('Error al generar informe.', 'Cerrar', { duration: 4000 });
+        }
+      });
+    });
   }
 } 

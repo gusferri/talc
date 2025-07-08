@@ -14,7 +14,7 @@
 
   <!-- Search and Filters Section -->
   <mat-card class="search-card">
-    <div class="search-section">
+    <div class="search-section" style="display: flex; align-items: center; gap: 16px;">
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar paciente</mat-label>
         <input type="text" matInput [formControl]="pacienteControl" [matAutocomplete]="autoPaciente">
@@ -25,6 +25,14 @@
         </mat-autocomplete>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
+      <div style="display: flex; gap: 10px; margin-left: auto;">
+        <button mat-raised-button color="primary" (click)="generarInforme('area')">
+          <mat-icon>edit</mat-icon> Específico
+        </button>
+        <button mat-raised-button color="accent" (click)="generarInforme('interdisciplinario')">
+          <mat-icon>edit</mat-icon> Interdisciplinario
+        </button>
+      </div>
     </div>
   </mat-card>
 
@@ -107,6 +115,12 @@
       </button>
       <button mat-raised-button color="primary" (click)="limpiarFormulario()" class="botones">
         <mat-icon>clear</mat-icon> Limpiar
+      </button>
+      <button mat-raised-button color="primary" (click)="generarInforme('area')">
+        <mat-icon>edit</mat-icon> Generar Informe Específico
+      </button>
+      <button mat-raised-button color="accent" (click)="generarInforme('interdisciplinario')">
+        <mat-icon>edit</mat-icon> Generar Informe Interdisciplinario
       </button>
     </div>
   </div>
