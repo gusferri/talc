@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NotasVozService } from '../../../services/notas-voz.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-dialog-nota-voz',
@@ -27,7 +29,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         </mat-form-field>
       </div>
       <div mat-dialog-actions align="end" class="dialog-actions">
-        <button mat-stroked-button color="primary" (click)="guardar()">
+        <button mat-stroked-button color="primary" (click)="guardar()" [disabled]="saving || loading">
           <mat-icon>save</mat-icon> Guardar
         </button>
         <button mat-button (click)="cerrar()">
@@ -117,16 +119,36 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class DialogNotaVozComponent {
   transcripcion: string = '';
   loading: boolean = false;
+  saving: boolean = false;
+  idNotaVoz: number | null = null;
   constructor(
     public dialogRef: MatDialogRef<DialogNotaVozComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private notasVozService: NotasVozService,
+    private snackBar: MatSnackBar
   ) {
     this.transcripcion = data.transcripcion || '';
     this.loading = data.loading || false;
+    this.idNotaVoz = data.turno.ID_NotaVoz || data.turno.id_nota_voz || null;
   }
 
   guardar() {
-    this.dialogRef.close({ transcripcion: this.transcripcion });
+    if (!this.idNotaVoz) {
+      this.snackBar.open('No se encontró el ID de la nota de voz.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    this.saving = true;
+    this.notasVozService.actualizarNotaVoz(this.idNotaVoz, this.transcripcion).subscribe({
+      next: () => {
+        this.saving = false;
+        this.snackBar.open('Transcripción guardada correctamente.', 'Cerrar', { duration: 2500 });
+        this.dialogRef.close({ transcripcion: this.transcripcion });
+      },
+      error: () => {
+        this.saving = false;
+        this.snackBar.open('Error al guardar la transcripción.', 'Cerrar', { duration: 4000 });
+      }
+    });
   }
 
   cerrar() {
