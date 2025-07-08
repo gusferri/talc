@@ -67,6 +67,19 @@ export const PagesRoutes: Routes = [
     },
   },
   {
+    path: 'pacientes/seguimiento-evolutivo',
+    loadComponent: () => import('./pacientes/seguimiento-evolutivo-por-paciente/seguimiento-evolutivo-por-paciente.component')
+      .then(m => m.SeguimientoEvolutivoPorPacienteComponent),
+    data: {
+      title: 'Seguimiento Evolutivo por Paciente',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Pacientes', url: '/pacientes' },
+        { title: 'Seguimiento Evolutivo' }
+      ],
+    },
+  },
+  {
     path: 'pacientes/:id',
     component: DetallePacienteComponent,
     data: {

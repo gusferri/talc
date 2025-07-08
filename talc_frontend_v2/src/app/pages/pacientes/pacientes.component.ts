@@ -180,6 +180,11 @@ export class PacientesComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/pacientes/seguimiento', paciente.DNI]);
   }
 
+  irASeguimientoEvolutivo(paciente: any, event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/pacientes/seguimiento-evolutivo'], { queryParams: { pacienteId: paciente.ID || paciente.id } });
+  }
+
   irANotasVoz(paciente: any, event: Event) {
     event.stopPropagation();
     this.router.navigate(['/pacientes/notasvoz'], { queryParams: { pacienteId: paciente.ID || paciente.id } });
