@@ -126,6 +126,13 @@
                       class="action-btn view-btn">
                 <mat-icon>visibility</mat-icon>
               </button>
+
+              <button mat-icon-button 
+                matTooltip="Adjuntar documentación"
+                (click)="adjuntarDocumentacion(paciente, $event)"
+                class="action-btn doc-btn">
+                <mat-icon>attach_file</mat-icon>
+              </button>
               
               <button mat-icon-button 
                       matTooltip="Agenda"
@@ -134,14 +141,14 @@
                 <mat-icon>calendar_today</mat-icon>
               </button>
 
-              <button mat-icon-button 
+              <button *ngIf="esProfesional" mat-icon-button 
                       matTooltip="Notas de Voz"
                       (click)="irANotasVoz(paciente, $event)"
                       class="action-btn voz-btn">
                 <mat-icon>graphic_eq</mat-icon>
               </button>
               
-              <button mat-icon-button 
+              <button *ngIf="esProfesional" mat-icon-button 
                       matTooltip="Seguimiento evolutivo"
                       (click)="irASeguimientoEvolutivo(paciente, $event)"
                       class="action-btn follow-btn">

@@ -1,9 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Query
+from fastapi.responses import FileResponse, StreamingResponse
 import mysql.connector
 from app.database import get_connection
 import shutil
 import os
 from datetime import datetime
+import mimetypes
 
 router = APIRouter()
 
@@ -60,3 +62,161 @@ async def subir_archivo(
         raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")
 
     return {"mensaje": "Archivo subido correctamente", "documento_id": documento_id}
+
+@router.get("/adjuntos/{id_paciente}")
+async def obtener_adjuntos_paciente(id_paciente: int):
+    """Obtener todos los adjuntos de un paciente"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT 
+                pd.ID,
+                pd.Titulo,
+                pd.FechaSubida,
+                pd.NombreArchivo,
+                pd.RutaArchivo,
+                u.Username as UsuarioSubio,
+                e.Nombre as Especialidad
+            FROM Paciente_Documentos pd
+            LEFT JOIN Usuario u ON u.ID = pd.ID_Usuario
+            LEFT JOIN Especialidad e ON e.ID_Especialidad = pd.ID_Especialidad
+            WHERE pd.ID_Paciente = %s
+            ORDER BY pd.FechaSubida DESC
+        """, (id_paciente,))
+        
+        adjuntos = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return adjuntos
+    except mysql.connector.Error as db_err:
+        raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")
+
+@router.get("/adjuntos/descargar/{documento_id}")
+async def descargar_adjunto(documento_id: int):
+    """Descargar un archivo adjunto"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT Titulo, NombreArchivo, RutaArchivo
+            FROM Paciente_Documentos
+            WHERE ID = %s
+        """, (documento_id,))
+        
+        documento = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if not documento:
+            raise HTTPException(status_code=404, detail="Documento no encontrado")
+        
+        ruta_archivo = documento['RutaArchivo']
+        if not os.path.exists(ruta_archivo):
+            raise HTTPException(status_code=404, detail="Archivo no encontrado en el servidor")
+        
+        # Determinar el tipo MIME
+        mime_type, _ = mimetypes.guess_type(ruta_archivo)
+        if not mime_type:
+            mime_type = 'application/octet-stream'
+        
+        return FileResponse(
+            path=ruta_archivo,
+            filename=documento['Titulo'],
+            media_type=mime_type
+        )
+    except mysql.connector.Error as db_err:
+        raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")
+
+@router.get("/adjuntos/visualizar/{documento_id}")
+async def visualizar_adjunto(documento_id: int):
+    """Obtener URL para visualizar un archivo adjunto"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT Titulo, NombreArchivo, RutaArchivo
+            FROM Paciente_Documentos
+            WHERE ID = %s
+        """, (documento_id,))
+        
+        documento = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if not documento:
+            raise HTTPException(status_code=404, detail="Documento no encontrado")
+        
+        ruta_archivo = documento['RutaArchivo']
+        if not os.path.exists(ruta_archivo):
+            raise HTTPException(status_code=404, detail="Archivo no encontrado en el servidor")
+        
+        # Determinar el tipo MIME
+        mime_type, _ = mimetypes.guess_type(ruta_archivo)
+        if not mime_type:
+            mime_type = 'application/octet-stream'
+        
+        # Para archivos que se pueden visualizar en el navegador
+        tipos_visualizables = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain']
+        
+        if mime_type in tipos_visualizables:
+            return FileResponse(
+                path=ruta_archivo,
+                media_type=mime_type
+            )
+        else:
+            raise HTTPException(status_code=400, detail="Tipo de archivo no visualizable")
+            
+    except mysql.connector.Error as db_err:
+        raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")
+
+@router.delete("/adjuntos/{documento_id}")
+async def eliminar_adjunto(documento_id: int):
+    """Eliminar un archivo adjunto"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Primero obtener la información del archivo
+        cursor.execute("""
+            SELECT RutaArchivo
+            FROM Paciente_Documentos
+            WHERE ID = %s
+        """, (documento_id,))
+        
+        documento = cursor.fetchone()
+        if not documento:
+            cursor.close()
+            conn.close()
+            raise HTTPException(status_code=404, detail="Documento no encontrado")
+        
+        ruta_archivo = documento['RutaArchivo']
+        
+        # Eliminar de la base de datos
+        cursor.execute("DELETE FROM Paciente_Documentos WHERE ID = %s", (documento_id,))
+        
+        if cursor.rowcount == 0:
+            cursor.close()
+            conn.close()
+            raise HTTPException(status_code=404, detail="Documento no encontrado")
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        # Eliminar el archivo físico
+        try:
+            if os.path.exists(ruta_archivo):
+                os.remove(ruta_archivo)
+        except Exception as e:
+            print(f"⚠️ Error al eliminar archivo físico: {e}")
+            # No fallamos si no se puede eliminar el archivo físico
+        
+        return {"mensaje": "Documento eliminado correctamente"}
+        
+    except mysql.connector.Error as db_err:
+        raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")

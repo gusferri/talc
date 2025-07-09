@@ -14,6 +14,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AdjuntarArchivoDialogComponent } from './adjuntar-archivo-dialog.component';
 
 @Component({
   standalone: true,
@@ -48,7 +50,7 @@ export class PacientesComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(public router: Router, private pacienteService: PacienteService) {}
+  constructor(public router: Router, private pacienteService: PacienteService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.verificarProfesionalYcargarPacientes();
@@ -194,6 +196,29 @@ export class PacientesComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
     const nombreCompleto = `${paciente.Nombre} ${paciente.Apellido}`;
     this.router.navigate(['/turnos'], { queryParams: { paciente: nombreCompleto } });
+  }
+
+  adjuntarDocumentacion(paciente: any, event: Event) {
+    event.stopPropagation();
+    console.log('Datos del paciente:', paciente);
+    
+    // Intentar obtener el ID del paciente de diferentes formas
+    const idPaciente = paciente.ID || paciente.id || paciente.Id || paciente.ID_Paciente || paciente.id_paciente;
+    console.log('ID del paciente encontrado:', idPaciente);
+    
+    if (!idPaciente) {
+      console.error('No se pudo encontrar el ID del paciente');
+      alert('Error: No se pudo identificar el paciente');
+      return;
+    }
+    
+    const dialogRef = this.dialog.open(AdjuntarArchivoDialogComponent, {
+      data: { idPaciente: idPaciente },
+      width: '520px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      // El diálogo maneja su propia lógica de actualización
+    });
   }
 
   aplicarFiltro(event: Event): void {
