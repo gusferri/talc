@@ -193,12 +193,13 @@ export class DetallePacienteComponent implements OnInit {
   }
 
   // Métodos de filtrado para autocompletes (idénticos a nuevo-paciente)
-  filtrarProvincias(value: string): void {
+  filtrarProvincias(value: any): void {
     if (!value) {
       this.provinciasFiltradas = this.provincias;
       return;
     }
-    const filterValue = value.toLowerCase();
+    // Si value es string, usarlo; si es objeto, usar value.Provincia
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : (value.Provincia || '').toLowerCase();
     this.provinciasFiltradas = this.provincias.filter(provincia =>
       provincia.Provincia.toLowerCase().includes(filterValue)
     );
