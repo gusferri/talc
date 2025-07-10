@@ -23,9 +23,11 @@
                [(ngModel)]="password" 
                name="password" 
                required 
-               placeholder="Ingrese su contraseña">
+               placeholder="Ingrese su contraseña"
+               (keydown.enter)="$event.preventDefault(); login();">
         <button mat-icon-button 
                 matSuffix 
+                type="button"
                 (click)="hidePassword = !hidePassword" 
                 [attr.aria-label]="'Hide password'" 
                 [attr.aria-pressed]="hidePassword">

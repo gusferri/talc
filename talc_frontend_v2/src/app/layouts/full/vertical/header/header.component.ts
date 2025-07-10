@@ -72,7 +72,6 @@ export class HeaderComponent implements OnInit {
     private notificacionesService: NotificacionesService,
     public router: Router
   ) {
-    translate.setDefaultLang('en');
     this.cargarNotificaciones();
   }
 

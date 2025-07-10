@@ -32,7 +32,6 @@ export class AppHorizontalHeaderComponent {
     public dialog: MatDialog,
     private translate: TranslateService
   ) {
-    translate.setDefaultLang('en');
   }
 
   openDialog() {

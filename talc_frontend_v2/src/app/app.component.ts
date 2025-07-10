@@ -9,12 +9,7 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   constructor() {
-    console.log('=== APP COMPONENT INITIALIZED ===');
-    console.log('localStorage en app.component:', {
-      usuario: localStorage.getItem('usuario'),
-      username: localStorage.getItem('username'),
-      nombreCompleto: localStorage.getItem('nombreCompleto')
-    });
+    // Limpieza: eliminar logs de inicialización
   }
 
   title = 'Modernize Angular Admin Template';

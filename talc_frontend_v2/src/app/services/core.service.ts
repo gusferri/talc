@@ -31,12 +31,4 @@ export class CoreService {
     this.notify$.next(this.optionsSignal);
     
   }
-
-  setLanguage(lang: string) {
-    this.setOptions({ language: lang });
-  }
-
-  getLanguage() {
-    return this.getOptions().language;
-  }
 }

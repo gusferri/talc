@@ -6,7 +6,6 @@ export interface AppSettings {
   boxed: boolean;
   horizontal: boolean;
   activeTheme: string;
-  language: string;
   cardBorder: boolean;
   navPos: 'side' | 'top';
 }
@@ -20,6 +19,5 @@ export const defaults: AppSettings = {
   horizontal: false,
   cardBorder: false,
   activeTheme: 'institucional_theme',
-  language: 'es',
   navPos: 'side',
 };
