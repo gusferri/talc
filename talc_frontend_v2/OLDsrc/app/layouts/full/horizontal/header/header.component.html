@@ -1,0 +1,97 @@
+<mat-toolbar class="topbar horizontal-topbar ">
+  <div class="container">
+    <div class="d-none d-sm-flex">
+      <app-branding></app-branding>
+    </div>
+
+    <!-- Mobile Menu -->
+    <button
+      mat-icon-button
+      (click)="toggleMobileNav.emit()"
+      class="d-flex align-items-center justify-content-center d-lg-none m-x-4"
+    >
+      <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
+    </button>
+    <!-- --------------------------------------------------------------- -->
+
+    <!-- --------------------------------------------------------------- -->
+    <!--  Search -->
+    <!-- --------------------------------------------------------------- -->
+    <button mat-icon-button (click)="openDialog()" class="d-flex align-items-center justify-content-center m-x-4">
+      <i-tabler name="search" class="icon-20 d-flex"></i-tabler>
+    </button>
+
+    <div class="d-none d-lg-flex">
+      <!-- --------------------------------------------------------------- -->
+      <!--  Links -->
+      <!-- --------------------------------------------------------------- -->
+      <!-- Menús eliminados: Apps, Chat, Calendar, Email -->
+    </div>
+
+    <span class="flex-1-auto"></span>
+
+    <!-- Mobile Menu -->
+    <button
+      mat-icon-button
+      (click)="toggleMobileFilterNav.emit()"
+      class="d-flex d-lg-none justify-content-center m-x-4"
+    >
+      <i-tabler name="grid-dots" class="icon-20 d-flex"></i-tabler>
+    </button>
+
+    <!-- --------------------------------------------------------------- -->
+    <!-- Notification Dropdown -->
+    <!-- --------------------------------------------------------------- -->
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="notificationmenu"
+      aria-label="Notifications" class="m-x-4"
+    >
+      <i-tabler
+        class="d-flex"
+        name="bell"
+        matBadge="1"
+      ></i-tabler>
+    </button>
+    <mat-menu
+      #notificationmenu="matMenu"
+      xPosition="before"
+      class="topbar-dd cardWithShadow"
+    >
+      <div class="d-flex align-items-center p-x-32 p-y-16">
+        <h6 class="f-s-16 f-w-600 m-0 ">Notifications</h6>
+        <span class="m-l-auto">
+          <span class="bg-primary text-white p-x-8 p-y-4 f-w-500 rounded f-s-12"
+            >5 new</span
+          >
+        </span>
+      </div>
+      <!-- Eliminar bloque de notificaciones que usaba notifications -->
+    </mat-menu>
+
+    <!-- --------------------------------------------------------------- -->
+    <!-- profile Dropdown -->
+    <!-- --------------------------------------------------------------- -->
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="profilemenu"
+      aria-label="Notifications" class="m-l-4"
+    >
+      <img
+        src="/assets/images/profile/user-2.jpg"
+        class="rounded-circle object-cover icon-35 profile-dd"
+        width="35"
+      />
+    </button>
+    <mat-menu #profilemenu="matMenu" class="topbar-dd cardWithShadow">
+      <button mat-menu-item (click)="openChangePasswordDialog()">
+        <i-tabler name="lock" class="icon-20 m-r-8"></i-tabler>
+        Cambiar contraseña
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <i-tabler name="logout" class="icon-20 m-r-8"></i-tabler>
+        Cerrar sesión
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

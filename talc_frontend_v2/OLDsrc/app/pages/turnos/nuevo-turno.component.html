@@ -1,0 +1,79 @@
+<div class="nuevo-turno-bg">
+  <mat-card class="nuevo-turno-card">
+    <div class="nuevo-turno-header">
+      <h2 mat-dialog-title>{{ modoEdicion ? 'Editar Turno' : 'Nuevo Turno' }}</h2>
+      <div class="nuevo-turno-subtitle">Agendá un turno para un paciente</div>
+    </div>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="guardarTurno()" class="nuevo-turno-form grid-form">
+        <div class="form-row row-2-cols wide-cols">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Paciente</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input type="text" matInput [formControl]="pacienteCtrl" [matAutocomplete]="autoPaciente" [disabled]="modoEdicion">
+            <mat-autocomplete #autoPaciente="matAutocomplete" (optionSelected)="seleccionarPaciente($event.option.value)" [displayWith]="displayPaciente">
+              <mat-option *ngFor="let paciente of filteredPacientes | async" [value]="paciente">
+                {{ paciente.Nombre }} {{ paciente.Apellido }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <input type="hidden" formControlName="ID_Paciente">
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Profesional</mat-label>
+            <mat-icon matPrefix>medical_services</mat-icon>
+            <input type="text" matInput [formControl]="profesionalCtrl" [matAutocomplete]="autoProfesional" [disabled]="modoEdicion">
+            <mat-autocomplete #autoProfesional="matAutocomplete" (optionSelected)="seleccionarProfesional($event.option.value)" [displayWith]="displayProfesional">
+              <mat-option *ngFor="let profesional of filteredProfesionales | async" [value]="profesional">
+                {{ profesional.nombre }} {{ profesional.apellido }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <input type="hidden" formControlName="ID_Profesional">
+        </div>
+
+        <div class="form-row row-2-cols">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Especialidad</mat-label>
+            <mat-select formControlName="ID_Especialidad" [disabled]="modoEdicion" required>
+              <mat-option *ngFor="let esp of especialidadesFiltradas" [value]="esp.ID">
+                {{ esp.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Fecha</mat-label>
+            <mat-icon matPrefix>event</mat-icon>
+            <input matInput [matDatepicker]="picker" formControlName="Fecha" required [min]="today">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row hora-row-right">
+          <div class="hora-container">
+            <mat-form-field appearance="outline" class="form-field hora-field">
+              <mat-label>Hora</mat-label>
+              <mat-icon matPrefix>schedule</mat-icon>
+              <mat-select formControlName="Hora" required>
+                <mat-option *ngFor="let hora of horasDisponibles" [value]="hora" [disabled]="estaOcupado(hora)">
+                  {{ hora }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid" class="btn-guardar">
+            <mat-icon>check_circle</mat-icon> Guardar Turno
+          </button>
+          <button mat-stroked-button color="warn" type="button" (click)="cancelar()" class="btn-cancelar">
+            <mat-icon>cancel</mat-icon> Cancelar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div> 

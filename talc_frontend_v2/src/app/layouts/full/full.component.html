@@ -96,31 +96,12 @@
         <mat-accordion>
           <mat-expansion-panel class="shadow-none">
             <mat-expansion-panel-header>
-              <mat-panel-title class="f-s-16 f-w-500"> Apps </mat-panel-title>
+              <mat-panel-title class="f-s-16 f-w-500"> Quick Links </mat-panel-title>
             </mat-expansion-panel-header>
             <div>
-              <div class="row">
-                @for(appdd of apps; track appdd.img) {
-                <div class="col-12 text-hover-primary">
-                  <a [routerLink]="[appdd.link]" class="d-flex align-items-center text-decoration-none m-b-24 gap-16">
-                    <button mat-mini-fab class="text-primary bg-light-primary shadow-none rounded">
-                      <img [src]="appdd.img" width="20" />
-                    </button>
-
-                    <div>
-                      <h5 class="f-s-14 f-w-600 m-0 textprimary f-s-14 hover-text">
-                        {{ appdd.title }}
-                      </h5>
-                      <span class="f-s-14 f-s-12">{{ appdd.subtitle }}</span>
-                    </div>
-                  </a>
-                </div>
-                }
-              </div>
-              <h4 class="f-s-18 f-w-600 m-b-16">Quick Links</h4>
               @for(quicklink of quicklinks; track quicklink.title) {
               <div class="text-hover-primary">
-                <a [routerLink]="['quicklink.link']"
+                <a [routerLink]="[quicklink.link]"
                   class="hover-text text-decoration-none f-s-14 f-w-600 d-block p-y-8">{{ quicklink.title }}</a>
               </div>
               }
