@@ -62,6 +62,9 @@ export class NuevoTurnoComponent implements OnInit {
   profesionalesCargados = false;
   especialidadesCargadas = false;
   turnoParaEditar: any = null;
+  private patchRetryCount = 0;
+  private readonly patchRetryLimit = 20;
+  private patchIntentado = false;
 
   constructor(
     private fb: FormBuilder,
@@ -89,21 +92,56 @@ export class NuevoTurnoComponent implements OnInit {
         this.modoEdicion = true;
         this.idTurnoEditar = +id;
         this.turnosService.obtenerTurnoPorId(+id).subscribe(turno => {
+          // Conversión de hora si es necesario
+          let horaValue = turno.Hora;
+          if (typeof horaValue === 'number') {
+            const totalMinutes = Math.floor(horaValue / 60);
+            const h = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+            const m = (totalMinutes % 60).toString().padStart(2, '0');
+            horaValue = `${h}:${m}`;
+          } else if (typeof horaValue === 'string') {
+            horaValue = horaValue.substring(0, 5);
+          }
+          const pacienteObj = this.pacientes.find(p => p.ID === turno.ID_Paciente) || '';
+          const profesionalObj = this.profesionales.find(p => p.ID === turno.ID_Profesional) || '';
+          this.form.patchValue({
+            ID_Paciente: turno.ID_Paciente,
+            pacienteCtrl: pacienteObj,
+            ID_Profesional: turno.ID_Profesional,
+            profesionalCtrl: profesionalObj,
+            ID_Especialidad: turno.ID_Especialidad,
+            Fecha: new Date(turno.Fecha),
+            Hora: horaValue
+          }, { emitEvent: false });
+          this.form.get('ID_Paciente')?.disable();
+          this.form.get('pacienteCtrl')?.disable();
+          this.form.get('ID_Profesional')?.disable();
+          this.form.get('profesionalCtrl')?.disable();
+          this.form.get('ID_Especialidad')?.disable();
           this.turnoParaEditar = turno;
-          this.cargarEspecialidadesPorProfesional(turno.ID_Profesional);
-          this.intentarPatch();
+          // En modo edición, llenar especialidadesFiltradas con la especialidad del turno
+          if (this.modoEdicion) {
+            this.especialidadesFiltradas = [{
+              ID: turno.ID_Especialidad,
+              Nombre: turno.Especialidad
+            }];
+          }
         });
       }
     });
+
+    // Solo para alta, no para edición
+    if (!this.modoEdicion) {
+      this.form.get('ID_Profesional')?.valueChanges.subscribe(id => {
+        this.cargarEspecialidadesPorProfesional(id);
+        this.form.get('ID_Especialidad')?.reset();
+      });
+    }
     this.cargarPacientes();
     this.cargarProfesionales();
     this.cargarTurnos();
     this.form.get('Fecha')?.valueChanges.subscribe(() => {
       this.filtrarHorasDisponibles();
-    });
-    this.form.get('ID_Profesional')?.valueChanges.subscribe(id => {
-      this.cargarEspecialidadesPorProfesional(id);
-      this.form.get('ID_Especialidad')?.reset();
     });
     this.form.get('ID_Profesional')?.valueChanges.subscribe(() => {
       this.filtrarHorasDisponibles();
@@ -121,16 +159,26 @@ export class NuevoTurnoComponent implements OnInit {
     );
   }
 
-  private _filterPacientes(value: string): any[] {
-    const filterValue = value.toLowerCase();
+  private _filterPacientes(value: any): any[] {
+    let filterValue = '';
+    if (typeof value === 'string') {
+      filterValue = value.toLowerCase();
+    } else if (value && (value.Nombre || value.nombre)) {
+      filterValue = (value.Nombre || value.nombre).toLowerCase();
+    }
     return this.pacientes.filter(p =>
       (p.Nombre && p.Nombre.toLowerCase().includes(filterValue)) ||
       (p.Apellido && p.Apellido.toLowerCase().includes(filterValue))
     );
   }
 
-  private _filterProfesionales(value: string): any[] {
-    const filterValue = value.toLowerCase();
+  private _filterProfesionales(value: any): any[] {
+    let filterValue = '';
+    if (typeof value === 'string') {
+      filterValue = value.toLowerCase();
+    } else if (value && (value.Nombre || value.nombre)) {
+      filterValue = (value.Nombre || value.nombre).toLowerCase();
+    }
     return this.profesionales.filter(p =>
       (p.nombre && p.nombre.toLowerCase().includes(filterValue)) ||
       (p.apellido && p.apellido.toLowerCase().includes(filterValue))
@@ -323,53 +371,11 @@ export class NuevoTurnoComponent implements OnInit {
     return ocupado;
   }
 
-  intentarPatch() {
-    if (
-      this.modoEdicion &&
-      this.pacientesCargados &&
-      this.profesionalesCargados &&
-      this.especialidadesCargadas &&
-      this.turnoParaEditar
-    ) {
-      const pacienteObj = this.pacientes.find(p => p.ID === this.turnoParaEditar.ID_Paciente);
-      const profesionalObj = this.profesionales.find(p => p.ID === this.turnoParaEditar.ID_Profesional);
-      const especialidadObj = Array.isArray(this.especialidadesFiltradas)
-        ? this.especialidadesFiltradas.find(e => e.ID === this.turnoParaEditar.ID_Especialidad)
-        : undefined;
-      console.log('Especialidades filtradas:', this.especialidadesFiltradas);
-      console.log('Especialidad seleccionada:', especialidadObj);
-      // Convertir fecha a Date y hora a string HH:mm
-      let fechaValue = this.turnoParaEditar.Fecha;
-      if (fechaValue && typeof fechaValue === 'string') {
-        fechaValue = new Date(fechaValue);
-      }
-      let horaValue = this.turnoParaEditar.Hora;
-      if (horaValue && typeof horaValue === 'string') {
-        horaValue = horaValue.substring(0,5);
-      }
-      this.form.patchValue({
-        ID_Paciente: this.turnoParaEditar.ID_Paciente,
-        pacienteCtrl: pacienteObj || '',
-        ID_Profesional: this.turnoParaEditar.ID_Profesional,
-        profesionalCtrl: profesionalObj || '',
-        ID_Especialidad: this.turnoParaEditar.ID_Especialidad,
-        Fecha: fechaValue,
-        Hora: horaValue
-      });
-      this.form.get('ID_Paciente')?.disable();
-      this.form.get('pacienteCtrl')?.disable();
-      this.form.get('ID_Profesional')?.disable();
-      this.form.get('profesionalCtrl')?.disable();
-      this.form.get('ID_Especialidad')?.disable();
-    }
-  }
-
   cargarPacientes() {
     this.pacienteService.obtenerPacientes().subscribe({
       next: (data) => {
         this.pacientes = data;
         this.pacientesCargados = true;
-        this.intentarPatch();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -382,8 +388,39 @@ export class NuevoTurnoComponent implements OnInit {
     this.turnosService.obtenerProfesionales().subscribe({
       next: (data) => {
         this.profesionales = data;
+        if (this.modoEdicion && this.turnoParaEditar) {
+          const pacienteObj = this.pacientes.find(p => p.ID === this.turnoParaEditar.ID_Paciente) || '';
+          const profesionalObj = this.profesionales.find(p => p.ID === this.turnoParaEditar.ID_Profesional) || '';
+          let horaValue = this.turnoParaEditar.Hora;
+          if (typeof horaValue === 'number') {
+            const totalMinutes = Math.floor(horaValue / 60);
+            const h = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+            const m = (totalMinutes % 60).toString().padStart(2, '0');
+            horaValue = `${h}:${m}`;
+          } else if (typeof horaValue === 'string') {
+            horaValue = horaValue.substring(0, 5);
+          }
+          this.form.patchValue({
+            ID_Paciente: this.turnoParaEditar.ID_Paciente,
+            pacienteCtrl: pacienteObj,
+            ID_Profesional: this.turnoParaEditar.ID_Profesional,
+            profesionalCtrl: profesionalObj,
+            ID_Especialidad: this.turnoParaEditar.ID_Especialidad,
+            Fecha: new Date(this.turnoParaEditar.Fecha),
+            Hora: horaValue
+          }, { emitEvent: false });
+          this.form.get('ID_Paciente')?.disable();
+          this.form.get('pacienteCtrl')?.disable();
+          this.form.get('ID_Profesional')?.disable();
+          this.form.get('profesionalCtrl')?.disable();
+          this.form.get('ID_Especialidad')?.disable();
+          // Especialidad
+          this.especialidadesFiltradas = [{
+            ID: this.turnoParaEditar.ID_Especialidad,
+            Nombre: this.turnoParaEditar.Especialidad
+          }];
+        }
         this.profesionalesCargados = true;
-        this.intentarPatch();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -396,13 +433,34 @@ export class NuevoTurnoComponent implements OnInit {
     if (!idProfesional) {
       this.especialidadesFiltradas = [];
       this.especialidadesCargadas = true;
-      this.intentarPatch();
       return;
     }
     this.turnosService.obtenerEspecialidadesPorProfesional(idProfesional).subscribe(data => {
       this.especialidadesFiltradas = data;
       this.especialidadesCargadas = true;
-      this.intentarPatch();
+      // Patch directo al terminar de cargar especialidades
+      if (this.modoEdicion && this.turnoParaEditar) {
+        const idEspecialidad = this.turnoParaEditar.ID_Especialidad;
+        const especialidadExiste = this.especialidadesFiltradas.some(e => e.ID === idEspecialidad);
+        if (!especialidadExiste) {
+          console.warn(`⚠️ La especialidad con ID ${idEspecialidad} no está entre las especialidades cargadas para el profesional.`);
+          console.warn('🧪 Especialidades disponibles:', this.especialidadesFiltradas);
+        }
+        this.form.patchValue({
+          ID_Paciente: this.turnoParaEditar.ID_Paciente,
+          pacienteCtrl: this.pacientes.find(p => p.ID === this.turnoParaEditar.ID_Paciente) || '',
+          ID_Profesional: this.turnoParaEditar.ID_Profesional,
+          profesionalCtrl: this.profesionales.find(p => p.ID === this.turnoParaEditar.ID_Profesional) || '',
+          ID_Especialidad: idEspecialidad,
+          Fecha: new Date(this.turnoParaEditar.Fecha),
+          Hora: (this.turnoParaEditar.Hora || '').substring(0,5)
+        });
+        this.form.get('ID_Paciente')?.disable();
+        this.form.get('pacienteCtrl')?.disable();
+        this.form.get('ID_Profesional')?.disable();
+        this.form.get('profesionalCtrl')?.disable();
+        this.form.get('ID_Especialidad')?.disable();
+      }
       this.cdr.detectChanges();
     });
   }

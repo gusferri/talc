@@ -37,7 +37,7 @@ export class TurnosService {
   }
 
   obtenerTurnoPorId(id: number) {
-    return this.http.get<any>(`http://192.168.2.41:8000/turnos/${id}`);
+    return this.http.get<any>(`http://192.168.2.41:8000/pacientes/turno/${id}`);
   }
 
   actualizarTurno(id: number, turno: any) {

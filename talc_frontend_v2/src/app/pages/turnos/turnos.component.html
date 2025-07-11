@@ -132,7 +132,7 @@
           <th mat-header-cell *matHeaderCellDef> Acciones </th>
           <td mat-cell *matCellDef="let turno">
             <div class="action-buttons" *ngIf="turno.Estado !== 'Cancelado'">
-              <button *ngIf="turno.Estado !== 'Asistido'" mat-icon-button 
+              <button *ngIf="turno.Estado === 'Agendado'" mat-icon-button 
                       matTooltip="Editar turno"
                       (click)="editarTurno(turno)"
                       class="action-btn edit-btn">
