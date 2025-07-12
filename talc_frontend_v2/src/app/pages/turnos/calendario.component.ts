@@ -4,6 +4,11 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { CalendarModule, CalendarEvent } from 'angular-calendar';
 import { TurnosService } from '../../services/turnos.service';
 import { Turno } from '../../models/turno.model';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-calendario',
@@ -11,20 +16,49 @@ import { Turno } from '../../models/turno.model';
   imports: [
     CalendarModule,
     AppFullcalendarComponent,
-    MatNativeDateModule
+    MatNativeDateModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatCardModule
   ],
   templateUrl: './calendario.component.html',
   styleUrls: ['./calendario.component.scss']
 })
 export class CalendarioComponent implements OnInit {
   eventos: CalendarEvent[] = [];
+  eventosFiltrados: CalendarEvent[] = [];
+  searchTerm: string = '';
 
   constructor(private turnosService: TurnosService) {}
 
   ngOnInit(): void {
     this.turnosService.obtenerTurnos().subscribe(turnos => {
       this.eventos = turnos.map(turno => this.turnoToEvent(turno));
+      this.filtrarEventos();
     });
+  }
+
+  filtrarEventos(): void {
+    const filtro = this.normalizarTexto(this.searchTerm);
+    if (!filtro) {
+      this.eventosFiltrados = this.eventos;
+      return;
+    }
+    this.eventosFiltrados = this.eventos.filter(ev => {
+      const paciente = this.normalizarTexto(ev.meta?.Paciente || '');
+      return paciente.includes(filtro);
+    });
+  }
+
+  normalizarTexto(texto: string): string {
+    return texto
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Quita tildes
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   turnoToEvent(turno: Turno): CalendarEvent {

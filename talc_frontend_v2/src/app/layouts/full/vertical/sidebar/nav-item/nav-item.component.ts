@@ -95,6 +95,10 @@ export class AppNavItemComponent implements OnChanges {
     return !!item.route && this.router.isActive(item.route, true);
   }
 
+  isRouteActive(item: NavItem): boolean {
+    return !!item.route && this.router.url.startsWith(item.route);
+  }
+
   isChildActive(item: NavItem): boolean {
     if (!item.children) return false;
     return item.children.some(

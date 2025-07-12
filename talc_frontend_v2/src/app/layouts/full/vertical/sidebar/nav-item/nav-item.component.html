@@ -4,9 +4,7 @@
 </div>
 } @if(!item.navCap && !item.external && !item.twoLines) {
 <a mat-list-item (click)="onItemSelected(item)" [ngClass]="{
-      'activeMenu': item.route
-        ? router.isActive(item.route, true)
-        : false,
+      'activeMenu': isRouteActive(item),
       expanded: expanded, activemenu: isChildActive(item),
       disabled: item.disabled
     }" class="menu-list-item">

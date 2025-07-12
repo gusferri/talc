@@ -44,6 +44,17 @@
   >
     <i-tabler name="chart-bar" class="icon-20 d-flex"></i-tabler>
   </button>
+  <!-- Botón calendario -->
+  <button
+    mat-icon-button
+    [routerLink]="['/turnos/calendario']"
+    matTooltip="Ver calendario de turnos"
+    class="d-flex justify-content-center"
+    style="margin-left: 4px;"
+    *ngIf="isTurnosRoute"
+  >
+    <i-tabler name="calendar-event" class="icon-20 d-flex"></i-tabler>
+  </button>
 
   @if(isTurnosRoute) {
     
