@@ -4,6 +4,9 @@ import {
   Inject,
   signal,
   LOCALE_ID,
+  Input,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule, DOCUMENT, NgSwitch } from '@angular/common';
 import { registerLocaleData } from '@angular/common';
@@ -106,7 +109,7 @@ export class CalendarDialogComponent {
     ],
     providers: [provideNativeDateAdapter(), CalendarDateFormatter, { provide: LOCALE_ID, useValue: 'es' }]
 })
-export class AppFullcalendarComponent {
+export class AppFullcalendarComponent implements OnChanges {
   // Eliminadas referencias a dialogs y acciones de edición/eliminación
   view = signal<any>('month');
   viewDate = signal<Date>(new Date());
@@ -115,33 +118,17 @@ export class AppFullcalendarComponent {
   refresh: Subject<any> = new Subject();
 
   // Solo eventos de ejemplo, sin acciones
-  events = signal<CalendarEvent[] | any>([
-    {
-      start: subDays(startOfDay(new Date()), 1),
-      end: addDays(new Date(), 1),
-      title: 'A 3 day event',
-      color: colors.red,
-    },
-    {
-      start: startOfDay(new Date()),
-      title: 'An event with no end date',
-      color: colors.blue,
-    },
-    {
-      start: subDays(endOfMonth(new Date()), 3),
-      end: addDays(endOfMonth(new Date()), 3),
-      title: 'A long event that spans 2 months',
-      color: colors.blue,
-    },
-    {
-      start: addHours(startOfDay(new Date()), 2),
-      end: new Date(),
-      title: 'A draggable and resizable event',
-      color: colors.yellow,
-    },
-  ]);
+  events = signal<CalendarEvent[] | any>([]);
+
+  @Input() eventsInput: CalendarEvent[] = [];
 
   constructor(@Inject(DOCUMENT) doc: any) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['eventsInput']) {
+      this.events.set(this.eventsInput || []);
+    }
+  }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate())) {

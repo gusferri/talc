@@ -80,6 +80,9 @@
         (dayClicked)="dayClicked($event.day)"
         (eventTimesChanged)="eventTimesChanged($event)"
       >
+        <ng-template #eventTemplate let-event="event">
+          <span [innerHTML]="event.title"></span>
+        </ng-template>
       </mwl-calendar-month-view>
 
       <!-- week view -->
@@ -92,6 +95,9 @@
         [dayStartHour]="8"
         [dayEndHour]="21"
       >
+        <ng-template #eventTemplate let-event="event">
+          <span [innerHTML]="event.title"></span>
+        </ng-template>
       </mwl-calendar-week-view>
 
       <!-- day view -->
@@ -104,6 +110,9 @@
         [dayStartHour]="8"
         [dayEndHour]="21"
       >
+        <ng-template #eventTemplate let-event="event">
+          <span [innerHTML]="event.title"></span>
+        </ng-template>
       </mwl-calendar-day-view>
     </div>
   </mat-card-content>
