@@ -16,6 +16,8 @@ talc_frontend_v2/.angular/
 talc_frontend_v2/.angular/cache/
 talc_frontend/.angular/
 talc_frontend/.angular/cache/
+talc_frontend_docker/.angular/
+talc_frontend_docker/.angular/cache/
 
 # Credenciales y archivos sensibles
 .env
