@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangePasswordDialogComponent } from '../../../shared/change-password/change-password-dialog.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +38,7 @@ export class LoginComponent {
 
   login() {
     if (this.username && this.password) {
-      this.http.post<any>('http://192.168.2.41:8000/login', {
+      this.http.post<any>(`${environment.apiBaseUrl}/login`, {
         username: this.username,
         password: this.password
       }).subscribe({
@@ -73,7 +74,7 @@ export class LoginComponent {
   }
 
   actualizarContrasena(currentPassword: string, newPassword: string) {
-    this.http.post('http://192.168.2.41:8000/cambiar-contrasena', {
+    this.http.post(`${environment.apiBaseUrl}/cambiar-contrasena`, {
       currentPassword: currentPassword,
       newPassword: newPassword
     }).subscribe({

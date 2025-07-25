@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpRequest, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface GenerarInformeRequest {
   ID_Paciente: number;
@@ -17,7 +18,7 @@ export interface GenerarInformeResponse {
     providedIn: 'root'
 })
 export class InformesService {
-    private apiUrl = 'http://192.168.2.41:8000/';
+    private apiUrl = environment.apiBaseUrl;
 
     constructor(private http: HttpClient) {}
 

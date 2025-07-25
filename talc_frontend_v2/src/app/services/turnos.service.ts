@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Turno } from '../models/turno.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TurnosService {
 
-  private apiUrl = 'http://192.168.2.41:8000/turnos/detalle';
+  private apiUrl = `${environment.apiBaseUrl}/turnos/detalle`;
 
   constructor(private http: HttpClient) {}
 
@@ -17,30 +18,30 @@ export class TurnosService {
   }
 
   actualizarEstadoTurno(turnoID: number, nuevoEstado: number) {
-    return this.http.put(`http://192.168.2.41:8000/turnos/${turnoID}/estado`, { ID_EstadoTurno: nuevoEstado });
+    return this.http.put(`${environment.apiBaseUrl}/turnos/${turnoID}/estado`, { ID_EstadoTurno: nuevoEstado });
   }
 
   registrarAsistencia(turnoID: number) {
-    return this.http.post(`http://192.168.2.41:8000/turnos/${turnoID}/asistencia`, {});
+    return this.http.post(`${environment.apiBaseUrl}/turnos/${turnoID}/asistencia`, {});
   }
 
   obtenerProfesionales() {
-    return this.http.get<any[]>('http://192.168.2.41:8000/turnos/profesionales');
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/turnos/profesionales`);
   }
 
   obtenerEspecialidadesPorProfesional(idProfesional: number) {
-    return this.http.get<any[]>(`http://192.168.2.41:8000/turnos/especialidades-por-profesional/${idProfesional}`);
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/turnos/especialidades-por-profesional/${idProfesional}`);
   }
 
   crearTurno(turno: any) {
-    return this.http.post('http://192.168.2.41:8000/turnos', turno);
+    return this.http.post(`${environment.apiBaseUrl}/turnos`, turno);
   }
 
   obtenerTurnoPorId(id: number) {
-    return this.http.get<any>(`http://192.168.2.41:8000/pacientes/turno/${id}`);
+    return this.http.get<any>(`${environment.apiBaseUrl}/pacientes/turno/${id}`);
   }
 
   actualizarTurno(id: number, turno: any) {
-    return this.http.put(`http://192.168.2.41:8000/turnos/${id}`, turno);
+    return this.http.put(`${environment.apiBaseUrl}/turnos/${id}`, turno);
   }
 } 

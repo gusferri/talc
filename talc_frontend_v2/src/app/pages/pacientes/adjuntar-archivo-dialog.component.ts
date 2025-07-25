@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AdjuntosService, Adjunto } from '../../services/adjuntos.service';
+import { AdjuntosService, AdjuntoBackend } from '../../services/adjuntos.service';
 
 @Component({
   selector: 'app-adjuntar-archivo-dialog',
@@ -22,7 +22,7 @@ import { AdjuntosService, Adjunto } from '../../services/adjuntos.service';
           <ul>
             <li *ngFor="let adj of adjuntos">
               <mat-icon>attach_file</mat-icon>
-              <span>{{ adj.titulo }}</span>
+              <span>{{ adj.Nombre }}</span>
               <button mat-icon-button (click)="verAdjunto(adj)" matTooltip="Ver archivo">
                 <mat-icon>visibility</mat-icon>
               </button>
@@ -77,7 +77,7 @@ import { AdjuntosService, Adjunto } from '../../services/adjuntos.service';
     `]
 })
 export class AdjuntarArchivoDialogComponent implements OnInit {
-  adjuntos: Adjunto[] = [];
+  adjuntos: AdjuntoBackend[] = [];
   file: File | null = null;
   descripcionArchivo: string = '';
   cargando: boolean = false;
@@ -98,22 +98,14 @@ export class AdjuntarArchivoDialogComponent implements OnInit {
 
   cargarAdjuntos() {
     console.log('Cargando adjuntos para paciente ID:', this.data.idPaciente);
-    this.adjuntosService.obtenerAdjuntosPaciente(this.data.idPaciente).subscribe({
-      next: (adjuntos) => {
-        console.log('Adjuntos cargados (después de transformación):', adjuntos);
-        console.log('Primer adjunto:', adjuntos[0]);
+    this.adjuntosService.obtenerAdjuntos(this.data.idPaciente).subscribe({
+      next: (adjuntos: AdjuntoBackend[]) => {
+        console.log('Adjuntos cargados:', adjuntos);
         this.adjuntos = adjuntos;
-        console.log('Adjuntos asignados al componente:', this.adjuntos);
-        console.log('Longitud del array:', this.adjuntos.length);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al cargar adjuntos:', error);
-        console.error('Detalles del error:', {
-          status: error.status,
-          message: error.message,
-          url: error.url
-        });
-        this.snackBar.open(`Error al cargar los archivos adjuntos: ${error.status}`, 'Cerrar', { duration: 5000 });
+        this.snackBar.open('Error al cargar los adjuntos', 'Cerrar', { duration: 3000 });
       }
     });
   }
@@ -134,13 +126,14 @@ export class AdjuntarArchivoDialogComponent implements OnInit {
 
     this.cargando = true;
     const username = localStorage.getItem('username') || '';
+    
+    const formData = new FormData();
+    formData.append('archivo', this.file);
+    formData.append('titulo', this.descripcionArchivo);
+    formData.append('id_paciente', this.data.idPaciente.toString());
+    formData.append('username', username);
 
-    this.adjuntosService.subirAdjunto(
-      this.file,
-      this.descripcionArchivo,
-      this.data.idPaciente,
-      username
-    ).subscribe({
+    this.adjuntosService.subirAdjunto(formData).subscribe({
       next: (response) => {
         this.snackBar.open('Archivo subido correctamente', 'Cerrar', { duration: 3000 });
         this.cargarAdjuntos(); // Recargar la lista
@@ -156,10 +149,17 @@ export class AdjuntarArchivoDialogComponent implements OnInit {
     });
   }
 
-  descargarAdjunto(adj: Adjunto) {
-    this.adjuntosService.descargarAdjunto(adj.id).subscribe({
+  descargarAdjunto(adj: AdjuntoBackend) {
+    this.adjuntosService.descargarAdjunto(adj.ID).subscribe({
       next: (blob) => {
-        this.adjuntosService.descargarBlob(blob, adj.titulo);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = adj.Nombre;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
         this.snackBar.open('Descarga iniciada', 'Cerrar', { duration: 2000 });
       },
       error: (error) => {
@@ -169,10 +169,10 @@ export class AdjuntarArchivoDialogComponent implements OnInit {
     });
   }
 
-  verAdjunto(adj: Adjunto) {
-    this.adjuntosService.visualizarAdjunto(adj.id).subscribe({
+  verAdjunto(adj: AdjuntoBackend) {
+    this.adjuntosService.visualizarAdjunto(adj.ID).subscribe({
       next: (blob) => {
-        const url = this.adjuntosService.crearUrlVisualizacion(blob);
+        const url = URL.createObjectURL(blob);
         this.dialog.open(VisorAdjuntoDialogComponent, {
           data: { ...adj, url },
           width: '600px'
@@ -185,9 +185,9 @@ export class AdjuntarArchivoDialogComponent implements OnInit {
     });
   }
 
-  eliminarAdjunto(adj: Adjunto) {
-    if (confirm(`¿Estás seguro de que quieres eliminar "${adj.titulo}"?`)) {
-      this.adjuntosService.eliminarAdjunto(adj.id).subscribe({
+  eliminarAdjunto(adj: AdjuntoBackend) {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${adj.Nombre}"?`)) {
+      this.adjuntosService.eliminarAdjunto(adj.ID).subscribe({
         next: () => {
           this.snackBar.open('Archivo eliminado correctamente', 'Cerrar', { duration: 3000 });
           this.cargarAdjuntos(); // Recargar la lista

@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class PacienteService {
-    private apiUrl = 'http://192.168.2.41:8000/pacientes';
+    private apiUrl = `${environment.apiBaseUrl}/pacientes`;
     constructor(private http: HttpClient) {}
 
 
@@ -93,6 +94,6 @@ export class PacienteService {
     }
 
     obtenerPacientes() {
-        return this.http.get<any[]>('http://192.168.2.41:8000/pacientes/completo');
+        return this.http.get<any[]>(`${environment.apiBaseUrl}/pacientes/completo`);
     }
 } 

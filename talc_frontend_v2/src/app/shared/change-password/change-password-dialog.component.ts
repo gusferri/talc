@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../environments/environment';
 
 @Component({
   standalone: true,
@@ -66,7 +67,7 @@ export class ChangePasswordDialogComponent {
     };
     console.log('Payload enviado al backend:', payload);
 
-    this.http.post('http://192.168.2.41:8000/cambiar-contrasena', payload, {
+    this.http.post(`${environment.apiBaseUrl}/cambiar-contrasena`, payload, {
       headers: { 'Content-Type': 'application/json' }
     }).subscribe({
       next: (response: any) => {

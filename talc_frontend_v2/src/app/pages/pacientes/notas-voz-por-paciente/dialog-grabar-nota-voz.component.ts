@@ -165,7 +165,10 @@ export class DialogGrabarNotaVozComponent {
   guardar() {
     if (!this.audioBlob) return;
     this.saving = true;
-    this.notasVozService.subirNotaVoz(this.data.turno.ID || this.data.turno.id_turno, this.audioBlob).subscribe({
+    const formData = new FormData();
+    formData.append('audio', this.audioBlob, 'nota_voz.webm');
+    formData.append('turno_id', (this.data.turno.ID || this.data.turno.id_turno).toString());
+    this.notasVozService.grabarNotaVoz(formData).subscribe({
       next: () => {
         this.saving = false;
         this.snackBar.open('Nota de voz guardada correctamente.', 'Cerrar', { duration: 2500 });

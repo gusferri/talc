@@ -24,7 +24,7 @@ export class NotificacionesDialogComponent {
   ) {}
 
   marcarComoLeida(noti: any) {
-    this.notificacionesService.marcarComoLeida(noti.ID).subscribe(() => {
+    this.notificacionesService.marcarComoLeido(noti.ID).subscribe(() => {
       noti.Leido = true;
     });
   }

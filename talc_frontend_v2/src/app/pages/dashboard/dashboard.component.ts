@@ -22,13 +22,13 @@ export interface QuickAction {
 }
 
 @Component({
-  selector: 'app-starter',
-  templateUrl: './starter.component.html',
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
   imports: [MaterialModule, CommonModule],
-  styleUrls: ['./starter.component.scss'],
+  styleUrls: ['./dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class StarterComponent implements OnInit {
+export class DashboardComponent implements OnInit {
   isLoading = true;
   nombreUsuario = '';
   currentDate = new Date();

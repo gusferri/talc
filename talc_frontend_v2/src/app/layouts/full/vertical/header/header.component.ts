@@ -158,7 +158,8 @@ export class HeaderComponent implements OnInit {
   }
 
   cargarNotificaciones() {
-    this.notificacionesService.obtenerNotificaciones().subscribe((notis: any[]) => {
+    const username = localStorage.getItem('username') || '';
+    this.notificacionesService.obtenerNotificaciones(username).subscribe((notis: any[]) => {
       // Filtrar solo no leídas
       this.notificaciones = notis.filter(n => !n.Leido);
       this.cantidadNoLeidas = this.notificaciones.length;

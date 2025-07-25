@@ -163,7 +163,7 @@ export class NuevoPacienteComponent implements OnInit {
     this.isLoading = true;
     
     // Cargar géneros
-    this.generoService.obtenerGeneros().subscribe({
+    this.generoService.buscarGeneros().subscribe({
       next: (generos) => {
         this.generos = generos;
         this.isLoading = false;
@@ -242,7 +242,7 @@ export class NuevoPacienteComponent implements OnInit {
       return;
     }
 
-    this.escuelaService.buscarEscuelasPorCiudad(ciudad.ID, value).subscribe({
+    this.escuelaService.buscarEscuelasPorCiudad(ciudad.Ciudad || value).subscribe({
       next: (escuelas) => {
         this.escuelasFiltradas = escuelas;
       },

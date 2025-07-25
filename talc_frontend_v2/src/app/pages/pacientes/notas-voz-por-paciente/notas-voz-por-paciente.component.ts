@@ -172,7 +172,7 @@ export class NotasVozPorPacienteComponent implements OnInit {
       },
       width: '600px'
     });
-    this.notasVozService.obtenerNotaVoz(idNotaVoz).subscribe({
+    this.notasVozService.obtenerNotasVoz(idNotaVoz).subscribe({
       next: (resp: any) => {
         console.log('Respuesta obtenerNotaVoz:', resp);
         dialogRef.componentInstance.transcripcion = resp.texto || resp.transcripcion || resp.text || '';

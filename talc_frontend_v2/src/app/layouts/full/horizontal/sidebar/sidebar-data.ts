@@ -5,9 +5,9 @@ export const navItems: NavItem[] = [
     navCap: 'Home',
   },
   {
-    displayName: 'Starter',
+    displayName: 'Dashboard',
     iconName: 'home',
-    route: '/starter',
+    route: '/dashboard',
   },
   {
     displayName: 'Login',

@@ -94,7 +94,7 @@ export class DetallePacienteComponent implements OnInit {
   cargarCatalogosYDespuesPaciente(dni: string): void {
     this.isLoading = true;
     forkJoin({
-      generos: this.generoService.obtenerGeneros(),
+      generos: this.generoService.buscarGeneros(),
       provincias: this.ubicacionService.obtenerProvincias(),
       ciudades: this.ubicacionService.obtenerCiudades(),
       obrasSociales: this.obraSocialService.obtenerObrasSociales(),
@@ -221,7 +221,7 @@ export class DetallePacienteComponent implements OnInit {
       this.escuelasFiltradas = [];
       return;
     }
-    this.escuelaService.buscarEscuelasPorCiudad(ciudad.ID, value).subscribe({
+    this.escuelaService.buscarEscuelasPorCiudad(ciudad.Ciudad || value).subscribe({
       next: (escuelas) => { this.escuelasFiltradas = escuelas; },
       error: (error) => { console.error('Error al buscar escuelas:', error); this.escuelasFiltradas = []; }
     });

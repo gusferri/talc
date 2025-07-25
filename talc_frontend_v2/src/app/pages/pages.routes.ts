@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { StarterComponent } from './starter/starter.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { PacientesComponent } from './pacientes/pacientes.component';
 import { TurnosComponent } from './turnos/turnos.component';
 import { NuevoPacienteComponent } from './pacientes/nuevo-paciente/nuevo-paciente.component';
@@ -11,7 +11,7 @@ import { CalendarioComponent } from './turnos/calendario.component';
 export const PagesRoutes: Routes = [
   {
     path: '',
-    component: StarterComponent,
+    component: DashboardComponent,
     data: {
       title: 'Dashboard',
       urls: [
@@ -22,7 +22,7 @@ export const PagesRoutes: Routes = [
   },
   {
     path: 'dashboard',
-    component: StarterComponent,
+    component: DashboardComponent,
     data: {
       title: 'Dashboard',
       urls: [
