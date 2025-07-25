@@ -1,67 +1,96 @@
+/**
+ * Estilos para el componente de diálogo de notificaciones
+ *
+ * Este archivo define el diseño y presentación visual del modal
+ * de notificaciones, incluyendo:
+ * - Layout del contenedor del diálogo
+ * - Estilos para lista de notificaciones
+ * - Estados de notificaciones (leídas/no leídas)
+ * - Badges y indicadores visuales
+ * - Botones de acción
+ * - Diseño responsivo y scroll
+ * - Sombras y efectos visuales
+ */
+
+/* Contenedor principal del diálogo */
+/* Define las dimensiones y apariencia del modal */
 .noti-dialog-container {
-  min-width: 340px;
-  max-width: 420px;
-  background: #fff;
-  padding: 22px 24px 18px 24px;
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(44,44,44,0.15);
+  min-width: 340px;                      /* Ancho mínimo para usabilidad */
+  max-width: 420px;                      /* Ancho máximo para legibilidad */
+  background: #fff;                      /* Fondo blanco */
+  padding: 22px 24px 18px 24px;         /* Espaciado interno */
+  border-radius: 10px;                   /* Bordes redondeados */
+  box-shadow: 0 8px 32px rgba(44,44,44,0.15);  /* Sombra sutil */
 }
 
+/* Título del diálogo */
+/* Estilo para el encabezado principal */
 .noti-dialog-container h2 {
-  margin-bottom: 22px;
+  margin-bottom: 22px;                   /* Espaciado inferior */
 }
 
+/* Estado vacío */
+/* Se muestra cuando no hay notificaciones disponibles */
 .noti-empty {
-  text-align: center;
-  color: #888;
-  padding: 22px 0 10px 0;
+  text-align: center;                    /* Texto centrado */
+  color: #888;                           /* Color de texto gris */
+  padding: 22px 0 10px 0;                /* Espaciado interno */
 }
 
+/* Lista de notificaciones */
+/* Contenedor para todas las notificaciones */
 .noti-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none;                      /* Sin viñetas */
+  padding: 0;                            /* Sin espaciado interno */
+  margin: 0;                             /* Sin márgenes */
+  max-height: 400px;                     /* Altura máxima para scroll */
+  overflow-y: auto;                      /* Scroll vertical cuando es necesario */
+  padding-right: 8px;                    /* Espaciado derecho para scroll */
 }
 
+/* Elemento individual de notificación */
+/* Estilo para cada notificación en la lista */
 .noti-item {
-  margin-bottom: 16px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 14px 60px 12px 18px;
-  position: relative;
-  border-left: 5px solid #1976d2;
-  box-shadow: 0 2px 8px rgba(44,44,44,0.03);
+  margin-bottom: 16px;                   /* Espaciado inferior entre notificaciones */
+  background: #f9f9f9;                   /* Fondo gris claro */
+  border-radius: 8px;                    /* Bordes redondeados */
+  padding: 14px 60px 12px 18px;         /* Espaciado interno */
+  position: relative;                    /* Posicionamiento relativo para botones */
+  border-left: 5px solid #1976d2;       /* Borde izquierdo azul */
+  box-shadow: 0 2px 8px rgba(44,44,44,0.03);  /* Sombra sutil */
 }
 
+/* Badge de notificación nueva */
+/* Indicador visual para notificaciones no leídas */
 .noti-badge {
-  background: #e53935;
-  color: #fff;
-  border-radius: 8px;
-  font-size: 10px;
-  padding: 2px 6px;
-  margin-left: 8px;
+  background: #e53935;                   /* Fondo rojo */
+  color: #fff;                           /* Color de texto blanco */
+  border-radius: 8px;                    /* Bordes redondeados */
+  font-size: 10px;                       /* Tamaño de fuente pequeño */
+  padding: 2px 6px;                      /* Espaciado interno */
+  margin-left: 8px;                      /* Margen izquierdo */
 }
 
+/* Mensaje de la notificación */
+/* Contenido principal de la notificación */
 .noti-mensaje {
-  font-size: 13px;
-  color: #222;
-  margin: 7px 0 3px 0;
+  font-size: 13px;                       /* Tamaño de fuente mediano */
+  color: #222;                           /* Color de texto oscuro */
+  margin: 7px 0 3px 0;                   /* Márgenes verticales */
 }
 
+/* Fecha de la notificación */
+/* Información temporal de la notificación */
 .noti-fecha {
-  font-size: 12px;
-  color: #888;
+  font-size: 12px;                       /* Tamaño de fuente pequeño */
+  color: #888;                           /* Color de texto gris */
 }
 
+/* Botón para marcar como leída */
+/* Botón de acción posicionado absolutamente */
 .noti-boton-leer {
-  position: absolute;
-  right: 14px;
-  top: 14px;
-  font-size: 12px;
-}
-
-.noti-list {
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 8px;
+  position: absolute;                     /* Posicionamiento absoluto */
+  right: 14px;                           /* Distancia desde la derecha */
+  top: 14px;                             /* Distancia desde arriba */
+  font-size: 12px;                       /* Tamaño de fuente pequeño */
 } 

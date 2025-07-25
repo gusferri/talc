@@ -1,27 +1,68 @@
+<!--
+  Template del componente de diálogo de notificaciones
+  Este archivo define la interfaz de usuario para el modal de notificaciones
+  del sistema TALC, permitiendo visualizar y gestionar las notificaciones
+  del usuario.
+
+  Características principales:
+  - Lista de notificaciones con estado de lectura
+  - Estado vacío cuando no hay notificaciones
+  - Botones para marcar como leídas
+  - Formateo de fechas
+  - Indicadores visuales de notificaciones nuevas
+  - Botón de cierre del diálogo
+  - Diseño responsivo con Material Design
+-->
+
+<!-- Contenedor principal del diálogo de notificaciones -->
 <div class="noti-dialog-container">
+  
+  <!-- Título del diálogo -->
   <h2>Notificaciones</h2>
+  
+  <!-- Estado vacío: Se muestra cuando no hay notificaciones -->
   <div *ngIf="!data.notificaciones || data.notificaciones.length === 0" class="noti-empty">
     <p>No tenés notificaciones.</p>
   </div>
+  
+  <!-- Lista de notificaciones: Se muestra cuando hay notificaciones disponibles -->
   <div *ngIf="data.notificaciones && data.notificaciones.length > 0">
     <ul class="noti-list">
+      <!-- Iteración sobre cada notificación -->
       <li *ngFor="let n of data.notificaciones" class="noti-item">
+        
+        <!-- Encabezado de la notificación: Título y badge de nuevo -->
         <div>
+          <!-- Título con peso de fuente según estado de lectura -->
           <span [style.fontWeight]="n.Leido ? 'normal' : 'bold'">{{ n.Titulo }}</span>
+          <!-- Badge "Nuevo" para notificaciones no leídas -->
           <span *ngIf="!n.Leido" class="noti-badge">Nuevo</span>
         </div>
+        
+        <!-- Mensaje de la notificación -->
         <div class="noti-mensaje">
           {{ n.Mensaje }}
         </div>
+        
+        <!-- Fecha de envío formateada -->
         <div class="noti-fecha">
           {{ n.FechaEnvio | date:'short' }}
         </div>
-        <button *ngIf="!n.Leido" mat-icon-button color="primary" aria-label="Marcar como leída" (click)="marcarComoLeida(n)" class="noti-boton-leer">
+        
+        <!-- Botón para marcar como leída (solo visible si no está leída) -->
+        <button *ngIf="!n.Leido" 
+                mat-icon-button 
+                color="primary" 
+                aria-label="Marcar como leída" 
+                (click)="marcarComoLeida(n)" 
+                class="noti-boton-leer">
           <mat-icon>check</mat-icon>
         </button>
       </li>
     </ul>
   </div>
+  
+  <!-- Sección de acciones: Botón para cerrar el diálogo -->
   <div style="text-align: right; margin-top: 18px;">
     <button mat-flat-button color="primary" (click)="cerrar()">Cerrar</button>
   </div>
