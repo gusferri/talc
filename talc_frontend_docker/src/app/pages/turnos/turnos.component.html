@@ -1,0 +1,171 @@
+<div class="turnos-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">event</mat-icon>
+          Gestión de Turnos
+        </h1>
+        <p class="page-subtitle">Administra los turnos y citas de tus pacientes</p>
+      </div>
+      <button mat-raised-button 
+              color="primary" 
+              class="new-appointment-btn"
+              (click)="nuevoTurno()">
+        <mat-icon>add</mat-icon>
+        Nuevo Turno
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <mat-card class="search-card">
+    <div class="search-section search-section-flex-between">
+      <div class="search-filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar turnos</mat-label>
+          <input matInput 
+                 [(ngModel)]="searchTerm"
+                 (input)="aplicarFiltro($event)"
+                 placeholder="Buscar por paciente, profesional o especialidad...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <div class="filter-buttons filter-buttons-inline">
+          <button mat-button [color]="filtroFecha === 'hoy' ? 'primary' : ''" (click)="setFiltroFecha('hoy')">Hoy</button>
+          <button mat-button [color]="filtroFecha === 'semana' ? 'primary' : ''" (click)="setFiltroFecha('semana')">Esta semana</button>
+          <button mat-button [color]="filtroFecha === 'todos' ? 'primary' : ''" (click)="setFiltroFecha('todos')">Todos</button>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Appointments Table Section -->
+  <mat-card class="table-card">
+    <div class="table-container">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando turnos...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && turnos.data.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">event_busy</mat-icon>
+        <h3>No hay turnos programados</h3>
+        <p>Comienza agregando tu primer turno</p>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="nuevoTurno()">
+          <mat-icon>add</mat-icon>
+          Agregar Turno
+        </button>
+      </div>
+
+      <!-- Appointments Table -->
+      <table *ngIf="!isLoading && turnos.data.length > 0" 
+             mat-table 
+             [dataSource]="turnos" 
+             matSort 
+             class="appointments-table">
+        
+        <!-- Paciente Column -->
+        <ng-container matColumnDef="paciente">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Paciente </th>
+          <td mat-cell *matCellDef="let turno"> 
+            <div class="patient-info">
+              <span class="patient-name">{{turno.Paciente}}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Profesional Column -->
+        <ng-container matColumnDef="profesional">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Profesional </th>
+          <td mat-cell *matCellDef="let turno"> {{turno.Profesional}} </td>
+        </ng-container>
+
+        <!-- Especialidad Column -->
+        <ng-container matColumnDef="especialidad">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Especialidad </th>
+          <td mat-cell *matCellDef="let turno"> 
+            <span class="specialty-chip">{{turno.Especialidad}}</span>
+          </td>
+        </ng-container>
+
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+          <td mat-cell *matCellDef="let turno"> 
+            <div class="date-info">
+              <mat-icon class="date-icon">calendar_today</mat-icon>
+              <span>{{formatearFecha(turno.Fecha)}}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Hora Column -->
+        <ng-container matColumnDef="hora">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Hora </th>
+          <td mat-cell *matCellDef="let turno"> 
+            <div class="time-info">
+              <mat-icon class="time-icon">schedule</mat-icon>
+              <span>{{formatearHora(turno.Hora)}}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+          <td mat-cell *matCellDef="let turno"> 
+            <mat-chip [color]="getEstadoColor(turno.Estado)" 
+                     class="status-chip">
+              <mat-icon class="status-icon">{{getEstadoIcon(turno.Estado)}}</mat-icon>
+              {{turno.Estado}}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let turno">
+            <div class="action-buttons" *ngIf="turno.Estado !== 'Cancelado'">
+              <button *ngIf="turno.Estado === 'Agendado'" mat-icon-button 
+                      matTooltip="Editar turno"
+                      (click)="editarTurno(turno)"
+                      class="action-btn edit-btn">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button *ngIf="turno.Estado === 'Agendado'" mat-icon-button 
+                      matTooltip="Cancelar turno"
+                      (click)="cambiarEstadoTurno(turno, 3)"
+                      class="action-btn cancel-btn">
+                <mat-icon style="color: #e53935;">close</mat-icon>
+              </button>
+              <button *ngIf="turno.Estado === 'Agendado' && puedeRegistrarAsistencia(turno)" mat-icon-button 
+                      matTooltip="Registrar asistencia"
+                      (click)="registrarAsistencia(turno)"
+                      class="action-btn asistencia-btn">
+                <mat-icon style="color: #43a047;">check_circle</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+            class="appointment-row">
+        </tr>
+      </table>
+
+      <!-- Paginator -->
+      <mat-paginator *ngIf="!isLoading && turnos.data.length > 0"
+                     [pageSizeOptions]="[5, 10, 25, 50]"
+                     showFirstLastButtons
+                     class="table-paginator">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div> 

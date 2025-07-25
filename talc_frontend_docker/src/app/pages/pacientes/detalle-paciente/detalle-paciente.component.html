@@ -1,0 +1,126 @@
+<mat-card *ngIf="!isLoading">
+  <mat-card-title>Detalle de Paciente</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="pacienteForm">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>DNI</mat-label>
+            <input matInput formControlName="dni" />
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" />
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" />
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput formControlName="fechaNacimiento" />
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Género</mat-label>
+            <mat-select formControlName="genero">
+              <mat-option *ngFor="let genero of generos" [value]="genero">
+                {{genero.Genero}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Provincia</mat-label>
+            <input matInput formControlName="provincia" [matAutocomplete]="provinciaAuto" />
+            <mat-autocomplete #provinciaAuto="matAutocomplete" [displayWith]="mostrarNombreProvincia">
+              <mat-option *ngFor="let provincia of provinciasFiltradas" [value]="provincia">
+                {{provincia.Provincia}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Ciudad</mat-label>
+            <input matInput formControlName="ciudad" [matAutocomplete]="ciudadAuto" />
+            <mat-autocomplete #ciudadAuto="matAutocomplete" [displayWith]="mostrarNombreCiudad">
+              <mat-option *ngFor="let ciudad of ciudadesFiltradas" [value]="ciudad">
+                {{ciudad.Ciudad}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" />
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-12">
+          <mat-slide-toggle formControlName="estaEscolarizado" class="toggle-field">
+            ¿Está escolarizado?
+          </mat-slide-toggle>
+        </div>
+        <div class="col-12 col-md-6" *ngIf="pacienteForm.get('estaEscolarizado')?.value">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Escuela</mat-label>
+            <input matInput formControlName="escuela" [matAutocomplete]="escuelaAuto" />
+            <mat-autocomplete #escuelaAuto="matAutocomplete" [displayWith]="mostrarNombreEscuela">
+              <mat-option *ngFor="let escuela of escuelasFiltradas" [value]="escuela">
+                {{escuela.Nombre}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-12">
+          <mat-slide-toggle formControlName="tieneObraSocial" class="toggle-field">
+            ¿Tiene obra social?
+          </mat-slide-toggle>
+        </div>
+        <div class="col-12 col-md-6" *ngIf="pacienteForm.get('tieneObraSocial')?.value">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Obra Social</mat-label>
+            <input matInput formControlName="obraSocial" [matAutocomplete]="obraSocialAuto" />
+            <mat-autocomplete #obraSocialAuto="matAutocomplete" [displayWith]="mostrarNombreObraSocial">
+              <mat-option *ngFor="let obra of obrasSocialesFiltradas" [value]="obra">
+                {{obra.Nombre}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Observaciones</mat-label>
+            <textarea matInput formControlName="observaciones" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-raised-button color="primary" *ngIf="!isEditing" (click)="habilitarEdicion()">Editar</button>
+    <button mat-raised-button color="accent" *ngIf="isEditing" (click)="guardarCambios()">Guardar</button>
+    <button mat-button *ngIf="isEditing" (click)="cancelarEdicion()">Cancelar</button>
+  </mat-card-actions>
+</mat-card>
+<mat-card *ngIf="isLoading">
+  <mat-card-content>
+    <mat-spinner></mat-spinner>
+    <p>Cargando datos del paciente...</p>
+  </mat-card-content>
+</mat-card> 

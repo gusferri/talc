@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const defaults = {\n  dir: 'ltr',\n  theme: 'institucional_theme',\n  sidenavOpened: false,\n  sidenavCollapsed: false,\n  boxed: true,\n  horizontal: false,\n  cardBorder: false,\n  activeTheme: 'institucional_theme',\n  navPos: 'side'\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}
