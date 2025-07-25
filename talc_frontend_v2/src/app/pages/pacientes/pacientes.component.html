@@ -1,7 +1,23 @@
+<!-- 
+  Template del componente de gestión de pacientes
+  Este archivo define la interfaz de usuario para la gestión completa de pacientes
+  del sistema TALC, incluyendo listado, búsqueda, ordenamiento y navegación.
+  
+  Características principales:
+  - Interfaz responsiva con Material Design
+  - Tabla dinámica con ordenamiento y paginación
+  - Búsqueda en tiempo real
+  - Acciones contextuales por paciente
+  - Estados de carga y vacío
+  - Control de acceso basado en roles
+-->
+
+<!-- Contenedor principal del componente de gestión de pacientes -->
 <div class="pacientes-container">
-  <!-- Header Section -->
+  <!-- Sección de encabezado: Título de la página y botón para crear nuevo paciente -->
   <div class="header-section">
     <div class="header-content">
+      <!-- Área del título con icono y descripción -->
       <div class="title-section">
         <h1 class="page-title">
           <mat-icon class="title-icon">people</mat-icon>
@@ -9,6 +25,7 @@
         </h1>
         <p class="page-subtitle">Administra la información de tus pacientes</p>
       </div>
+      <!-- Botón para crear un nuevo paciente -->
       <button mat-raised-button 
               color="primary" 
               class="new-patient-btn"
@@ -19,34 +36,37 @@
     </div>
   </div>
 
-  <!-- Search and Filters Section -->
+  <!-- Sección de búsqueda y filtros: Campo de búsqueda para filtrar pacientes -->
   <mat-card class="search-card">
     <div class="search-section">
+      <!-- Campo de búsqueda con autocompletado -->
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar pacientes</mat-label>
         <input matInput 
                [(ngModel)]="searchTerm"
                (input)="aplicarFiltro($event)"
                placeholder="Buscar por nombre, apellido o DNI...">
+        <!-- Icono de búsqueda -->
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
   </mat-card>
 
-  <!-- Patients Table Section -->
+  <!-- Sección de tabla de pacientes: Contiene la tabla principal con los datos -->
   <mat-card class="table-card">
     <div class="table-container">
-      <!-- Loading State -->
+      <!-- Estado de carga: Se muestra mientras se cargan los datos -->
       <div *ngIf="isLoading" class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
         <p>Cargando pacientes...</p>
       </div>
 
-      <!-- Empty State -->
+      <!-- Estado vacío: Se muestra cuando no hay pacientes registrados -->
       <div *ngIf="!isLoading && pacientes.data.length === 0" class="empty-state">
         <mat-icon class="empty-icon">people_outline</mat-icon>
         <h3>No hay pacientes registrados</h3>
         <p>Comienza agregando tu primer paciente</p>
+        <!-- Botón de acción para agregar paciente desde estado vacío -->
         <button mat-raised-button 
                 color="primary" 
                 (click)="nuevoPaciente()">
@@ -55,17 +75,19 @@
         </button>
       </div>
 
-      <!-- Patients Table -->
+      <!-- Tabla de pacientes: Se muestra cuando hay datos disponibles -->
       <table *ngIf="!isLoading && pacientes.data.length > 0" 
              mat-table 
              [dataSource]="pacientes" 
              class="patients-table">
         
-        <!-- DNI Column -->
+        <!-- Columna DNI: Muestra el número de documento del paciente -->
         <ng-container matColumnDef="dni">
           <th mat-header-cell *matHeaderCellDef> 
+            <!-- Botón de ordenamiento para la columna DNI -->
             <button mat-button (click)="ordenarPor('dni')" class="sort-button">
               DNI 
+              <!-- Icono que indica la dirección del ordenamiento -->
               <mat-icon *ngIf="columnaOrden === 'dni'">
                 {{direccionOrden === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
               </mat-icon>
@@ -74,11 +96,13 @@
           <td mat-cell *matCellDef="let paciente"> {{paciente.DNI}} </td>
         </ng-container>
 
-        <!-- Nombre Column -->
+        <!-- Columna Nombre: Muestra el nombre del paciente -->
         <ng-container matColumnDef="nombre">
           <th mat-header-cell *matHeaderCellDef> 
+            <!-- Botón de ordenamiento para la columna Nombre -->
             <button mat-button (click)="ordenarPor('nombre')" class="sort-button">
               Nombre 
+              <!-- Icono que indica la dirección del ordenamiento -->
               <mat-icon *ngIf="columnaOrden === 'nombre'">
                 {{direccionOrden === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
               </mat-icon>
@@ -87,11 +111,13 @@
           <td mat-cell *matCellDef="let paciente"> {{paciente.Nombre}} </td>
         </ng-container>
 
-        <!-- Apellido Column -->
+        <!-- Columna Apellido: Muestra el apellido del paciente -->
         <ng-container matColumnDef="apellido">
           <th mat-header-cell *matHeaderCellDef> 
+            <!-- Botón de ordenamiento para la columna Apellido -->
             <button mat-button (click)="ordenarPor('apellido')" class="sort-button">
               Apellido 
+              <!-- Icono que indica la dirección del ordenamiento -->
               <mat-icon *ngIf="columnaOrden === 'apellido'">
                 {{direccionOrden === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
               </mat-icon>
@@ -100,26 +126,31 @@
           <td mat-cell *matCellDef="let paciente"> {{paciente.Apellido}} </td>
         </ng-container>
 
-        <!-- Edad Column -->
+        <!-- Columna Edad: Muestra la edad calculada del paciente -->
         <ng-container matColumnDef="edad">
           <th mat-header-cell *matHeaderCellDef> 
+            <!-- Botón de ordenamiento para la columna Edad -->
             <button mat-button (click)="ordenarPor('edad')" class="sort-button">
               Edad 
+              <!-- Icono que indica la dirección del ordenamiento -->
               <mat-icon *ngIf="columnaOrden === 'edad'">
                 {{direccionOrden === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
               </mat-icon>
             </button>
           </th>
           <td mat-cell *matCellDef="let paciente"> 
+            <!-- Chip que muestra la edad calculada -->
             <span class="age-chip">{{calcularEdad(paciente.FechaNacimiento)}} años</span>
           </td>
         </ng-container>
 
-        <!-- Acciones Column -->
+        <!-- Columna Acciones: Contiene botones para diferentes acciones sobre cada paciente -->
         <ng-container matColumnDef="acciones">
           <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let paciente">
+            <!-- Contenedor de botones de acción -->
             <div class="action-buttons">
+              <!-- Botón para ver detalles del paciente -->
               <button mat-icon-button 
                       matTooltip="Ver detalles"
                       (click)="verDetallePaciente(paciente)"
@@ -127,6 +158,7 @@
                 <mat-icon>visibility</mat-icon>
               </button>
 
+              <!-- Botón para adjuntar documentación al paciente -->
               <button mat-icon-button 
                 matTooltip="Adjuntar documentación"
                 (click)="adjuntarDocumentacion(paciente, $event)"
@@ -134,6 +166,7 @@
                 <mat-icon>attach_file</mat-icon>
               </button>
               
+              <!-- Botón para ver la agenda/turnos del paciente -->
               <button mat-icon-button 
                       matTooltip="Agenda"
                       (click)="irATurnos(paciente, $event)"
@@ -141,6 +174,7 @@
                 <mat-icon>calendar_today</mat-icon>
               </button>
 
+              <!-- Botón para notas de voz (solo visible para profesionales) -->
               <button *ngIf="esProfesional" mat-icon-button 
                       matTooltip="Notas de Voz"
                       (click)="irANotasVoz(paciente, $event)"
@@ -148,6 +182,7 @@
                 <mat-icon>graphic_eq</mat-icon>
               </button>
               
+              <!-- Botón para seguimiento evolutivo (solo visible para profesionales) -->
               <button *ngIf="esProfesional" mat-icon-button 
                       matTooltip="Seguimiento evolutivo"
                       (click)="irASeguimientoEvolutivo(paciente, $event)"
@@ -159,13 +194,15 @@
           </td>
         </ng-container>
 
+        <!-- Definición de filas de encabezado y datos -->
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <!-- Fila de datos: Hace clic en toda la fila para ver detalles del paciente -->
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
             class="patient-row"
             (click)="verDetallePaciente(row)"></tr>
       </table>
 
-      <!-- Paginator -->
+      <!-- Paginador: Controla la paginación de la tabla -->
       <mat-paginator *ngIf="!isLoading && pacientes.data.length > 0"
                      [pageSizeOptions]="[5, 10, 25, 50]"
                      showFirstLastButtons

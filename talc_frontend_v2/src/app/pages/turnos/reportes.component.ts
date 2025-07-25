@@ -1,8 +1,37 @@
+/**
+ * Componente Reportes - Estadísticas y visualización de datos de turnos
+ *
+ * Este componente permite visualizar estadísticas y reportes gráficos
+ * sobre los turnos del sistema TALC, incluyendo:
+ * - Distribución de turnos por estado (asistidos, cancelados, ausentes, agendados)
+ * - Turnos por profesional y especialidad
+ * - Porcentaje de asistencia por profesional
+ * - Filtros por rango de fechas
+ *
+ * Utiliza ApexCharts para la visualización interactiva de datos.
+ *
+ * Funcionalidades principales:
+ * - Filtros de fecha (desde/hasta)
+ * - Gráficos de torta, barras y líneas
+ * - Actualización dinámica de datos
+ * - Visualización responsiva
+ *
+ * Arquitectura:
+ * - Componente standalone
+ * - Integración con ApexCharts y Angular Material
+ * - Manejo reactivo de filtros y datos
+ */
+
+// Importaciones de Angular y librerías de gráficos
 import { Component, OnInit } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ApexNonAxisChartSeries, ApexChart, ApexResponsive, ApexLegend, ApexAxisChartSeries, ApexXAxis, ApexYAxis, ApexStroke, ApexGrid, ApexTooltip, ApexPlotOptions, ApexDataLabels } from 'ng-apexcharts';
+
+// Servicio de turnos y modelo de datos
 import { TurnosService } from '../../services/turnos.service';
 import { Turno } from '../../models/turno.model';
+
+// Formularios y Material
 import { FormControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +40,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
+/**
+ * Tipos de configuración para los diferentes gráficos ApexCharts
+ */
 export type ChartOptions = {
   series: ApexNonAxisChartSeries;
   chart: ApexChart;
@@ -44,6 +76,9 @@ export type BarChartOptions = {
   tooltip: ApexTooltip;
 };
 
+/**
+ * Componente principal de reportes y estadísticas de turnos
+ */
 @Component({
   selector: 'app-reportes',
   standalone: true,
@@ -60,20 +95,37 @@ export type BarChartOptions = {
   ]
 })
 export class ReportesComponent implements OnInit {
+  /** Opciones para el gráfico de torta de estados de turnos */
   public chartOptions: ChartOptions;
+  /** Opciones para el gráfico de líneas (no usado en este template) */
   public lineChartOptions: LineChartOptions;
+  /** Opciones para el gráfico de barras de turnos por profesional */
   public barChartOptions: BarChartOptions;
+  /** Opciones para el gráfico de torta de profesionales */
   public profesionalesPieOptions: ChartOptions;
+  /** Opciones para el gráfico de torta de especialidades */
   public especialidadesPieOptions: ChartOptions;
+  /** Opciones para el gráfico de barras apiladas de asistencia por profesional */
   public asistenciaProfesionalOptions: BarChartOptions;
+  /** Opciones para el gráfico de barras de horarios (no usado en este template) */
   public horarioBarOptions: BarChartOptions;
+  /** Opciones para el gráfico de línea de ausentismo (no usado en este template) */
   public ausentismoLineOptions: LineChartOptions;
+  /** Opciones para el gráfico de programados vs efectivos (no usado en este template) */
   public programadosVsEfectivosOptions: LineChartOptions;
+
+  /** Filtro de fecha desde */
   public fechaDesde = new FormControl();
+  /** Filtro de fecha hasta */
   public fechaHasta = new FormControl();
+  /** Lista completa de turnos (sin filtrar) */
   private allTurnos: Turno[] = [];
 
+  /**
+   * Constructor: inicializa las opciones de los gráficos y servicios
+   */
   constructor(private turnosService: TurnosService) {
+    // Configuración inicial de los gráficos (colores, tipos, leyendas, etc.)
     this.chartOptions = {
       series: [0, 0, 0, 0],
       chart: {
@@ -98,6 +150,7 @@ export class ReportesComponent implements OnInit {
         position: 'bottom'
       }
     };
+    // Configuración de otros gráficos (línea, barras, torta, etc.)
     this.lineChartOptions = {
       series: [],
       chart: {
@@ -273,6 +326,9 @@ export class ReportesComponent implements OnInit {
     };
   }
 
+  /**
+   * Hook de inicialización: carga los turnos y configura los gráficos
+   */
   ngOnInit(): void {
     this.turnosService.obtenerTurnos().subscribe((turnos: Turno[]) => {
       this.allTurnos = turnos;
@@ -282,6 +338,10 @@ export class ReportesComponent implements OnInit {
     this.fechaHasta.valueChanges.subscribe(() => this.actualizarGraficosPorRango());
   }
 
+  /**
+   * Actualiza todos los gráficos según el rango de fechas seleccionado
+   * Filtra los turnos y recalcula los datos de cada gráfico
+   */
   actualizarGraficosPorRango() {
     const desde = this.fechaDesde.value ? new Date(this.fechaDesde.value) : null;
     const hasta = this.fechaHasta.value ? new Date(this.fechaHasta.value) : null;
@@ -374,6 +434,9 @@ export class ReportesComponent implements OnInit {
     this.asistenciaProfesionalOptions.chart.width = 1100;
   }
 
+  /**
+   * Limpia los filtros de fecha
+   */
   limpiarFechas() {
     this.fechaDesde.setValue(null);
     this.fechaHasta.setValue(null);

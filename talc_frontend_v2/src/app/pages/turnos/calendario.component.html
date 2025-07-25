@@ -1,28 +1,57 @@
+<!--
+  Template del componente de calendario de turnos
+  Este archivo define la interfaz de usuario para la visualización
+  de turnos en formato calendario del sistema TALC.
+
+  Características principales:
+  - Vista de calendario interactiva con eventos
+  - Búsqueda de pacientes en tiempo real
+  - Filtrado dinámico de eventos
+  - Integración con angular-calendar
+  - Diseño responsivo con Material Design
+  - Header con título y descripción
+  - Campo de búsqueda con filtrado automático
+-->
+
+<!-- Contenedor principal del calendario -->
 <div class="calendario-container">
-  <!-- Header Section -->
+  
+  <!-- Sección de encabezado: Título y descripción -->
   <div class="header-section">
     <div class="header-content">
       <div class="title-section">
+        <!-- Título principal con icono -->
         <h1 class="page-title">
           <mat-icon class="title-icon">event</mat-icon>
           Calendario de Turnos
         </h1>
+        <!-- Subtítulo descriptivo -->
         <p class="page-subtitle">Administra los turnos y citas de tus pacientes</p>
       </div>
     </div>
   </div>
+  
+  <!-- Tarjeta de búsqueda: Campo para filtrar por paciente -->
   <mat-card class="search-card">
     <div class="search-section search-section-flex-between">
       <div class="search-filters-row">
+        <!-- Campo de búsqueda con filtrado automático -->
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar paciente</mat-label>
-          <input matInput [(ngModel)]="searchTerm" (input)="filtrarEventos()" placeholder="Buscar por paciente...">
+          <input matInput 
+                 [(ngModel)]="searchTerm" 
+                 (input)="filtrarEventos()" 
+                 placeholder="Buscar por paciente...">
+          <!-- Icono de búsqueda -->
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
       </div>
     </div>
   </mat-card>
+  
+  <!-- Tarjeta del calendario: Contiene el componente de calendario -->
   <div class="calendar-card">
+    <!-- Componente de calendario con eventos filtrados -->
     <app-fullcalendar [eventsInput]="eventosFiltrados"></app-fullcalendar>
   </div>
 </div> 

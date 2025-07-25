@@ -1,27 +1,45 @@
+/**
+ * Estilos para el componente de reportes y estadísticas de turnos
+ *
+ * Este archivo define el diseño y presentación visual de la interfaz
+ * de reportes, incluyendo:
+ * - Layout responsivo para gráficos y estadísticas
+ * - Botón de limpiar filtros con efectos hover
+ * - Espaciado y organización de elementos
+ * - Consistencia visual con el sistema TALC
+ * - Efectos de transición y animaciones
+ */
+
+/* Contenedor principal de reportes */
+/* Proporciona el espaciado y layout base para todos los elementos */
 .reportes-container {
-  padding: 2rem;
+  padding: 2rem;                         /* Espaciado interno uniforme */
 }
 
+/* Botón de nueva cita (reutilizado para limpiar filtros) */
+/* Estilo principal con gradiente corporativo y efectos hover */
 .new-appointment-btn {
-  height: 48px;
-  padding: 0 24px;
-  font-weight: 500;
-  font-size: 14px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);
-  border-radius: 8px;
-  box-shadow: 0 8px 32px 0 rgba(170, 38, 43, 0.18);
-  transition: all 0.3s ease;
-  color: #f5f1eb !important;
-  border: none !important;
-  outline: none !important;
+  height: 48px;                          /* Altura fija */
+  padding: 0 24px;                       /* Espaciado interno horizontal */
+  font-weight: 500;                      /* Peso de fuente medium */
+  font-size: 14px;                       /* Tamaño de fuente */
+  font-family: 'Plus Jakarta Sans', sans-serif;  /* Fuente corporativa */
+  background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);  /* Gradiente corporativo */
+  border-radius: 8px;                    /* Bordes redondeados */
+  box-shadow: 0 8px 32px 0 rgba(170, 38, 43, 0.18);  /* Sombra con color corporativo */
+  transition: all 0.3s ease;             /* Transición suave para todos los cambios */
+  color: #f5f1eb !important;             /* Color de texto claro */
+  border: none !important;               /* Sin borde */
+  outline: none !important;              /* Sin outline */
 
+  /* Efecto hover con elevación y sombra aumentada */
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px 0 rgba(170, 38, 43, 0.28);
+    transform: translateY(-2px);         /* Movimiento hacia arriba */
+    box-shadow: 0 12px 32px 0 rgba(170, 38, 43, 0.28);  /* Sombra más intensa */
   }
 
+  /* Icono del botón */
   mat-icon {
-    margin-right: 8px;
+    margin-right: 8px;                   /* Espaciado derecho del icono */
   }
 } 

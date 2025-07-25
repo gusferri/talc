@@ -1,9 +1,24 @@
+<!-- Contenedor principal de la página de error -->
+<!-- Utiliza el layout en blanco para mostrar solo el contenido de error -->
 <div class="blank-layout-container justify-content-center">
+  <!-- Fila para centrar el contenido -->
   <div class="row">
+    <!-- Columna que ocupa todo el ancho y centra el contenido -->
     <div class="col-12 text-center">
+      <!-- Imagen de fondo para la página de error -->
+      <!-- Proporciona contexto visual sobre el tipo de error -->
       <img src="/assets/images/backgrounds/errorimg.svg" alt="error-bg" />
+      
+      <!-- Título principal de la página de error -->
+      <!-- Mensaje llamativo para captar la atención del usuario -->
       <h2 class="auth-title f-w-600">Opps!!!</h2>
+      
+      <!-- Descripción del error -->
+      <!-- Explica de manera clara que la página no fue encontrada -->
       <h6 class="f-s-20 f-w-600 m-b-30">This page you are looking for could not be found.</h6>
+      
+      <!-- Botón para volver a la página principal -->
+      <!-- Proporciona una ruta de escape clara para el usuario -->
       <a mat-flat-button color="primary" [routerLink]="['/starter']">Go back to Home</a>
     </div>
   </div>

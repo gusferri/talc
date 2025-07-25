@@ -1,92 +1,129 @@
-// Estilos base para la página de calendario
+/**
+ * Estilos para el componente de calendario de turnos
+ *
+ * Este archivo define el diseño y presentación visual de la interfaz
+ * de calendario, incluyendo:
+ * - Layout responsivo con contenedor centrado
+ * - Diseño de tarjetas para búsqueda y calendario
+ * - Header con título y subtítulo
+ * - Campo de búsqueda con estilos Material
+ * - Sombras y bordes redondeados
+ * - Consistencia visual con el sistema TALC
+ */
+
+/* Estilos base para la página de calendario */
+/* Contenedor fluido con espaciado */
 .container-fluid {
-  padding-top: 0.5rem;
-  padding-bottom: 2rem;
+  padding-top: 0.5rem;                   /* Espaciado superior */
+  padding-bottom: 2rem;                  /* Espaciado inferior */
 }
+
+/* Tarjeta genérica */
+/* Estilos base para todas las tarjetas */
 .card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(170, 38, 43, 0.04);
-  margin-top: 0.5rem;
+  border-radius: 12px;                   /* Bordes redondeados */
+  box-shadow: 0 2px 8px rgba(170, 38, 43, 0.04);  /* Sombra sutil con color corporativo */
+  margin-top: 0.5rem;                    /* Margen superior */
 }
+
+/* Cuerpo de la tarjeta */
+/* Espaciado interno para el contenido */
 .card-body {
-  padding: 1.2rem;
+  padding: 1.2rem;                       /* Espaciado interno */
 }
 
+/* Contenedor principal del calendario */
+/* Layout centrado con ancho máximo */
 .calendario-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px;                         /* Espaciado interno */
+  max-width: 1400px;                     /* Ancho máximo para legibilidad */
+  margin: 0 auto;                        /* Centrado horizontal */
 }
 
+/* Tarjeta de búsqueda */
+/* Contiene el campo de búsqueda de pacientes */
 .search-card {
-  margin-bottom: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;                   /* Margen inferior */
+  border-radius: 12px;                   /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
 
+  /* Sección de búsqueda */
   .search-section {
-    padding: 16px;
+    padding: 16px;                       /* Espaciado interno */
 
+    /* Layout flexible para la sección de búsqueda */
     .search-section-flex-between {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 24px;
-      padding-bottom: 24px;
+      display: flex;                     /* Layout flexbox */
+      align-items: center;               /* Centrado vertical */
+      justify-content: flex-start;       /* Alineación a la izquierda */
+      padding-top: 24px;                 /* Espaciado superior */
+      padding-bottom: 24px;              /* Espaciado inferior */
     }
 
+    /* Fila de filtros de búsqueda */
     .search-filters-row {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 24px;
+      display: flex;                     /* Layout flexbox */
+      width: 100%;                       /* Ancho completo */
+      align-items: center;               /* Centrado vertical */
+      justify-content: flex-start;       /* Alineación a la izquierda */
+      gap: 24px;                         /* Espaciado entre elementos */
     }
 
+    /* Campo de búsqueda */
     .search-field {
-      flex: 1;
-      min-width: 220px;
-      max-width: 400px;
+      flex: 1;                           /* Crecimiento flexible */
+      min-width: 220px;                  /* Ancho mínimo */
+      max-width: 400px;                  /* Ancho máximo para usabilidad */
     }
   }
 }
 
+/* Tarjeta del calendario */
+/* Contiene el componente de calendario */
 .calendar-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(170, 38, 43, 0.04);
-  background: #fff;
-  padding: 1.2rem;
+  border-radius: 12px;                   /* Bordes redondeados */
+  box-shadow: 0 2px 8px rgba(170, 38, 43, 0.04);  /* Sombra sutil con color corporativo */
+  background: #fff;                      /* Fondo blanco */
+  padding: 1.2rem;                       /* Espaciado interno */
 }
 
+/* Sección del encabezado */
+/* Contiene el título y subtítulo de la página */
 .header-section {
-  margin-bottom: 24px;
+  margin-bottom: 24px;                   /* Margen inferior */
 
+  /* Contenido del encabezado */
   .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
+    display: flex;                       /* Layout flexbox */
+    justify-content: space-between;      /* Distribución del espacio */
+    align-items: center;                 /* Centrado vertical */
+    flex-wrap: wrap;                     /* Envolver en pantallas pequeñas */
+    gap: 16px;                           /* Espaciado entre elementos */
 
+    /* Sección del título */
     .title-section {
+      /* Título principal con icono */
       .page-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0 0 8px 0;
-        font-size: 28px;
-        font-weight: 600;
-        color: #333;
+        display: flex;                   /* Layout flexbox para icono y texto */
+        align-items: center;             /* Centrado vertical */
+        gap: 12px;                       /* Espaciado entre icono y texto */
+        margin: 0 0 8px 0;               /* Márgenes */
+        font-size: 28px;                 /* Tamaño de fuente grande */
+        font-weight: 600;                /* Peso de fuente semi-bold */
+        color: #333;                     /* Color de texto oscuro */
 
+        /* Icono del título */
         .title-icon {
-          color: #aa262b;
-          font-size: 32px;
+          color: #aa262b;                /* Color corporativo TALC */
+          font-size: 32px;               /* Tamaño del icono */
         }
       }
 
+      /* Subtítulo descriptivo */
       .page-subtitle {
-        margin: 0;
-        color: #666;
-        font-size: 16px;
+        margin: 0;                       /* Sin márgenes */
+        color: #666;                     /* Color de texto gris */
+        font-size: 16px;                 /* Tamaño de fuente mediano */
       }
     }
   }

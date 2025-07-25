@@ -1,11 +1,21 @@
+<!-- Contenedor principal de la página de login -->
+<!-- Proporciona el layout y centrado de la interfaz de autenticación -->
 <div class="login-container">
+  <!-- Tarjeta principal del formulario de login -->
+  <!-- Contiene todo el contenido de autenticación con diseño moderno -->
   <div class="login-card">
+    <!-- Encabezado de la página de login -->
+    <!-- Muestra el título de bienvenida y el propósito de la página -->
     <div class="login-header">
       <h1 class="welcome-text">Bienvenido a TALC Gestión</h1>
       <h2 class="login-text">Iniciar Sesión</h2>
     </div>
 
+    <!-- Formulario de autenticación -->
+    <!-- Maneja el envío de credenciales y validación de campos -->
     <form (ngSubmit)="login()" class="login-form">
+      <!-- Campo de entrada para el nombre de usuario -->
+      <!-- Utiliza Material Design con validación requerida -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Usuario</mat-label>
         <input matInput 
@@ -13,9 +23,12 @@
                name="username" 
                required 
                placeholder="Ingrese su usuario">
+        <!-- Icono de persona para indicar el tipo de campo -->
         <mat-icon matSuffix>person</mat-icon>
       </mat-form-field>
 
+      <!-- Campo de entrada para la contraseña -->
+      <!-- Incluye funcionalidad para mostrar/ocultar contraseña -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Contraseña</mat-label>
         <input matInput 
@@ -25,6 +38,8 @@
                required 
                placeholder="Ingrese su contraseña"
                (keydown.enter)="$event.preventDefault(); login();">
+        <!-- Botón para alternar visibilidad de la contraseña -->
+        <!-- Cambia el icono según el estado de visibilidad -->
         <button mat-icon-button 
                 matSuffix 
                 type="button"
@@ -35,6 +50,8 @@
         </button>
       </mat-form-field>
 
+      <!-- Botón de envío del formulario -->
+      <!-- Ejecuta la función de login al hacer clic -->
       <button mat-raised-button 
               color="primary" 
               type="submit" 
@@ -43,6 +60,8 @@
         Ingresar
       </button>
 
+      <!-- Mensaje de error -->
+      <!-- Se muestra solo cuando hay errores de autenticación -->
       <div *ngIf="loginError" class="error-message">
         <mat-icon>error</mat-icon>
         {{ loginError }}

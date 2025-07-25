@@ -1,7 +1,29 @@
+/**
+ * Componente para crear nuevos pacientes en el sistema TALC
+ * 
+ * Este componente proporciona un formulario completo y validado para
+ * registrar nuevos pacientes con toda su información personal, de contacto,
+ * ubicación y datos adicionales.
+ * 
+ * Funcionalidades principales:
+ * - Formulario reactivo con validaciones avanzadas
+ * - Habilitación progresiva de campos
+ * - Autocompletado inteligente para ubicaciones
+ * - Carga de catálogos dinámicos
+ * - Validación de datos en tiempo real
+ * - Capitalización automática de nombres
+ * - Gestión de estados de carga y envío
+ */
+
+// Importaciones de Angular Core
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+
+// Importaciones de Angular Forms
+import { ReactiveFormsModule, FormBuilder, Validators, FormControl, FormGroup } from '@angular/forms';
+
+// Importaciones de Angular Material
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -17,13 +39,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 
-// Services
+// Importaciones de servicios
 import { PacienteService } from '../../../services/paciente.service';
 import { UbicacionService } from '../../../services/ubicacion.service';
 import { ObraSocialService } from '../../../services/obra-social.service';
 import { EscuelaService } from '../../../services/escuela.service';
 import { GeneroService } from '../../../services/genero.service';
 
+/**
+ * Componente principal para creación de nuevos pacientes
+ * Maneja todo el proceso de registro con validaciones y UX optimizada
+ */
 @Component({
   selector: 'app-nuevo-paciente',
   standalone: true,
@@ -48,23 +74,41 @@ import { GeneroService } from '../../../services/genero.service';
   styleUrls: ['./nuevo-paciente.component.scss']
 })
 export class NuevoPacienteComponent implements OnInit {
+  /** Formulario reactivo para los datos del paciente */
   pacienteForm: FormGroup;
+  
+  /** Estado de carga de datos iniciales */
   isLoading = false;
+  
+  /** Estado de envío del formulario */
   isSubmitting = false;
 
-  // Data arrays
+  // Arrays de datos para los catálogos
+  /** Lista de géneros disponibles */
   generos: any[] = [];
+  /** Lista de provincias disponibles */
   provincias: any[] = [];
+  /** Lista de ciudades disponibles */
   ciudades: any[] = [];
+  /** Lista de escuelas disponibles */
   escuelas: any[] = [];
+  /** Lista de obras sociales disponibles */
   obrasSociales: any[] = [];
 
-  // Filtered arrays for autocomplete
+  // Arrays filtrados para autocompletado
+  /** Provincias filtradas para el autocompletado */
   provinciasFiltradas: any[] = [];
+  /** Ciudades filtradas para el autocompletado */
   ciudadesFiltradas: any[] = [];
+  /** Escuelas filtradas para el autocompletado */
   escuelasFiltradas: any[] = [];
+  /** Obras sociales filtradas para el autocompletado */
   obrasSocialesFiltradas: any[] = [];
 
+  /**
+   * Constructor del componente
+   * Inicializa el formulario reactivo con todas las validaciones necesarias
+   */
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -75,6 +119,7 @@ export class NuevoPacienteComponent implements OnInit {
     private generoService: GeneroService,
     private snackBar: MatSnackBar
   ) {
+    // Inicialización del formulario reactivo con validaciones
     this.pacienteForm = this.fb.group({
       dni: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
       apellido: ['', [Validators.required]],
@@ -92,15 +137,26 @@ export class NuevoPacienteComponent implements OnInit {
       observaciones: ['']
     });
 
+    // Configurar listeners para cambios en el formulario
     this.setupFormListeners();
   }
 
+  /**
+   * Hook del ciclo de vida - se ejecuta al inicializar el componente
+   * Carga los datos iniciales necesarios para el formulario
+   */
   ngOnInit(): void {
     this.cargarDatosIniciales();
   }
 
+  /**
+   * Configura los listeners para cambios en el formulario
+   * Implementa habilitación progresiva de campos y filtrado dinámico
+   */
   setupFormListeners(): void {
-    // Habilitar campos progresivamente
+    // Habilitación progresiva de campos basada en validaciones previas
+    
+    // DNI: Habilitar apellido solo si DNI tiene 8 dígitos
     this.pacienteForm.get('dni')?.valueChanges.subscribe(value => {
       if (value && value.toString().length === 8) {
         this.pacienteForm.get('apellido')?.enable();
@@ -109,6 +165,7 @@ export class NuevoPacienteComponent implements OnInit {
       }
     });
 
+    // Apellido: Habilitar nombre solo si apellido no está vacío
     this.pacienteForm.get('apellido')?.valueChanges.subscribe(value => {
       if (value && value.trim().length > 0) {
         this.pacienteForm.get('nombre')?.enable();
@@ -117,6 +174,7 @@ export class NuevoPacienteComponent implements OnInit {
       }
     });
 
+    // Nombre: Habilitar fecha de nacimiento solo si nombre no está vacío
     this.pacienteForm.get('nombre')?.valueChanges.subscribe(value => {
       if (value && value.trim().length > 0) {
         this.pacienteForm.get('fechaNacimiento')?.enable();
@@ -125,6 +183,7 @@ export class NuevoPacienteComponent implements OnInit {
       }
     });
 
+    // Fecha de nacimiento: Habilitar género solo si fecha está seleccionada
     this.pacienteForm.get('fechaNacimiento')?.valueChanges.subscribe(value => {
       if (value) {
         this.pacienteForm.get('genero')?.enable();
@@ -133,6 +192,7 @@ export class NuevoPacienteComponent implements OnInit {
       }
     });
 
+    // Género: Habilitar provincia solo si género está seleccionado
     this.pacienteForm.get('genero')?.valueChanges.subscribe(value => {
       if (value) {
         this.pacienteForm.get('provincia')?.enable();
@@ -141,24 +201,32 @@ export class NuevoPacienteComponent implements OnInit {
       }
     });
 
-    // Autocomplete listeners
+    // Listeners para autocompletado
+    // Provincia: Filtrar provincias según entrada del usuario
     this.pacienteForm.get('provincia')?.valueChanges.subscribe(value => {
       this.filtrarProvincias(value);
     });
 
+    // Ciudad: Filtrar ciudades según provincia seleccionada
     this.pacienteForm.get('ciudad')?.valueChanges.subscribe(value => {
       this.filtrarCiudades(value);
     });
 
+    // Escuela: Filtrar escuelas según ciudad seleccionada
     this.pacienteForm.get('escuela')?.valueChanges.subscribe(value => {
       this.filtrarEscuelas(value);
     });
 
+    // Obra social: Filtrar obras sociales según entrada del usuario
     this.pacienteForm.get('obraSocial')?.valueChanges.subscribe(value => {
       this.filtrarObrasSociales(value);
     });
   }
 
+  /**
+   * Carga los datos iniciales necesarios para el formulario
+   * Obtiene catálogos de géneros, provincias, obras sociales y escuelas
+   */
   cargarDatosIniciales(): void {
     this.isLoading = true;
     
@@ -205,18 +273,28 @@ export class NuevoPacienteComponent implements OnInit {
     });
   }
 
+  /**
+   * Filtra las provincias para el autocompletado
+   * 
+   * @param value - Valor de entrada para filtrar
+   */
   filtrarProvincias(value: any): void {
     if (!value) {
       this.provinciasFiltradas = this.provincias;
       return;
     }
-    // Si value es string, usarlo; si es objeto, usar value.Provincia
+    // Manejar tanto strings como objetos
     const filterValue = typeof value === 'string' ? value.toLowerCase() : (value.Provincia || '').toLowerCase();
     this.provinciasFiltradas = this.provincias.filter(provincia =>
       provincia.Provincia.toLowerCase().includes(filterValue)
     );
   }
 
+  /**
+   * Filtra las ciudades basándose en la provincia seleccionada
+   * 
+   * @param value - Valor de entrada para filtrar
+   */
   filtrarCiudades(value: string): void {
     const provincia = this.pacienteForm.get('provincia')?.value;
     if (!provincia || !value) {
@@ -235,6 +313,11 @@ export class NuevoPacienteComponent implements OnInit {
     });
   }
 
+  /**
+   * Filtra las escuelas basándose en la ciudad seleccionada
+   * 
+   * @param value - Valor de entrada para filtrar
+   */
   filtrarEscuelas(value: string): void {
     const ciudad = this.pacienteForm.get('ciudad')?.value;
     if (!ciudad || !value) {
@@ -253,6 +336,11 @@ export class NuevoPacienteComponent implements OnInit {
     });
   }
 
+  /**
+   * Filtra las obras sociales para el autocompletado
+   * 
+   * @param value - Valor de entrada para filtrar
+   */
   filtrarObrasSociales(value: string): void {
     if (!value) {
       this.obrasSocialesFiltradas = this.obrasSociales;
@@ -270,22 +358,52 @@ export class NuevoPacienteComponent implements OnInit {
     });
   }
 
+  /**
+   * Función helper para mostrar el nombre de la provincia en el autocompletado
+   * 
+   * @param provincia - Objeto provincia
+   * @returns Nombre de la provincia o string vacío
+   */
   mostrarNombreProvincia(provincia: any): string {
     return provincia?.Provincia || '';
   }
 
+  /**
+   * Función helper para mostrar el nombre de la ciudad en el autocompletado
+   * 
+   * @param ciudad - Objeto ciudad
+   * @returns Nombre de la ciudad o string vacío
+   */
   mostrarNombreCiudad(ciudad: any): string {
     return ciudad?.Ciudad || '';
   }
 
+  /**
+   * Función helper para mostrar el nombre de la escuela en el autocompletado
+   * 
+   * @param escuela - Objeto escuela
+   * @returns Nombre de la escuela o string vacío
+   */
   mostrarNombreEscuela(escuela: any): string {
     return escuela?.Nombre || '';
   }
 
+  /**
+   * Función helper para mostrar el nombre de la obra social en el autocompletado
+   * 
+   * @param obra - Objeto obra social
+   * @returns Nombre de la obra social o string vacío
+   */
   mostrarNombreObraSocial(obra: any): string {
     return obra?.Nombre || '';
   }
 
+  /**
+   * Capitaliza automáticamente el texto de un campo específico
+   * Se ejecuta al perder el foco (evento blur)
+   * 
+   * @param controlName - Nombre del control a capitalizar
+   */
   capitalizarTexto(controlName: string): void {
     const control = this.pacienteForm.get(controlName);
     if (control) {
@@ -297,12 +415,22 @@ export class NuevoPacienteComponent implements OnInit {
     }
   }
 
+  /**
+   * Valida que la fecha de nacimiento sea anterior a la fecha actual
+   * 
+   * @param fecha - Fecha a validar
+   * @returns true si la fecha es válida (pasada), false en caso contrario
+   */
   validarFechaNacimiento(fecha: Date): boolean {
     if (!fecha) return false;
     const hoy = new Date();
     return fecha < hoy;
   }
 
+  /**
+   * Guarda el nuevo paciente en el sistema
+   * Valida el formulario y envía los datos al servidor
+   */
   guardarPaciente(): void {
     if (this.pacienteForm.valid) {
       this.isSubmitting = true;
@@ -311,6 +439,7 @@ export class NuevoPacienteComponent implements OnInit {
       
       this.pacienteService.insertarPaciente(pacienteData).subscribe({
         next: (response) => {
+          // Éxito: mostrar mensaje y navegar a la lista de pacientes
           this.snackBar.open('Paciente guardado exitosamente', 'Cerrar', {
             duration: 3000,
             horizontalPosition: 'center',
@@ -319,6 +448,7 @@ export class NuevoPacienteComponent implements OnInit {
           this.router.navigate(['/pacientes']);
         },
         error: (error) => {
+          // Error: mostrar mensaje de error y permitir reintentar
           console.error('Error al guardar paciente:', error);
           this.snackBar.open('Error al guardar el paciente', 'Cerrar', {
             duration: 3000,
@@ -329,10 +459,15 @@ export class NuevoPacienteComponent implements OnInit {
         }
       });
     } else {
+      // Formulario inválido: marcar campos con errores
       this.marcarCamposInvalidos();
     }
   }
 
+  /**
+   * Marca todos los campos inválidos como "touched"
+   * Esto activa la visualización de errores en el formulario
+   */
   marcarCamposInvalidos(): void {
     Object.keys(this.pacienteForm.controls).forEach(key => {
       const control = this.pacienteForm.get(key);
@@ -342,10 +477,17 @@ export class NuevoPacienteComponent implements OnInit {
     });
   }
 
+  /**
+   * Cancela la creación del paciente y regresa a la lista
+   */
   cancelar(): void {
     this.router.navigate(['/pacientes']);
   }
 
+  /**
+   * Limpia todos los campos del formulario
+   * Restablece los valores por defecto de los toggles
+   */
   limpiarFormulario(): void {
     this.pacienteForm.reset();
     this.pacienteForm.patchValue({

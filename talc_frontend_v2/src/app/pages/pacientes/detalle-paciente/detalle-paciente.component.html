@@ -1,32 +1,48 @@
+<!-- Tarjeta principal del detalle de paciente -->
+<!-- Se muestra cuando los datos han sido cargados exitosamente -->
 <mat-card *ngIf="!isLoading">
+  <!-- Título de la tarjeta -->
   <mat-card-title>Detalle de Paciente</mat-card-title>
+  
+  <!-- Contenido principal de la tarjeta -->
   <mat-card-content>
+    <!-- Formulario reactivo para mostrar y editar datos del paciente -->
     <form [formGroup]="pacienteForm">
+      <!-- Grid responsivo para organizar los campos del formulario -->
       <div class="row">
+        <!-- Campo DNI - Información de identificación -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>DNI</mat-label>
             <input matInput formControlName="dni" />
           </mat-form-field>
         </div>
+        
+        <!-- Campo Apellido - Información personal -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Apellido</mat-label>
             <input matInput formControlName="apellido" />
           </mat-form-field>
         </div>
+        
+        <!-- Campo Nombre - Información personal -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="nombre" />
           </mat-form-field>
         </div>
+        
+        <!-- Campo Fecha de Nacimiento - Información demográfica -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Fecha de Nacimiento</mat-label>
             <input matInput formControlName="fechaNacimiento" />
           </mat-form-field>
         </div>
+        
+        <!-- Campo Género - Información demográfica con selector -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Género</mat-label>
@@ -37,6 +53,8 @@
             </mat-select>
           </mat-form-field>
         </div>
+        
+        <!-- Campo Provincia - Ubicación con autocompletado -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Provincia</mat-label>
@@ -48,6 +66,8 @@
             </mat-autocomplete>
           </mat-form-field>
         </div>
+        
+        <!-- Campo Ciudad - Ubicación con autocompletado dependiente de provincia -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Ciudad</mat-label>
@@ -59,23 +79,32 @@
             </mat-autocomplete>
           </mat-form-field>
         </div>
+        
+        <!-- Campo Teléfono - Información de contacto -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Teléfono</mat-label>
             <input matInput formControlName="telefono" />
           </mat-form-field>
         </div>
+        
+        <!-- Campo Email - Información de contacto -->
         <div class="col-12 col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Email</mat-label>
             <input matInput formControlName="email" />
           </mat-form-field>
         </div>
+        
+        <!-- Toggle para escolarización - Información educativa -->
         <div class="col-12 col-md-12">
           <mat-slide-toggle formControlName="estaEscolarizado" class="toggle-field">
             ¿Está escolarizado?
           </mat-slide-toggle>
         </div>
+        
+        <!-- Campo Escuela - Solo visible si está escolarizado -->
+        <!-- Se habilita dinámicamente basado en el estado de escolarización -->
         <div class="col-12 col-md-6" *ngIf="pacienteForm.get('estaEscolarizado')?.value">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Escuela</mat-label>
@@ -87,11 +116,16 @@
             </mat-autocomplete>
           </mat-form-field>
         </div>
+        
+        <!-- Toggle para obra social - Información de cobertura médica -->
         <div class="col-12 col-md-12">
           <mat-slide-toggle formControlName="tieneObraSocial" class="toggle-field">
             ¿Tiene obra social?
           </mat-slide-toggle>
         </div>
+        
+        <!-- Campo Obra Social - Solo visible si tiene obra social -->
+        <!-- Se habilita dinámicamente basado en el estado de cobertura -->
         <div class="col-12 col-md-6" *ngIf="pacienteForm.get('tieneObraSocial')?.value">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Obra Social</mat-label>
@@ -103,6 +137,9 @@
             </mat-autocomplete>
           </mat-form-field>
         </div>
+        
+        <!-- Campo Observaciones - Información adicional -->
+        <!-- Campo de texto multilínea para notas importantes -->
         <div class="col-12 col-md-12">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Observaciones</mat-label>
@@ -112,15 +149,26 @@
       </div>
     </form>
   </mat-card-content>
+  
+  <!-- Acciones de la tarjeta - Botones de edición -->
   <mat-card-actions align="end">
+    <!-- Botón Editar - Solo visible en modo de solo lectura -->
     <button mat-raised-button color="primary" *ngIf="!isEditing" (click)="habilitarEdicion()">Editar</button>
+    
+    <!-- Botón Guardar - Solo visible en modo de edición -->
     <button mat-raised-button color="accent" *ngIf="isEditing" (click)="guardarCambios()">Guardar</button>
+    
+    <!-- Botón Cancelar - Solo visible en modo de edición -->
     <button mat-button *ngIf="isEditing" (click)="cancelarEdicion()">Cancelar</button>
   </mat-card-actions>
 </mat-card>
+
+<!-- Tarjeta de carga - Se muestra mientras se cargan los datos -->
 <mat-card *ngIf="isLoading">
   <mat-card-content>
+    <!-- Spinner de carga -->
     <mat-spinner></mat-spinner>
+    <!-- Mensaje informativo -->
     <p>Cargando datos del paciente...</p>
   </mat-card-content>
 </mat-card> 

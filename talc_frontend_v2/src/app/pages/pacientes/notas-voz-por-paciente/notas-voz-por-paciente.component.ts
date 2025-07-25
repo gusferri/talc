@@ -1,24 +1,52 @@
+/**
+ * Componente para gestión de notas de voz por paciente
+ * 
+ * Este componente permite a los profesionales consultar y gestionar
+ * las notas de voz asociadas a los turnos de cada paciente.
+ * 
+ * Funcionalidades principales:
+ * - Búsqueda y selección de pacientes
+ * - Visualización de turnos con estado de notas de voz
+ * - Reproducción y edición de transcripciones existentes
+ * - Grabación de nuevas notas de voz
+ * - Interfaz dual para gestión de transcripciones
+ */
+
+// Importaciones de Angular Core
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+
+// Importaciones de Angular Forms
+import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+
+// Importaciones de Angular Material
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PacienteService } from '../../../services/paciente.service';
-import { debounceTime, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogNotaVozComponent } from './dialog-nota-voz.component';
-import { NotasVozService } from '../../../services/notas-voz.service';
-import { DialogGrabarNotaVozComponent } from './dialog-grabar-nota-voz.component';
-import { ActivatedRoute } from '@angular/router';
 
+// Importaciones de servicios
+import { PacienteService } from '../../../services/paciente.service';
+import { NotasVozService } from '../../../services/notas-voz.service';
+
+// Importaciones de RxJS
+import { debounceTime, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+
+// Importaciones de componentes de diálogo
+import { DialogNotaVozComponent } from './dialog-nota-voz.component';
+import { DialogGrabarNotaVozComponent } from './dialog-grabar-nota-voz.component';
+
+/**
+ * Componente principal para gestión de notas de voz por paciente
+ * Permite consultar, reproducir y gestionar las notas de voz de los turnos
+ */
 @Component({
   selector: 'app-notas-voz-por-paciente',
   standalone: true,
@@ -39,33 +67,71 @@ import { ActivatedRoute } from '@angular/router';
   ]
 })
 export class NotasVozPorPacienteComponent implements OnInit {
+  /** Control del formulario para búsqueda de pacientes */
   pacienteControl = new FormControl('');
+  
+  /** Lista completa de pacientes del profesional */
   pacientes: any[] = [];
+  
+  /** Lista filtrada de pacientes para autocompletado */
   pacientesFiltrados: any[] = [];
+  
+  /** Paciente actualmente seleccionado */
   pacienteSeleccionado: any = null;
+  
+  /** Lista de turnos del paciente seleccionado */
   turnos: any[] = [];
+  
+  /** Columnas a mostrar en la tabla de turnos */
   displayedColumns = ['fecha', 'hora', 'notaVoz', 'acciones'];
+  
+  /** Estado de carga de datos */
   isLoading: boolean = false;
+  
+  /** Servicio de pacientes inyectado */
   private pacienteService = inject(PacienteService);
+  
+  /** Sesión/turno seleccionado para transcripción */
   sesionSeleccionada: any = null;
+  
+  /** Texto de la transcripción actual */
   transcripcion: string = '';
+  
+  /** ID de la nota de voz actual */
   idNotaVoz: number | null = null;
+  
+  /** Servicio de diálogos de Material */
   private dialog: MatDialog;
+  
+  /** Servicio de notas de voz inyectado */
   private notasVozService = inject(NotasVozService);
+  
+  /** Servicio de rutas para obtener parámetros */
   private route: ActivatedRoute;
 
+  /**
+   * Constructor del componente
+   * Inicializa los servicios necesarios para diálogos y rutas
+   */
   constructor(dialog: MatDialog, route: ActivatedRoute) {
     this.dialog = dialog;
     this.route = route;
   }
 
+  /**
+   * Hook del ciclo de vida - se ejecuta al inicializar el componente
+   * Carga los pacientes del profesional y configura la búsqueda
+   */
   ngOnInit(): void {
+    // Obtener el username del profesional desde localStorage
     const shortname = localStorage.getItem('username');
     if (shortname) {
+      // Cargar pacientes asociados al profesional
       this.pacienteService.obtenerPacientesPorProfesional(shortname).subscribe((pacientes: any[]) => {
         this.pacientes = pacientes;
         this.pacientesFiltrados = pacientes;
-        // Selección automática por query param
+        
+        // Verificar si hay un pacienteId en los query params para selección automática
         this.route.queryParams.subscribe(params => {
           const pacienteId = params['pacienteId'];
           if (pacienteId) {
@@ -78,9 +144,11 @@ export class NotasVozPorPacienteComponent implements OnInit {
         });
       });
     }
+    
+    // Configurar búsqueda reactiva con debounce
     this.pacienteControl.valueChanges
       .pipe(
-        debounceTime(300),
+        debounceTime(300), // Esperar 300ms después del último cambio
         switchMap(value => {
           if (typeof value === 'string' && value.length > 1) {
             const filtro = value.toLowerCase();
@@ -100,69 +168,59 @@ export class NotasVozPorPacienteComponent implements OnInit {
       });
   }
 
+  /**
+   * Función helper para mostrar el nombre del paciente en el autocompletado
+   * 
+   * @param paciente - Objeto paciente
+   * @returns String formateado con apellido y nombre
+   */
   displayPaciente(paciente: any): string {
     return paciente ? `${paciente.Apellido}, ${paciente.Nombre}` : '';
   }
 
+  /**
+   * Maneja la selección de un paciente del autocompletado
+   * Carga los turnos asociados al paciente seleccionado
+   * 
+   * @param event - Evento de selección del autocompletado
+   */
   onPacienteSeleccionado(event: any) {
     const paciente = event.option.value;
     this.pacienteSeleccionado = paciente;
+    
     if (paciente && paciente.ID) {
+      // Cargar turnos del paciente seleccionado
       this.pacienteService.obtenerTurnosPorPaciente(paciente.ID).subscribe((turnos: any[]) => {
-        // Filtrar solo los turnos en estado Asistido (5)
-        this.turnos = (turnos || []).filter(t => t.EstadoTurno === 'Asistido' || t.EstadoTurno === 5 || t.estado === 'Asistido' || t.estado === 5)
-          .map(t => ({
-            ...t,
-            tieneNotaVoz: !!(t.ID_NotaVoz || t.id_nota_voz)
-          }));
+        // Filtrar solo turnos en estado "Asistido" y agregar flag de nota de voz
+        this.turnos = (turnos || []).filter(t => 
+          t.EstadoTurno === 'Asistido' || t.EstadoTurno === 5 || 
+          t.estado === 'Asistido' || t.estado === 5
+        ).map(t => ({
+          ...t,
+          tieneNotaVoz: !!(t.ID_NotaVoz || t.id_nota_voz)
+        }));
       });
     } else {
       this.turnos = [];
     }
   }
 
-  editarNotaVoz(turno: any) {
-    // Lógica para editar la nota de voz
-  }
-
-  cargarNotaVoz(idNotaVoz: number, sesion?: any) {
-    if (!idNotaVoz) return;
-    if (sesion) {
-      this.sesionSeleccionada = sesion;
-    }
-    // Aquí deberías llamar a tu servicio de notas de voz para obtener la transcripción
-    // Ejemplo:
-    // this.notasVozService.obtenerNotaVoz(idNotaVoz).subscribe(resp => {
-    //   this.transcripcion = resp.texto;
-    //   this.idNotaVoz = idNotaVoz;
-    // });
-    // Por ahora, simula:
-    this.transcripcion = 'Transcripción de ejemplo para la nota de voz.';
-    this.idNotaVoz = idNotaVoz;
-  }
-
-  guardarEdicionNotaVoz() {
-    if (!this.idNotaVoz || !this.transcripcion) return;
-    // Aquí deberías llamar a tu servicio para guardar la transcripción editada
-    // this.notasVozService.actualizarNotaVoz(this.idNotaVoz, this.transcripcion).subscribe(...)
-    alert('Transcripción guardada (simulado)');
-  }
-
-  limpiarFormulario() {
-    this.transcripcion = '';
-    this.idNotaVoz = null;
-    this.sesionSeleccionada = null;
-  }
-
+  /**
+   * Abre el diálogo para editar una nota de voz existente
+   * 
+   * @param turno - Turno asociado a la nota de voz
+   */
   abrirDialogNotaVoz(turno: any) {
     // Determinar el ID correcto de la nota de voz
     const idNotaVoz = turno.ID_NotaVoz || turno.id_nota_voz;
     console.log('Intentando obtener nota de voz para ID:', idNotaVoz, 'Turno:', turno);
+    
     if (!idNotaVoz) {
       alert('No hay nota de voz asociada a este turno.');
       return;
     }
-    // Mostrar loading mientras se obtiene la nota
+    
+    // Abrir diálogo con estado de carga inicial
     const dialogRef = this.dialog.open(DialogNotaVozComponent, {
       data: {
         turno,
@@ -172,17 +230,23 @@ export class NotasVozPorPacienteComponent implements OnInit {
       },
       width: '600px'
     });
+    
+    // Cargar la transcripción de la nota de voz
     this.notasVozService.obtenerNotasVoz(idNotaVoz).subscribe({
       next: (resp: any) => {
         console.log('Respuesta obtenerNotaVoz:', resp);
+        // Actualizar la transcripción en el diálogo
         dialogRef.componentInstance.transcripcion = resp.texto || resp.transcripcion || resp.text || '';
         dialogRef.componentInstance.loading = false;
       },
       error: () => {
+        // En caso de error, limpiar transcripción
         dialogRef.componentInstance.transcripcion = '';
         dialogRef.componentInstance.loading = false;
       }
     });
+    
+    // Manejar el cierre del diálogo
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.transcripcion !== undefined) {
         turno.transcripcion = result.transcripcion;
@@ -190,6 +254,11 @@ export class NotasVozPorPacienteComponent implements OnInit {
     });
   }
 
+  /**
+   * Abre el diálogo para grabar una nueva nota de voz
+   * 
+   * @param turno - Turno para el cual grabar la nota
+   */
   onGrabarNotaVoz(turno: any) {
     const dialogRef = this.dialog.open(DialogGrabarNotaVozComponent, {
       data: {
@@ -198,6 +267,8 @@ export class NotasVozPorPacienteComponent implements OnInit {
       },
       width: '500px'
     });
+    
+    // Manejar el cierre del diálogo y refrescar datos si es necesario
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         // Si se grabó una nota de voz, refrescar los turnos del paciente
@@ -211,5 +282,60 @@ export class NotasVozPorPacienteComponent implements OnInit {
         }
       }
     });
+  }
+
+  /**
+   * Carga una nota de voz específica para edición
+   * 
+   * @param idNotaVoz - ID de la nota de voz a cargar
+   * @param sesion - Sesión/turno asociado (opcional)
+   */
+  cargarNotaVoz(idNotaVoz: number, sesion?: any) {
+    if (!idNotaVoz) return;
+    
+    if (sesion) {
+      this.sesionSeleccionada = sesion;
+    }
+    
+    // TODO: Implementar llamada real al servicio
+    // this.notasVozService.obtenerNotaVoz(idNotaVoz).subscribe(resp => {
+    //   this.transcripcion = resp.texto;
+    //   this.idNotaVoz = idNotaVoz;
+    // });
+    
+    // Simulación temporal
+    this.transcripcion = 'Transcripción de ejemplo para la nota de voz.';
+    this.idNotaVoz = idNotaVoz;
+  }
+
+  /**
+   * Guarda la edición de la transcripción actual
+   */
+  guardarEdicionNotaVoz() {
+    if (!this.idNotaVoz || !this.transcripcion) return;
+    
+    // TODO: Implementar llamada real al servicio
+    // this.notasVozService.actualizarNotaVoz(this.idNotaVoz, this.transcripcion).subscribe(...)
+    
+    alert('Transcripción guardada (simulado)');
+  }
+
+  /**
+   * Limpia el formulario de transcripción
+   */
+  limpiarFormulario() {
+    this.transcripcion = '';
+    this.idNotaVoz = null;
+    this.sesionSeleccionada = null;
+  }
+
+  /**
+   * Abre el diálogo para editar una nota de voz (método alternativo)
+   * 
+   * @param turno - Turno asociado a la nota de voz
+   */
+  editarNotaVoz(turno: any) {
+    // Lógica para editar la nota de voz
+    // TODO: Implementar funcionalidad completa
   }
 } 

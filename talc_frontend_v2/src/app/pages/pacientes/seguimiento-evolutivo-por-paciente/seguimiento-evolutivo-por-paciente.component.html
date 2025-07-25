@@ -1,34 +1,44 @@
+<!-- Contenedor principal de la interfaz de seguimiento evolutivo -->
 <div class="pacientes-container">
-  <!-- Header Section -->
+  <!-- Sección del encabezado de la página -->
   <div class="header-section">
     <div class="header-content">
       <div class="title-section">
+        <!-- Título principal con icono -->
         <h1 class="page-title">
           <mat-icon class="title-icon">insights</mat-icon>
           Seguimiento Evolutivo por Paciente
         </h1>
+        <!-- Subtítulo descriptivo -->
         <p class="page-subtitle">Consulta los informes evolutivos asociados a cada paciente</p>
       </div>
     </div>
   </div>
 
-  <!-- Search and Filters Section -->
+  <!-- Tarjeta de búsqueda y generación de informes -->
   <mat-card class="search-card">
     <div class="search-section" style="display: flex; align-items: center; gap: 16px;">
+      <!-- Campo de búsqueda de pacientes con autocompletado -->
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar paciente</mat-label>
         <input type="text" matInput [formControl]="pacienteControl" [matAutocomplete]="autoPaciente">
+        <!-- Autocompletado de pacientes -->
         <mat-autocomplete #autoPaciente="matAutocomplete" [displayWith]="displayPaciente" (optionSelected)="onPacienteSeleccionado($event)">
           <mat-option *ngFor="let paciente of pacientesFiltrados" [value]="paciente">
             {{ paciente.Apellido }}, {{ paciente.Nombre }}
           </mat-option>
         </mat-autocomplete>
+        <!-- Icono de búsqueda -->
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
+      
+      <!-- Botones para generar informes -->
       <div style="display: flex; gap: 10px; margin-left: auto;">
+        <!-- Botón para generar informe específico por área -->
         <button mat-raised-button color="primary" (click)="generarInforme('area')">
           <mat-icon>edit</mat-icon> Específico
         </button>
+        <!-- Botón para generar informe interdisciplinario -->
         <button mat-raised-button color="accent" (click)="generarInforme('interdisciplinario')">
           <mat-icon>edit</mat-icon> Interdisciplinario
         </button>
@@ -36,56 +46,58 @@
     </div>
   </mat-card>
 
-  <!-- Informes Table Section -->
+  <!-- Tarjeta de la tabla de informes -->
   <mat-card class="table-card">
     <div class="table-container">
-      <!-- Loading State -->
+      <!-- Estado de carga - Se muestra mientras se cargan los datos -->
       <div *ngIf="isLoading" class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
         <p>Cargando informes...</p>
       </div>
 
-      <!-- Empty State -->
+      <!-- Estado vacío - Se muestra cuando no hay informes -->
       <div *ngIf="!isLoading && informes.length === 0" class="empty-state">
         <mat-icon class="empty-icon">event_busy</mat-icon>
         <h3>No hay informes registrados para este paciente</h3>
         <p>Selecciona un paciente para ver sus informes evolutivos</p>
       </div>
 
-      <!-- Informes Table -->
+      <!-- Tabla de informes - Se muestra cuando hay datos disponibles -->
       <table *ngIf="!isLoading && informes.length > 0" 
              mat-table 
              [dataSource]="informes" 
              class="patients-table">
         
-        <!-- Fecha Column -->
+        <!-- Columna de Fecha -->
         <ng-container matColumnDef="fecha">
           <th mat-header-cell *matHeaderCellDef>Fecha</th>
           <td mat-cell *matCellDef="let informe">{{ informe.FechaGenerado | date:'dd/MM/yyyy' }}</td>
         </ng-container>
 
-        <!-- Tipo de Informe Column -->
+        <!-- Columna de Tipo de Informe -->
         <ng-container matColumnDef="tipoInforme">
           <th mat-header-cell *matHeaderCellDef>Tipo de Informe</th>
           <td mat-cell *matCellDef="let informe">{{ informe.NombreTipoInforme }}</td>
         </ng-container>
 
-        <!-- Profesional Column -->
+        <!-- Columna de Profesional -->
         <ng-container matColumnDef="profesional">
           <th mat-header-cell *matHeaderCellDef>Profesional</th>
           <td mat-cell *matCellDef="let informe">{{ informe.Nombre }} {{ informe.Apellido }}</td>
         </ng-container>
 
-        <!-- Acciones Column -->
+        <!-- Columna de Acciones -->
         <ng-container matColumnDef="acciones">
           <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let informe">
+            <!-- Botón para ver/editar informe -->
             <button mat-icon-button color="primary" (click)="abrirDialogInforme(informe)">
               <mat-icon>visibility</mat-icon>
             </button>
           </td>
         </ng-container>
 
+        <!-- Definición de filas de la tabla -->
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
@@ -93,12 +105,19 @@
   </mat-card>
 </div>
 
+<!-- Layout dual para gestión de informes -->
+<!-- Sección izquierda y derecha para mejor organización -->
 <div class="notasvoz-layout">
+  <!-- Columna izquierda - Contiene la búsqueda y tabla -->
   <div class="col-izq">
     <!-- Todo el contenido actual de búsqueda y tabla aquí -->
     <!-- ... -->
   </div>
+
+  <!-- Columna derecha - Panel de edición de informes -->
+  <!-- Solo visible cuando hay un informe seleccionado -->
   <div class="col-der" *ngIf="informeSeleccionado">
+    <!-- Título del panel de edición -->
     <h3>
       Resumen del informe de
       <span *ngIf="pacienteSeleccionado">{{ pacienteSeleccionado.Nombre }} {{ pacienteSeleccionado.Apellido }}</span>
@@ -106,19 +125,27 @@
         con fecha <span>{{ informeSeleccionado.FechaGenerado | date:'dd/MM/yyyy' }}</span>
       </ng-container>
     </h3>
+
+    <!-- Campo de texto para editar el resumen del informe -->
     <mat-form-field appearance="outline" class="textarea-transcripcion">
       <textarea matInput rows="12" [(ngModel)]="informeSeleccionado.Resumen"></textarea>
     </mat-form-field>
+
+    <!-- Botones de acción para la gestión del informe -->
     <div style="display: flex; gap: 12px; margin-top: 12px;">
+      <!-- Botón para guardar la edición -->
       <button mat-raised-button color="primary" (click)="guardarEdicionInforme()" class="botones">
         <mat-icon>save</mat-icon> Guardar Edición
       </button>
+      <!-- Botón para limpiar el formulario -->
       <button mat-raised-button color="primary" (click)="limpiarFormulario()" class="botones">
         <mat-icon>clear</mat-icon> Limpiar
       </button>
+      <!-- Botón para generar informe específico -->
       <button mat-raised-button color="primary" (click)="generarInforme('area')">
         <mat-icon>edit</mat-icon> Generar Informe Específico
       </button>
+      <!-- Botón para generar informe interdisciplinario -->
       <button mat-raised-button color="accent" (click)="generarInforme('interdisciplinario')">
         <mat-icon>edit</mat-icon> Generar Informe Interdisciplinario
       </button>

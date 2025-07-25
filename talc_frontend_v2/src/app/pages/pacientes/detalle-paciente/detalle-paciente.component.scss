@@ -1,8 +1,54 @@
-.w-100 { width: 100%; }
-.row { display: flex; flex-wrap: wrap; gap: 16px; }
-.col-12 { flex: 0 0 100%; max-width: 100%; }
-.col-md-6 { flex: 0 0 48%; max-width: 48%; }
-@media (max-width: 768px) {
-  .col-md-6 { flex: 0 0 100%; max-width: 100%; }
+/**
+ * Estilos para el componente de Detalle de Paciente
+ * 
+ * Este archivo define el diseño responsivo y la presentación visual
+ * del formulario de detalles del paciente, incluyendo:
+ * - Layout de grid responsivo
+ * - Estilos para campos de formulario
+ * - Adaptación para dispositivos móviles
+ * - Consistencia visual con el sistema
+ */
+
+/* Clase utilitaria para ancho completo */
+.w-100 { 
+  width: 100%; 
 }
-mat-card-actions { display: flex; justify-content: flex-end; gap: 8px; } 
+
+/* Contenedor principal del formulario */
+/* Utiliza flexbox para crear un grid responsivo */
+.row { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 16px; /* Espaciado entre columnas */
+}
+
+/* Columna de ancho completo (12/12) */
+/* Ocupa todo el ancho disponible */
+.col-12 { 
+  flex: 0 0 100%; 
+  max-width: 100%; 
+}
+
+/* Columna de medio ancho (6/12) en pantallas medianas y grandes */
+/* En pantallas de 768px o más, ocupa el 48% del ancho */
+.col-md-6 { 
+  flex: 0 0 48%; 
+  max-width: 48%; 
+}
+
+/* Diseño responsivo para dispositivos móviles */
+/* En pantallas menores a 768px, todas las columnas ocupan ancho completo */
+@media (max-width: 768px) {
+  .col-md-6 { 
+    flex: 0 0 100%; 
+    max-width: 100%; 
+  }
+}
+
+/* Contenedor de acciones (botones) */
+/* Alinea los botones al final del contenedor con espaciado */
+mat-card-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 8px; /* Espaciado entre botones */
+} 

@@ -1,140 +1,170 @@
+/**
+ * Estilos para el componente de Notas de Voz por Paciente
+ * 
+ * Este archivo define el diseño y presentación visual de la interfaz
+ * para gestión de notas de voz, incluyendo:
+ * - Layout responsivo con header y secciones
+ * - Diseño de tarjetas para búsqueda y tabla
+ * - Estados de carga y vacío
+ * - Layout dual para transcripciones
+ * - Consistencia visual con el sistema TALC
+ */
+
+/* Contenedor principal de la página */
+/* Proporciona el layout base y centrado del contenido */
 .pacientes-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px;                    /* Espaciado interno */
+  max-width: 1400px;                /* Ancho máximo para legibilidad */
+  margin: 0 auto;                   /* Centrado horizontal */
 }
 
-// Header Section
+/* Sección del encabezado de la página */
+/* Contiene el título y subtítulo de la funcionalidad */
 .header-section {
-  margin-bottom: 24px;
+  margin-bottom: 24px;              /* Espaciado inferior */
 
   .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
+    display: flex;                  /* Layout flexbox */
+    justify-content: space-between; /* Distribución del espacio */
+    align-items: center;            /* Centrado vertical */
+    flex-wrap: wrap;                /* Envolver en pantallas pequeñas */
+    gap: 16px;                      /* Espaciado entre elementos */
 
     .title-section {
+      /* Título principal con icono */
       .page-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0 0 8px 0;
-        font-size: 28px;
-        font-weight: 600;
-        color: #333;
+        display: flex;              /* Layout flexbox para icono y texto */
+        align-items: center;        /* Centrado vertical */
+        gap: 12px;                  /* Espaciado entre icono y texto */
+        margin: 0 0 8px 0;          /* Márgenes */
+        font-size: 28px;            /* Tamaño de fuente grande */
+        font-weight: 600;           /* Peso de fuente semi-bold */
+        color: #333;                /* Color de texto oscuro */
 
+        /* Icono del título */
         .title-icon {
-          color: #aa262b;
-          font-size: 32px;
+          color: #aa262b;           /* Color corporativo TALC */
+          font-size: 32px;          /* Tamaño del icono */
         }
       }
 
+      /* Subtítulo descriptivo */
       .page-subtitle {
-        margin: 0;
-        color: #666;
-        font-size: 16px;
+        margin: 0;                  /* Sin márgenes */
+        color: #666;                /* Color de texto gris */
+        font-size: 16px;            /* Tamaño de fuente mediano */
       }
     }
   }
 }
 
-// Search Card
+/* Tarjeta de búsqueda */
+/* Contiene el campo de búsqueda de pacientes */
 .search-card {
-  margin-bottom: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;              /* Espaciado inferior */
+  border-radius: 12px;              /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
 
   .search-section {
-    padding: 16px;
+    padding: 16px;                  /* Espaciado interno */
 
+    /* Campo de búsqueda */
     .search-field {
-      width: 100%;
-      max-width: 400px;
+      width: 100%;                  /* Ancho completo */
+      max-width: 400px;             /* Ancho máximo para usabilidad */
     }
   }
 }
 
-// Table Card
+/* Tarjeta de la tabla */
+/* Contiene la tabla de turnos y notas de voz */
 .table-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  border-radius: 12px;              /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
+  overflow: hidden;                 /* Ocultar contenido que se desborde */
 
   .table-container {
-    position: relative;
-    min-height: 400px;
+    position: relative;             /* Posicionamiento relativo */
+    min-height: 400px;              /* Altura mínima para evitar saltos */
 
-    // Loading State
+    /* Estado de carga */
+    /* Se muestra mientras se cargan los datos */
     .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      gap: 16px;
+      display: flex;                /* Layout flexbox */
+      flex-direction: column;       /* Dirección vertical */
+      align-items: center;          /* Centrado horizontal */
+      justify-content: center;      /* Centrado vertical */
+      padding: 60px 20px;           /* Espaciado interno */
+      gap: 16px;                    /* Espaciado entre elementos */
 
       p {
-        color: #666;
-        margin: 0;
+        color: #666;                /* Color de texto gris */
+        margin: 0;                  /* Sin márgenes */
       }
     }
 
-    // Empty State
+    /* Estado vacío */
+    /* Se muestra cuando no hay datos disponibles */
     .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      text-align: center;
+      display: flex;                /* Layout flexbox */
+      flex-direction: column;       /* Dirección vertical */
+      align-items: center;          /* Centrado horizontal */
+      justify-content: center;      /* Centrado vertical */
+      padding: 60px 20px;           /* Espaciado interno */
+      text-align: center;           /* Texto centrado */
 
+      /* Icono de estado vacío */
       .empty-icon {
-        font-size: 64px;
-        color: #ccc;
-        margin-bottom: 16px;
+        font-size: 64px;            /* Tamaño grande del icono */
+        color: #ccc;                /* Color gris claro */
+        margin-bottom: 16px;        /* Espaciado inferior */
       }
 
       h3 {
-        margin: 0 0 8px 0;
-        color: #333;
-        font-weight: 500;
+        margin: 0 0 8px 0;          /* Márgenes */
+        color: #333;                /* Color de texto oscuro */
+        font-weight: 500;           /* Peso de fuente medium */
       }
 
       p {
-        margin: 0 0 24px 0;
-        color: #666;
+        margin: 0 0 24px 0;         /* Márgenes */
+        color: #666;                /* Color de texto gris */
       }
     }
 
-    // Patients Table
+    /* Tabla de pacientes/turnos */
+    /* Estilos para la tabla Material Design */
     .patients-table {
-      width: 100%;
+      width: 100%;                  /* Ancho completo */
 
+      /* Celdas del encabezado */
       .mat-mdc-header-cell {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        color: #333;
-        padding: 16px 12px;
+        background-color: #f8f9fa;  /* Fondo gris claro */
+        font-weight: 600;           /* Peso de fuente semi-bold */
+        color: #333;                /* Color de texto oscuro */
+        padding: 16px 12px;         /* Espaciado interno */
       }
 
+      /* Celdas del cuerpo */
       .mat-mdc-cell {
-        padding: 16px 12px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 16px 12px;         /* Espaciado interno */
+        border-bottom: 1px solid #f0f0f0;  /* Borde inferior sutil */
       }
 
+      /* Filas de pacientes */
       .patient-row {
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+        cursor: pointer;            /* Cursor de puntero */
+        transition: background-color 0.2s ease;  /* Transición suave */
 
+        /* Efecto hover */
         &:hover {
-          background-color: #f8f9fa;
+          background-color: #f8f9fa;  /* Fondo gris claro al pasar el mouse */
         }
 
+        /* Última fila sin borde inferior */
         &:last-child {
           .mat-mdc-cell {
-            border-bottom: none;
+            border-bottom: none;    /* Sin borde inferior */
           }
         }
       }
@@ -142,37 +172,49 @@
   }
 }
 
+/* Layout dual para gestión de transcripciones */
+/* Organiza el contenido en dos columnas */
 .notasvoz-layout {
-  display: flex;
-  flex-direction: row;
-  gap: 32px;
-  align-items: flex-start;
-  margin-top: 32px;
+  display: flex;                    /* Layout flexbox */
+  flex-direction: row;              /* Dirección horizontal */
+  gap: 32px;                        /* Espaciado entre columnas */
+  align-items: flex-start;          /* Alineación al inicio */
+  margin-top: 32px;                 /* Espaciado superior */
 }
+
+/* Columna izquierda */
+/* Contiene la búsqueda y tabla principal */
 .col-izq {
-  min-width: 340px;
-  max-width: 500px;
-  flex: 1;
+  min-width: 340px;                 /* Ancho mínimo */
+  max-width: 500px;                 /* Ancho máximo */
+  flex: 1;                          /* Crecimiento flexible */
 }
+
+/* Columna derecha */
+/* Contiene el panel de transcripción */
 .col-der {
-  flex: 1;
-  min-width: 340px;
+  flex: 1;                          /* Crecimiento flexible */
+  min-width: 340px;                 /* Ancho mínimo */
 }
 
+/* Campo de texto para transcripción */
+/* Área de edición de transcripciones */
 .textarea-transcripcion {
-  width: 100%;
-  min-width: 250px;
-  margin-bottom: 8px;
-  height: 100%;
-  max-height: 400px;
+  width: 100%;                      /* Ancho completo */
+  min-width: 250px;                 /* Ancho mínimo */
+  margin-bottom: 8px;               /* Espaciado inferior */
+  height: 100%;                     /* Altura completa */
+  max-height: 400px;                /* Altura máxima */
 }
 
+/* Botones de acción */
+/* Estilos para los botones de guardar y limpiar */
 .botones {
-  margin-top: 8px !important;
-  min-width: 150px !important;
-  font-weight: bold !important;
-  font-size: 14px !important;
-  border-radius: 8px !important;
-  padding: 16px !important;
-  background-color: #d0cfcf !important;
+  margin-top: 8px !important;       /* Espaciado superior */
+  min-width: 150px !important;      /* Ancho mínimo */
+  font-weight: bold !important;     /* Peso de fuente bold */
+  font-size: 14px !important;       /* Tamaño de fuente */
+  border-radius: 8px !important;    /* Bordes redondeados */
+  padding: 16px !important;         /* Espaciado interno */
+  background-color: #d0cfcf !important;  /* Color de fondo gris */
 } 

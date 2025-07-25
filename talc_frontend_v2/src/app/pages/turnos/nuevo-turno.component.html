@@ -1,38 +1,83 @@
+<!--
+  Template del componente de creación/edición de turnos
+  Este archivo define la interfaz de usuario para el formulario de citas médicas
+  del sistema TALC, permitiendo crear nuevos turnos y editar existentes.
+
+  Características principales:
+  - Formulario reactivo con validaciones
+  - Selección de paciente con autocompletado
+  - Selección de profesional y especialidad
+  - Selector de fecha y hora
+  - Verificación de disponibilidad
+  - Estados de carga y envío
+  - Diseño responsivo con Material Design
+  - Modo edición vs creación
+  - Validaciones en tiempo real
+-->
+
+<!-- Contenedor principal del formulario de turnos -->
 <div class="nuevo-turno-bg">
+  <!-- Tarjeta principal del formulario -->
   <mat-card class="nuevo-turno-card">
+    <!-- Encabezado del formulario -->
     <div class="nuevo-turno-header">
       <h2 mat-dialog-title>{{ modoEdicion ? 'Editar Turno' : 'Nuevo Turno' }}</h2>
       <div class="nuevo-turno-subtitle">Agendá un turno para un paciente</div>
     </div>
+    
+    <!-- Contenido del formulario -->
     <mat-card-content>
+      <!-- Formulario reactivo con validaciones -->
       <form [formGroup]="form" (ngSubmit)="guardarTurno()" class="nuevo-turno-form grid-form">
+        
+        <!-- Primera fila: Paciente y Profesional -->
         <div class="form-row row-2-cols wide-cols">
+          <!-- Campo de selección de paciente con autocompletado -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Paciente</mat-label>
             <mat-icon matPrefix>person</mat-icon>
-            <input type="text" matInput [formControl]="pacienteCtrl" [matAutocomplete]="autoPaciente" [disabled]="modoEdicion">
-            <mat-autocomplete #autoPaciente="matAutocomplete" (optionSelected)="seleccionarPaciente($event.option.value)" [displayWith]="displayPaciente">
+            <input type="text" 
+                   matInput 
+                   [formControl]="pacienteCtrl" 
+                   [matAutocomplete]="autoPaciente" 
+                   [disabled]="modoEdicion">
+            <!-- Autocompletado de pacientes -->
+            <mat-autocomplete #autoPaciente="matAutocomplete" 
+                             (optionSelected)="seleccionarPaciente($event.option.value)" 
+                             [displayWith]="displayPaciente">
               <mat-option *ngFor="let paciente of filteredPacientes | async" [value]="paciente">
                 {{ paciente.Nombre }} {{ paciente.Apellido }}
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
+          <!-- Campo oculto para el ID del paciente -->
           <input type="hidden" formControlName="ID_Paciente">
 
+          <!-- Campo de selección de profesional con autocompletado -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Profesional</mat-label>
             <mat-icon matPrefix>medical_services</mat-icon>
-            <input type="text" matInput [formControl]="profesionalCtrl" [matAutocomplete]="autoProfesional" [disabled]="modoEdicion">
-            <mat-autocomplete #autoProfesional="matAutocomplete" (optionSelected)="seleccionarProfesional($event.option.value)" [displayWith]="displayProfesional">
+            <input type="text" 
+                   matInput 
+                   [formControl]="profesionalCtrl" 
+                   [matAutocomplete]="autoProfesional" 
+                   [disabled]="modoEdicion">
+            <!-- Autocompletado de profesionales -->
+            <mat-autocomplete #autoProfesional="matAutocomplete" 
+                             (optionSelected)="seleccionarProfesional($event.option.value)" 
+                             [displayWith]="displayProfesional">
               <mat-option *ngFor="let profesional of filteredProfesionales | async" [value]="profesional">
                 {{ profesional.nombre }} {{ profesional.apellido }}
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
+          <!-- Campo oculto para el ID del profesional -->
           <input type="hidden" formControlName="ID_Profesional">
         </div>
 
+        <!-- Segunda fila: Especialidad y Fecha -->
         <div class="form-row row-2-cols">
+          <!-- Selector de especialidad (se carga dinámicamente según el profesional) -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Especialidad</mat-label>
             <mat-select formControlName="ID_Especialidad" [disabled]="modoEdicion" required>
@@ -42,22 +87,31 @@
             </mat-select>
           </mat-form-field>
 
+          <!-- Selector de fecha con datepicker -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Fecha</mat-label>
             <mat-icon matPrefix>event</mat-icon>
-            <input matInput [matDatepicker]="picker" formControlName="Fecha" required [min]="today">
+            <input matInput 
+                   [matDatepicker]="picker" 
+                   formControlName="Fecha" 
+                   required 
+                   [min]="today">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
         </div>
 
+        <!-- Tercera fila: Hora (ocupa toda la fila) -->
         <div class="form-row hora-row-right">
           <div class="hora-container">
+            <!-- Selector de hora con verificación de disponibilidad -->
             <mat-form-field appearance="outline" class="form-field hora-field">
               <mat-label>Hora</mat-label>
               <mat-icon matPrefix>schedule</mat-icon>
               <mat-select formControlName="Hora" required>
-                <mat-option *ngFor="let hora of horasDisponibles" [value]="hora" [disabled]="estaOcupado(hora)">
+                <mat-option *ngFor="let hora of horasDisponibles" 
+                           [value]="hora" 
+                           [disabled]="estaOcupado(hora)">
                   {{ hora }}
                 </mat-option>
               </mat-select>
@@ -65,11 +119,22 @@
           </div>
         </div>
 
+        <!-- Sección de acciones del formulario -->
         <div class="form-actions">
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid" class="btn-guardar">
+          <!-- Botón de guardar (se deshabilita si el formulario es inválido) -->
+          <button mat-flat-button 
+                  color="primary" 
+                  type="submit" 
+                  [disabled]="form.invalid" 
+                  class="btn-guardar">
             <mat-icon>check_circle</mat-icon> Guardar Turno
           </button>
-          <button mat-stroked-button color="warn" type="button" (click)="cancelar()" class="btn-cancelar">
+          <!-- Botón de cancelar -->
+          <button mat-stroked-button 
+                  color="warn" 
+                  type="button" 
+                  (click)="cancelar()" 
+                  class="btn-cancelar">
             <mat-icon>cancel</mat-icon> Cancelar
           </button>
         </div>

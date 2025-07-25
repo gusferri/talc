@@ -1,302 +1,350 @@
+/**
+ * Estilos para el componente de gestión de pacientes
+ * 
+ * Este archivo define el diseño y presentación visual de la interfaz
+ * para gestión de pacientes, incluyendo:
+ * - Layout responsivo con header y secciones
+ * - Diseño de tarjetas para búsqueda y tabla
+ * - Estados de carga y vacío
+ * - Tabla con ordenamiento y paginación
+ * - Botones de acción con estados hover
+ * - Diseño adaptativo para dispositivos móviles
+ * - Consistencia visual con el sistema TALC
+ */
+
+/* Contenedor principal de la página */
+/* Proporciona el layout base y centrado del contenido */
 .pacientes-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px;                    /* Espaciado interno */
+  max-width: 1400px;                /* Ancho máximo para legibilidad */
+  margin: 0 auto;                   /* Centrado horizontal */
 }
 
-// Header Section
+/* Sección del encabezado de la página */
+/* Contiene el título, subtítulo y botón de nuevo paciente */
 .header-section {
-  margin-bottom: 24px;
+  margin-bottom: 24px;              /* Espaciado inferior */
 
   .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
+    display: flex;                  /* Layout flexbox */
+    justify-content: space-between; /* Distribución del espacio */
+    align-items: center;            /* Centrado vertical */
+    flex-wrap: wrap;                /* Envolver en pantallas pequeñas */
+    gap: 16px;                      /* Espaciado entre elementos */
 
     .title-section {
+      /* Título principal con icono */
       .page-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0 0 8px 0;
-        font-size: 28px;
-        font-weight: 600;
-        color: #333;
+        display: flex;              /* Layout flexbox para icono y texto */
+        align-items: center;        /* Centrado vertical */
+        gap: 12px;                  /* Espaciado entre icono y texto */
+        margin: 0 0 8px 0;          /* Márgenes */
+        font-size: 28px;            /* Tamaño de fuente grande */
+        font-weight: 600;           /* Peso de fuente semi-bold */
+        color: #333;                /* Color de texto oscuro */
 
+        /* Icono del título */
         .title-icon {
-          color: #aa262b;
-          font-size: 32px;
+          color: #aa262b;           /* Color corporativo TALC */
+          font-size: 32px;          /* Tamaño del icono */
         }
       }
 
+      /* Subtítulo descriptivo */
       .page-subtitle {
-        margin: 0;
-        color: #666;
-        font-size: 16px;
+        margin: 0;                  /* Sin márgenes */
+        color: #666;                /* Color de texto gris */
+        font-size: 16px;            /* Tamaño de fuente mediano */
       }
     }
 
+    /* Botón para crear nuevo paciente */
     .new-patient-btn {
-      height: 48px;
-      padding: 0 24px;
-      font-weight: 500;
-      background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      color: #f5f1eb !important;
+      height: 48px;                 /* Altura fija */
+      padding: 0 24px;              /* Espaciado interno */
+      font-weight: 500;             /* Peso de fuente medium */
+      background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);  /* Gradiente corporativo */
+      border-radius: 8px;           /* Bordes redondeados */
+      transition: all 0.3s ease;    /* Transición suave */
+      color: #f5f1eb !important;    /* Color de texto claro */
 
+      /* Efecto hover con elevación */
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(170, 38, 43, 0.3);
+        transform: translateY(-2px);  /* Movimiento hacia arriba */
+        box-shadow: 0 8px 20px rgba(170, 38, 43, 0.3);  /* Sombra con color corporativo */
       }
 
+      /* Icono del botón */
       mat-icon {
-        margin-right: 8px;
+        margin-right: 8px;          /* Espaciado derecho */
       }
     }
   }
 }
 
-// Search Card
+/* Tarjeta de búsqueda */
+/* Contiene el campo de búsqueda para filtrar pacientes */
 .search-card {
-  margin-bottom: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;              /* Espaciado inferior */
+  border-radius: 12px;              /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
 
   .search-section {
-    padding: 16px;
+    padding: 16px;                  /* Espaciado interno */
 
+    /* Campo de búsqueda */
     .search-field {
-      width: 100%;
-      max-width: 400px;
+      width: 100%;                  /* Ancho completo */
+      max-width: 400px;             /* Ancho máximo para usabilidad */
     }
   }
 }
 
-// Table Card
+/* Tarjeta de la tabla */
+/* Contiene la tabla principal de pacientes */
 .table-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  border-radius: 12px;              /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
+  overflow: hidden;                 /* Ocultar contenido que se desborde */
 
   .table-container {
-    position: relative;
-    min-height: 400px;
+    position: relative;             /* Posicionamiento relativo */
+    min-height: 400px;              /* Altura mínima para evitar saltos */
 
-    // Loading State
+    /* Estado de carga */
+    /* Se muestra mientras se cargan los datos */
     .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      gap: 16px;
+      display: flex;                /* Layout flexbox */
+      flex-direction: column;       /* Dirección vertical */
+      align-items: center;          /* Centrado horizontal */
+      justify-content: center;      /* Centrado vertical */
+      padding: 60px 20px;           /* Espaciado interno */
+      gap: 16px;                    /* Espaciado entre elementos */
 
       p {
-        color: #666;
-        margin: 0;
+        color: #666;                /* Color de texto gris */
+        margin: 0;                  /* Sin márgenes */
       }
     }
 
-    // Empty State
+    /* Estado vacío */
+    /* Se muestra cuando no hay datos disponibles */
     .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      text-align: center;
+      display: flex;                /* Layout flexbox */
+      flex-direction: column;       /* Dirección vertical */
+      align-items: center;          /* Centrado horizontal */
+      justify-content: center;      /* Centrado vertical */
+      padding: 60px 20px;           /* Espaciado interno */
+      text-align: center;           /* Texto centrado */
 
+      /* Icono de estado vacío */
       .empty-icon {
-        font-size: 64px;
-        color: #ccc;
-        margin-bottom: 16px;
+        font-size: 64px;            /* Tamaño grande del icono */
+        color: #ccc;                /* Color gris claro */
+        margin-bottom: 16px;        /* Espaciado inferior */
       }
 
       h3 {
-        margin: 0 0 8px 0;
-        color: #333;
-        font-weight: 500;
+        margin: 0 0 8px 0;          /* Márgenes */
+        color: #333;                /* Color de texto oscuro */
+        font-weight: 500;           /* Peso de fuente medium */
       }
 
       p {
-        margin: 0 0 24px 0;
-        color: #666;
+        margin: 0 0 24px 0;         /* Márgenes */
+        color: #666;                /* Color de texto gris */
       }
 
+      /* Botón de acción en estado vacío */
       button {
-        height: 44px;
-        padding: 0 24px;
-        background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);
-        border-radius: 8px;
-        color: #f5f5dc !important;
+        height: 44px;               /* Altura fija */
+        padding: 0 24px;            /* Espaciado interno */
+        background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);  /* Gradiente corporativo */
+        border-radius: 8px;         /* Bordes redondeados */
+        color: #f5f5dc !important;  /* Color de texto claro */
 
+        /* Icono del botón */
         mat-icon {
-          margin-right: 8px;
+          margin-right: 8px;        /* Espaciado derecho */
         }
       }
     }
 
-    // Patients Table
+    /* Tabla de pacientes */
+    /* Estilos para la tabla Material Design */
     .patients-table {
-      width: 100%;
+      width: 100%;                  /* Ancho completo */
 
+      /* Celdas del encabezado */
       .mat-mdc-header-cell {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        color: #333;
-        padding: 16px 12px;
+        background-color: #f8f9fa;  /* Fondo gris claro */
+        font-weight: 600;           /* Peso de fuente semi-bold */
+        color: #333;                /* Color de texto oscuro */
+        padding: 16px 12px;         /* Espaciado interno */
       }
 
+      /* Celdas del cuerpo */
       .mat-mdc-cell {
-        padding: 16px 12px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 16px 12px;         /* Espaciado interno */
+        border-bottom: 1px solid #f0f0f0;  /* Borde inferior sutil */
       }
 
+      /* Filas de pacientes */
       .patient-row {
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+        cursor: pointer;            /* Cursor de puntero */
+        transition: background-color 0.2s ease;  /* Transición suave */
 
+        /* Efecto hover */
         &:hover {
-          background-color: #f8f9fa;
+          background-color: #f8f9fa;  /* Fondo gris claro al pasar el mouse */
         }
 
+        /* Última fila sin borde inferior */
         &:last-child {
           .mat-mdc-cell {
-            border-bottom: none;
+            border-bottom: none;    /* Sin borde inferior */
           }
         }
       }
 
-      // Age Chip
+      /* Chip de edad */
+      /* Estilo especial para mostrar la edad */
       .age-chip {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 500;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  /* Gradiente azul */
+        color: white;               /* Color de texto blanco */
+        padding: 4px 12px;          /* Espaciado interno */
+        border-radius: 16px;        /* Bordes redondeados */
+        font-size: 12px;            /* Tamaño de fuente pequeño */
+        font-weight: 500;           /* Peso de fuente medium */
       }
 
-      // Obra Social Chip
+      /* Chip de obra social */
+      /* Estilo para mostrar información de obra social */
       .obra-social-chip {
-        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 500;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);  /* Gradiente verde */
+        color: white;               /* Color de texto blanco */
+        padding: 4px 12px;          /* Espaciado interno */
+        border-radius: 16px;        /* Bordes redondeados */
+        font-size: 12px;            /* Tamaño de fuente pequeño */
+        font-weight: 500;           /* Peso de fuente medium */
       }
 
+      /* Texto para pacientes sin obra social */
       .no-obra-social {
-        color: #999;
-        font-style: italic;
-        font-size: 12px;
+        color: #999;                /* Color de texto gris */
+        font-style: italic;         /* Estilo cursiva */
+        font-size: 12px;            /* Tamaño de fuente pequeño */
       }
 
-      // Action Buttons
+      /* Botones de acción */
+      /* Contenedor y estilos para los botones de acción */
       .action-buttons {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
+        display: flex;              /* Layout flexbox */
+        gap: 8px;                   /* Espaciado entre botones */
+        justify-content: center;    /* Centrado horizontal */
 
+        /* Estilos base para botones de acción */
         .action-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
+          width: 36px;              /* Ancho fijo */
+          height: 36px;             /* Alto fijo */
+          border-radius: 8px;       /* Bordes redondeados */
+          transition: all 0.2s ease;  /* Transición suave */
 
+          /* Botón de ver detalles */
           &.view-btn {
-            color: #2196f3;
+            color: #2196f3;         /* Color azul */
 
             &:hover {
-              background-color: rgba(33, 150, 243, 0.1);
+              background-color: rgba(33, 150, 243, 0.1);  /* Fondo azul claro */
             }
           }
 
+          /* Botón de agenda */
           &.agenda-btn {
-            color: #ff9800;
+            color: #ff9800;         /* Color naranja */
 
             &:hover {
-              background-color: rgba(255, 152, 0, 0.1);
+              background-color: rgba(255, 152, 0, 0.1);  /* Fondo naranja claro */
             }
           }
 
+          /* Botón de seguimiento */
           &.follow-btn {
-            color: #9c27b0;
+            color: #9c27b0;         /* Color púrpura */
 
             &:hover {
-              background-color: rgba(156, 39, 176, 0.1);
+              background-color: rgba(156, 39, 176, 0.1);  /* Fondo púrpura claro */
             }
           }
         }
       }
 
-      /** Centrado definitivo de encabezados y celdas **/
+      /* Centrado definitivo de encabezados y celdas */
+      /* Estilos específicos para alineación de contenido */
       ::ng-deep .patients-table th.mat-header-cell {
-        text-align: center !important;
+        text-align: center !important;  /* Centrado de encabezados */
       }
 
       ::ng-deep .patients-table th.mat-header-cell .mat-sort-header-container,
       ::ng-deep .patients-table th.mat-header-cell .sort-button,
       ::ng-deep .patients-table th.mat-header-cell .mat-header-cell-label,
       ::ng-deep .patients-table th.mat-header-cell > div {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
+        display: flex !important;           /* Layout flexbox */
+        justify-content: center !important; /* Centrado horizontal */
+        align-items: center !important;     /* Centrado vertical */
+        width: 100% !important;             /* Ancho completo */
       }
 
       ::ng-deep .patients-table td.mat-cell {
-        text-align: left !important;
+        text-align: left !important;        /* Alineación izquierda para celdas */
       }
 
       ::ng-deep .patients-table td.mat-cell:last-child,
       ::ng-deep .patients-table th.mat-header-cell:last-child {
-        justify-content: flex-start !important;
+        justify-content: flex-start !important;  /* Alineación izquierda para última columna */
         text-align: left !important;
       }
 
-      // Botón de ordenamiento ocupa todo el ancho
+      /* Botón de ordenamiento ocupa todo el ancho */
       .patients-table th.mat-header-cell .sort-button {
-        width: 100%;
-        justify-content: center;
+        width: 100%;                /* Ancho completo */
+        justify-content: center;    /* Centrado horizontal */
       }
 
-      // Excepción: columna de acciones alineada a la izquierda
+      /* Excepción: columna de acciones alineada a la izquierda */
       .patients-table td.mat-cell:last-child,
       .patients-table th.mat-header-cell:last-child {
-        justify-content: flex-start;
-        text-align: left;
+        justify-content: flex-start;  /* Alineación izquierda */
+        text-align: left;             /* Texto alineado a la izquierda */
       }
     }
 
-    // Paginator
+    /* Paginador */
+    /* Estilos para el control de paginación */
     .table-paginator {
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px solid #f0f0f0;  /* Borde superior sutil */
     }
   }
 }
 
-// Responsive Design
+/* Diseño responsivo */
+/* Adaptaciones para diferentes tamaños de pantalla */
 @media (max-width: 768px) {
   .pacientes-container {
-    padding: 16px;
+    padding: 16px;                  /* Espaciado reducido */
   }
 
   .header-section {
     .header-content {
-      flex-direction: column;
-      align-items: stretch;
+      flex-direction: column;       /* Dirección vertical */
+      align-items: stretch;         /* Estiramiento completo */
 
       .title-section {
-        text-align: center;
+        text-align: center;         /* Texto centrado */
       }
 
       .new-patient-btn {
-        width: 100%;
+        width: 100%;                /* Ancho completo */
       }
     }
   }
@@ -304,7 +352,7 @@
   .search-card {
     .search-section {
       .search-field {
-        max-width: 100%;
+        max-width: 100%;            /* Ancho completo */
       }
     }
   }
@@ -313,12 +361,12 @@
     .table-container {
       .patients-table {
         .action-buttons {
-          flex-direction: column;
-          gap: 4px;
+          flex-direction: column;   /* Dirección vertical */
+          gap: 4px;                 /* Espaciado reducido */
 
           .action-btn {
-            width: 32px;
-            height: 32px;
+            width: 32px;            /* Tamaño reducido */
+            height: 32px;           /* Tamaño reducido */
           }
         }
       }
@@ -326,19 +374,20 @@
   }
 }
 
+/* Diseño para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .pacientes-container {
-    padding: 12px;
+    padding: 12px;                  /* Espaciado mínimo */
   }
 
   .header-section {
     .header-content {
       .title-section {
         .page-title {
-          font-size: 24px;
+          font-size: 24px;          /* Tamaño de fuente reducido */
 
           .title-icon {
-            font-size: 28px;
+            font-size: 28px;        /* Tamaño de icono reducido */
           }
         }
       }
@@ -346,27 +395,31 @@
   }
 }
 
+/* Estilos para botones de ordenamiento */
+/* Botones especiales en los encabezados de la tabla */
 .sort-button {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font-weight: 500;
-  color: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: auto;
-  line-height: 1;
+  background: none;                 /* Sin fondo */
+  border: none;                     /* Sin borde */
+  padding: 0;                       /* Sin espaciado interno */
+  margin: 0;                        /* Sin márgenes */
+  font-weight: 500;                 /* Peso de fuente medium */
+  color: inherit;                   /* Color heredado */
+  cursor: pointer;                  /* Cursor de puntero */
+  display: flex;                    /* Layout flexbox */
+  align-items: center;              /* Centrado vertical */
+  gap: 4px;                         /* Espaciado entre elementos */
+  min-width: auto;                  /* Ancho mínimo automático */
+  line-height: 1;                   /* Altura de línea */
   
+  /* Efecto hover */
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: rgba(0, 0, 0, 0.04);  /* Fondo gris muy claro */
   }
   
+  /* Icono del botón */
   mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 16px;                /* Tamaño de fuente */
+    width: 16px;                    /* Ancho fijo */
+    height: 16px;                   /* Alto fijo */
   }
 } 

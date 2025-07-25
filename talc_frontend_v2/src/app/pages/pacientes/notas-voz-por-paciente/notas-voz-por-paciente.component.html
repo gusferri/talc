@@ -1,89 +1,108 @@
+<!-- Contenedor principal de la interfaz de notas de voz por paciente -->
 <div class="pacientes-container">
-  <!-- Header Section -->
+  <!-- Sección del encabezado de la página -->
   <div class="header-section">
     <div class="header-content">
       <div class="title-section">
+        <!-- Título principal con icono -->
         <h1 class="page-title">
           <mat-icon class="title-icon">graphic_eq</mat-icon>
           Notas de Voz por Paciente
         </h1>
+        <!-- Subtítulo descriptivo -->
         <p class="page-subtitle">Consulta los turnos y notas de voz asociadas a cada paciente</p>
       </div>
     </div>
   </div>
 
-  <!-- Search and Filters Section -->
+  <!-- Tarjeta de búsqueda y filtros -->
   <mat-card class="search-card">
     <div class="search-section">
+      <!-- Campo de búsqueda de pacientes con autocompletado -->
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar paciente</mat-label>
         <input type="text" matInput [formControl]="pacienteControl" [matAutocomplete]="autoPaciente">
+        <!-- Autocompletado de pacientes -->
         <mat-autocomplete #autoPaciente="matAutocomplete" [displayWith]="displayPaciente" (optionSelected)="onPacienteSeleccionado($event)">
           <mat-option *ngFor="let paciente of pacientesFiltrados" [value]="paciente">
             {{ paciente.Apellido }}, {{ paciente.Nombre }}
           </mat-option>
         </mat-autocomplete>
+        <!-- Icono de búsqueda -->
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
   </mat-card>
 
-  <!-- Turnos y Notas de Voz Table Section -->
+  <!-- Tarjeta de la tabla de turnos y notas de voz -->
   <mat-card class="table-card">
     <div class="table-container">
-      <!-- Loading State -->
+      <!-- Estado de carga - Se muestra mientras se cargan los datos -->
       <div *ngIf="isLoading" class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
         <p>Cargando turnos...</p>
       </div>
 
-      <!-- Empty State -->
+      <!-- Estado vacío - Se muestra cuando no hay turnos -->
       <div *ngIf="!isLoading && turnos.length === 0" class="empty-state">
         <mat-icon class="empty-icon">event_busy</mat-icon>
         <h3>No hay turnos registrados para este paciente</h3>
         <p>Selecciona un paciente para ver sus turnos y notas de voz</p>
       </div>
 
-      <!-- Turnos Table -->
+      <!-- Tabla de turnos - Se muestra cuando hay datos disponibles -->
       <table *ngIf="!isLoading && turnos.length > 0" 
              mat-table 
              [dataSource]="turnos" 
              class="patients-table">
         
-        <!-- Fecha Column -->
+        <!-- Columna de Fecha -->
         <ng-container matColumnDef="fecha">
           <th mat-header-cell *matHeaderCellDef>Fecha</th>
           <td mat-cell *matCellDef="let turno">{{ turno.Fecha || turno.fecha | date:'dd/MM/yyyy' }}</td>
         </ng-container>
 
-        <!-- Hora Column -->
+        <!-- Columna de Hora -->
         <ng-container matColumnDef="hora">
           <th mat-header-cell *matHeaderCellDef>Hora</th>
           <td mat-cell *matCellDef="let turno">{{ turno.Hora || turno.hora }}</td>
         </ng-container>
 
-        <!-- Nota de Voz Column -->
+        <!-- Columna de Nota de Voz - Muestra el estado con iconos -->
         <ng-container matColumnDef="notaVoz">
           <th mat-header-cell *matHeaderCellDef>Nota de voz</th>
           <td mat-cell *matCellDef="let turno">
+            <!-- Icono verde si tiene nota de voz -->
             <mat-icon *ngIf="turno.ID_NotaVoz || turno.id_nota_voz" style="color: #388e3c;">volume_up</mat-icon>
+            <!-- Icono rojo si no tiene nota de voz -->
             <mat-icon *ngIf="!(turno.ID_NotaVoz || turno.id_nota_voz)" style="color: #e53935;">volume_off</mat-icon>
           </td>
         </ng-container>
 
-        <!-- Acciones Column -->
+        <!-- Columna de Acciones - Botones para gestionar notas de voz -->
         <ng-container matColumnDef="acciones">
           <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let turno">
-            <button *ngIf="turno.ID_NotaVoz || turno.id_nota_voz" mat-icon-button color="primary" (click)="abrirDialogNotaVoz(turno)">
+            <!-- Botón para ver nota de voz existente -->
+            <button *ngIf="turno.ID_NotaVoz || turno.id_nota_voz" 
+                    mat-icon-button 
+                    color="primary" 
+                    (click)="abrirDialogNotaVoz(turno)"
+                    matTooltip="Ver nota de voz">
               <mat-icon>visibility</mat-icon>
             </button>
-            <button *ngIf="!(turno.ID_NotaVoz || turno.id_nota_voz)" mat-icon-button color="accent" (click)="onGrabarNotaVoz(turno)">
+            <!-- Botón para grabar nueva nota de voz -->
+            <button *ngIf="!(turno.ID_NotaVoz || turno.id_nota_voz)" 
+                    mat-icon-button 
+                    color="accent" 
+                    (click)="onGrabarNotaVoz(turno)"
+                    matTooltip="Grabar nota de voz">
               <mat-icon>mic</mat-icon>
             </button>
           </td>
         </ng-container>
 
+        <!-- Definición de filas de la tabla -->
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
@@ -91,12 +110,19 @@
   </mat-card>
 </div>
 
+<!-- Layout dual para gestión de transcripciones -->
+<!-- Sección izquierda y derecha para mejor organización -->
 <div class="notasvoz-layout">
+  <!-- Columna izquierda - Contiene la búsqueda y tabla -->
   <div class="col-izq">
     <!-- Todo el contenido actual de búsqueda y tabla aquí -->
     <!-- ... -->
   </div>
+  
+  <!-- Columna derecha - Panel de transcripción -->
+  <!-- Solo visible cuando hay una sesión seleccionada -->
   <div class="col-der" *ngIf="sesionSeleccionada">
+    <!-- Título del panel de transcripción -->
     <h3>
       Transcripción de la nota de la sesión de
       <span *ngIf="pacienteSeleccionado">{{ pacienteSeleccionado.Nombre }} {{ pacienteSeleccionado.Apellido }}</span>
@@ -104,13 +130,19 @@
         con fecha <span>{{ (sesionSeleccionada.Fecha || sesionSeleccionada.fecha) | date:'dd/MM/yyyy' }}</span>
       </ng-container>
     </h3>
+    
+    <!-- Campo de texto para editar la transcripción -->
     <mat-form-field appearance="outline" class="textarea-transcripcion">
       <textarea matInput rows="12" [(ngModel)]="transcripcion"></textarea>
     </mat-form-field>
+    
+    <!-- Botones de acción para la transcripción -->
     <div style="display: flex; gap: 12px; margin-top: 12px;">
+      <!-- Botón para guardar la edición -->
       <button mat-raised-button color="primary" (click)="guardarEdicionNotaVoz()" class="botones">
         <mat-icon>save</mat-icon> Guardar Edición
       </button>
+      <!-- Botón para limpiar el formulario -->
       <button mat-raised-button color="primary" (click)="limpiarFormulario()" class="botones">
         <mat-icon>clear</mat-icon> Limpiar
       </button>

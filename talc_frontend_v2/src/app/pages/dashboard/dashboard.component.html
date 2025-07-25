@@ -1,13 +1,15 @@
+<!-- Contenedor principal del dashboard -->
 <div class="dashboard-container">
-  <!-- Loading Overlay -->
+  <!-- Overlay de carga: Se muestra mientras se cargan los datos del dashboard -->
   <div *ngIf="isLoading" class="loading-overlay">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Cargando dashboard...</p>
   </div>
 
-  <!-- Welcome Section -->
+  <!-- Sección de bienvenida: Muestra saludo personalizado y fecha actual -->
   <div class="welcome-section">
     <div class="welcome-content">
+      <!-- Texto de bienvenida con icono y nombre del usuario -->
       <div class="welcome-text">
         <h1 class="welcome-title">
           <mat-icon class="welcome-icon">dashboard</mat-icon>
@@ -15,6 +17,7 @@
         </h1>
         <p class="welcome-subtitle">Panel de control de TALC Gestión</p>
       </div>
+      <!-- Información de fecha y hora actual -->
       <div class="welcome-time">
         <mat-icon>schedule</mat-icon>
         <span>{{ currentDate | date:'EEEE, d \'de\' MMMM, yyyy' }}</span>
@@ -22,21 +25,24 @@
     </div>
   </div>
 
-  <!-- Statistics Cards -->
+  <!-- Sección de estadísticas: Muestra métricas importantes del sistema -->
   <div class="stats-section">
     <h2 class="section-title">
       <mat-icon>analytics</mat-icon>
       Resumen General
     </h2>
+    <!-- Grid de tarjetas de estadísticas: Pacientes, Turnos Hoy, Turnos Pendientes -->
     <div class="stats-grid">
       <mat-card *ngFor="let stat of stats" 
                 class="stat-card" 
                 (click)="navegarA(stat.route)">
         <mat-card-content>
           <div class="stat-content">
+            <!-- Icono de la estadística con color personalizado -->
             <div class="stat-icon" [style.background-color]="stat.color">
               <mat-icon>{{ stat.icon }}</mat-icon>
             </div>
+            <!-- Información de la estadística: valor y título -->
             <div class="stat-info">
               <h3 class="stat-value">{{ stat.value }}</h3>
               <p class="stat-title">{{ stat.title }}</p>
@@ -47,25 +53,29 @@
     </div>
   </div>
 
-  <!-- Quick Actions -->
+  <!-- Sección de acciones rápidas: Acceso directo a funcionalidades principales -->
   <div class="quick-actions-section">
     <h2 class="section-title">
       <mat-icon>flash_on</mat-icon>
       Acciones Rápidas
     </h2>
+    <!-- Grid de tarjetas de acciones rápidas -->
     <div class="quick-actions-grid">
       <mat-card *ngFor="let action of quickActions" 
                 class="action-card" 
                 (click)="navegarA(action.route)">
         <mat-card-content>
           <div class="action-content">
+            <!-- Icono de la acción con color personalizado -->
             <div class="action-icon" [style.background-color]="action.color">
               <mat-icon>{{ action.icon }}</mat-icon>
             </div>
+            <!-- Información de la acción: título y descripción -->
             <div class="action-info">
               <h3 class="action-title">{{ action.title }}</h3>
               <p class="action-description">{{ action.description }}</p>
             </div>
+            <!-- Flecha indicadora de navegación -->
             <mat-icon class="action-arrow">arrow_forward</mat-icon>
           </div>
         </mat-card-content>
@@ -73,8 +83,9 @@
     </div>
   </div>
 
-  <!-- Today's Appointments -->
+  <!-- Sección de turnos de hoy: Lista de citas programadas para el día actual -->
   <div class="recent-appointments-section">
+    <!-- Encabezado de la sección con botón para ver todos los turnos -->
     <div class="section-header">
       <h2 class="section-title">
         <mat-icon>event</mat-icon>
@@ -88,29 +99,37 @@
       </button>
     </div>
     
+    <!-- Tarjeta que contiene la lista de turnos -->
     <mat-card class="appointments-card">
       <mat-card-content>
+        <!-- Estado vacío: Se muestra cuando no hay turnos para hoy -->
         <div *ngIf="turnosHoy.length === 0" class="empty-state">
           <mat-icon class="empty-icon">event_busy</mat-icon>
           <p>No hay turnos para hoy</p>
         </div>
         
+        <!-- Lista de turnos: Se muestra cuando hay turnos programados -->
         <div *ngIf="turnosHoy.length > 0" class="appointments-list">
+          <!-- Iteración sobre cada turno del día -->
           <div *ngFor="let turno of turnosHoy" 
                class="appointment-item"
                (click)="navegarA('/turnos')">
             <div class="appointment-info">
+              <!-- Información principal del turno: paciente, profesional y especialidad -->
               <div class="appointment-main">
                 <h4 class="patient-name">{{ turno.Paciente }}</h4>
                 <p class="appointment-details">
                   {{ turno.Profesional }} • {{ turno.Especialidad }}
                 </p>
               </div>
+              <!-- Información de tiempo y estado del turno -->
               <div class="appointment-time">
+                <!-- Fecha y hora del turno -->
                 <div class="date-time">
                   <span class="date">{{ formatearFecha(turno.Fecha) }}</span>
                   <span class="time">{{ formatearHora(turno.Hora) }}</span>
                 </div>
+                <!-- Badge de estado con color dinámico según el estado del turno -->
                 <div class="status-badge" 
                      [style.background-color]="getEstadoColor(turno.Estado)">
                   {{ turno.Estado }}

@@ -1,21 +1,26 @@
+<!-- Contenedor principal del formulario de nuevo paciente -->
 <div class="nuevo-paciente-container">
-  <!-- Loading Overlay -->
+  <!-- Overlay de carga - Se muestra mientras se cargan los datos iniciales -->
   <div *ngIf="isLoading" class="loading-overlay">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Cargando datos...</p>
   </div>
 
-  <!-- Header Section -->
+  <!-- Sección del encabezado de la página -->
   <div class="header-section">
     <div class="header-content">
       <div class="title-section">
+        <!-- Título principal con icono -->
         <h1 class="page-title">
           <mat-icon class="title-icon">person_add</mat-icon>
           Nuevo Paciente
         </h1>
+        <!-- Subtítulo descriptivo -->
         <p class="page-subtitle">Completa la información del nuevo paciente</p>
       </div>
+      <!-- Acciones del encabezado -->
       <div class="header-actions">
+        <!-- Botón para cancelar y volver -->
         <button mat-stroked-button 
                 (click)="cancelar()"
                 class="cancel-btn">
@@ -26,10 +31,10 @@
     </div>
   </div>
 
-  <!-- Form Section -->
+  <!-- Formulario principal -->
   <form [formGroup]="pacienteForm" (ngSubmit)="guardarPaciente()" class="form-container">
     
-    <!-- Personal Information Card -->
+    <!-- Tarjeta de Información Personal -->
     <mat-card class="form-card">
       <mat-card-header>
         <mat-card-title>
@@ -38,7 +43,9 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
+        <!-- Primera fila: DNI, Apellido, Nombre -->
         <div class="form-row">
+          <!-- Campo DNI con validación de formato -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>DNI *</mat-label>
             <input matInput 
@@ -46,6 +53,7 @@
                    placeholder="12345678"
                    maxlength="8"
                    required>
+            <!-- Mensajes de error para DNI -->
             <mat-error *ngIf="pacienteForm.get('dni')?.hasError('required')">
               El DNI es requerido
             </mat-error>
@@ -54,6 +62,7 @@
             </mat-error>
           </mat-form-field>
 
+          <!-- Campo Apellido con capitalización automática -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Apellido *</mat-label>
             <input matInput 
@@ -66,6 +75,7 @@
             </mat-error>
           </mat-form-field>
 
+          <!-- Campo Nombre con capitalización automática -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Nombre *</mat-label>
             <input matInput 
@@ -79,7 +89,9 @@
           </mat-form-field>
         </div>
 
+        <!-- Segunda fila: Fecha de Nacimiento, Género -->
         <div class="form-row">
+          <!-- Campo Fecha de Nacimiento con datepicker -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Fecha de Nacimiento *</mat-label>
             <input matInput 
@@ -94,6 +106,7 @@
             </mat-error>
           </mat-form-field>
 
+          <!-- Campo Género con selector -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Género *</mat-label>
             <mat-select formControlName="genero" required>
@@ -109,7 +122,7 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Contact Information Card -->
+    <!-- Tarjeta de Información de Contacto -->
     <mat-card class="form-card">
       <mat-card-header>
         <mat-card-title>
@@ -119,6 +132,7 @@
       </mat-card-header>
       <mat-card-content>
         <div class="form-row">
+          <!-- Campo Teléfono con validación de formato -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Teléfono</mat-label>
             <input matInput 
@@ -130,6 +144,7 @@
             </mat-error>
           </mat-form-field>
 
+          <!-- Campo Email con validación de formato -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Email</mat-label>
             <input matInput 
@@ -144,7 +159,7 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Location Information Card -->
+    <!-- Tarjeta de Información de Ubicación -->
     <mat-card class="form-card">
       <mat-card-header>
         <mat-card-title>
@@ -154,6 +169,7 @@
       </mat-card-header>
       <mat-card-content>
         <div class="form-row">
+          <!-- Campo Provincia con autocompletado -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Provincia</mat-label>
             <input matInput 
@@ -168,6 +184,7 @@
             </mat-autocomplete>
           </mat-form-field>
 
+          <!-- Campo Ciudad con autocompletado dependiente de provincia -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Ciudad</mat-label>
             <input matInput 
@@ -185,7 +202,7 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Additional Information Card -->
+    <!-- Tarjeta de Información Adicional -->
     <mat-card class="form-card">
       <mat-card-header>
         <mat-card-title>
@@ -194,11 +211,14 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
+        <!-- Primera fila: Escolarización -->
         <div class="form-row">
+          <!-- Toggle para escolarización -->
           <mat-slide-toggle formControlName="estaEscolarizado" class="toggle-field">
             ¿Está escolarizado?
           </mat-slide-toggle>
 
+          <!-- Campo Escuela - Solo visible si está escolarizado -->
           <mat-form-field *ngIf="pacienteForm.get('estaEscolarizado')?.value" 
                          appearance="outline" class="form-field">
             <mat-label>Escuela</mat-label>
@@ -215,11 +235,14 @@
           </mat-form-field>
         </div>
 
+        <!-- Segunda fila: Obra Social -->
         <div class="form-row">
+          <!-- Toggle para obra social -->
           <mat-slide-toggle formControlName="tieneObraSocial" class="toggle-field">
             ¿Tiene obra social?
           </mat-slide-toggle>
 
+          <!-- Campo Obra Social - Solo visible si tiene obra social -->
           <mat-form-field *ngIf="pacienteForm.get('tieneObraSocial')?.value" 
                          appearance="outline" class="form-field">
             <mat-label>Obra Social</mat-label>
@@ -236,6 +259,7 @@
           </mat-form-field>
         </div>
 
+        <!-- Campo Observaciones - Ancho completo -->
         <mat-form-field appearance="outline" class="form-field full-width">
           <mat-label>Observaciones</mat-label>
           <textarea matInput 
@@ -246,8 +270,9 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Form Actions -->
+    <!-- Acciones del formulario -->
     <div class="form-actions">
+      <!-- Botón para limpiar formulario -->
       <button mat-stroked-button 
               type="button"
               (click)="limpiarFormulario()"
@@ -256,12 +281,15 @@
         Limpiar
       </button>
       
+      <!-- Botón para guardar paciente -->
       <button mat-raised-button 
               color="primary" 
               type="submit"
               [disabled]="isSubmitting || pacienteForm.invalid"
               class="action-btn submit-btn">
+        <!-- Spinner de carga durante el envío -->
         <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+        <!-- Icono de guardar cuando no está enviando -->
         <mat-icon *ngIf="!isSubmitting">save</mat-icon>
         {{ isSubmitting ? 'Guardando...' : 'Guardar Paciente' }}
       </button>

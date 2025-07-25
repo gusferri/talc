@@ -1,195 +1,267 @@
-// Fondo general institucional
+/**
+ * Estilos para el componente de creación/edición de turnos
+ *
+ * Este archivo define el diseño y presentación visual del formulario
+ * de citas médicas, incluyendo:
+ * - Layout responsivo con grid system
+ * - Diseño de tarjetas con sombras y bordes redondeados
+ * - Estilos de formularios Material Design
+ * - Botones con estados hover y transiciones
+ * - Adaptación para dispositivos móviles
+ * - Consistencia visual con el sistema TALC
+ */
+
+/* Fondo general institucional */
+/* Proporciona el contexto visual y centrado del formulario */
 .nuevo-turno-bg {
-  min-height: 100vh;
-  background: #f5f1eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 100vh;                     /* Altura mínima completa */
+  background: #f5f1eb;                   /* Color de fondo institucional */
+  display: flex;                         /* Layout flexbox */
+  align-items: center;                   /* Centrado vertical */
+  justify-content: center;               /* Centrado horizontal */
 }
 
+/* Tarjeta principal del formulario */
+/* Contiene todo el contenido del formulario con diseño elevado */
 .nuevo-turno-card {
-  width: 100%;
-  max-width: 900px;
-  border-radius: 22px;
-  box-shadow: 0 6px 32px rgba(170, 38, 43, 0.10), 0 1.5px 6px rgba(44,44,44,0.08);
-  background: #fff;
-  padding: 40px 40px 32px 40px;
-  margin: 18px 0 32px 0;
+  width: 100%;                           /* Ancho completo */
+  max-width: 900px;                      /* Ancho máximo para legibilidad */
+  border-radius: 22px;                   /* Bordes muy redondeados */
+  box-shadow: 0 6px 32px rgba(170, 38, 43, 0.10), 0 1.5px 6px rgba(44,44,44,0.08);  /* Sombra múltiple */
+  background: #fff;                      /* Fondo blanco */
+  padding: 40px 40px 32px 40px;         /* Espaciado interno */
+  margin: 18px 0 32px 0;                /* Márgenes externos */
 }
 
+/* Encabezado del formulario */
+/* Contiene el título y subtítulo */
 .nuevo-turno-header {
-  text-align: left;
-  margin-bottom: 18px;
+  text-align: left;                      /* Alineación a la izquierda */
+  margin-bottom: 18px;                   /* Espaciado inferior */
 }
 
+/* Título principal del formulario */
 .nuevo-turno-title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #aa262b;
-  margin-bottom: 12px;
-  letter-spacing: -1px;
+  font-size: 2.2rem;                     /* Tamaño de fuente grande */
+  font-weight: 800;                      /* Peso de fuente extra-bold */
+  color: #aa262b;                        /* Color corporativo TALC */
+  margin-bottom: 12px;                   /* Espaciado inferior */
+  letter-spacing: -1px;                  /* Espaciado entre letras */
 }
 
+/* Subtítulo descriptivo */
 .nuevo-turno-subtitle {
-  font-size: 1.08rem;
-  color: #7a7a7a;
-  margin-bottom: 18px;
-  margin-top: 0;
+  font-size: 1.08rem;                    /* Tamaño de fuente mediano */
+  color: #7a7a7a;                        /* Color de texto gris */
+  margin-bottom: 18px;                   /* Espaciado inferior */
+  margin-top: 0;                         /* Sin margen superior */
 }
 
+/* Formulario principal */
+/* Layout vertical con espaciado entre elementos */
 .nuevo-turno-form {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  display: flex;                         /* Layout flexbox */
+  flex-direction: column;                /* Dirección vertical */
+  gap: 22px;                            /* Espaciado entre elementos */
 }
 
+/* Campo de formulario genérico */
+/* Estilos base para todos los campos Material */
 .form-field {
-  width: 100%;
-  font-size: 1.13rem;
+  width: 100%;                           /* Ancho completo */
+  font-size: 1.13rem;                    /* Tamaño de fuente */
 }
 
+/* Campos de formulario Material Design */
+/* Fondo y bordes personalizados */
 .mat-form-field {
-  background: #f5f1eb;
-  border-radius: 8px;
+  background: #f5f1eb;                   /* Fondo gris claro */
+  border-radius: 8px;                    /* Bordes redondeados */
 }
 
+/* Contorno de los campos Material */
+/* Color personalizado para el outline */
 .mat-form-field-appearance-outline .mat-form-field-outline {
-  color: #aa262b;
+  color: #aa262b;                        /* Color corporativo TALC */
 }
 
+/* Campo enfocado */
+/* Cambio de color cuando el campo está activo */
 .mat-form-field.mat-focused .mat-form-field-outline {
-  color: #aa262b;
+  color: #aa262b;                        /* Color corporativo TALC */
 }
 
+/* Etiqueta del campo enfocado */
 .mat-form-field.mat-focused .mat-form-field-label {
-  color: #aa262b !important;
+  color: #aa262b !important;             /* Color corporativo TALC */
 }
 
+/* Elemento de entrada enfocado */
 .mat-form-field.mat-focused .mat-input-element {
-  color: #aa262b;
+  color: #aa262b;                        /* Color corporativo TALC */
 }
 
+/* Contenedor interno del campo */
+/* Altura mínima y tamaño de fuente */
 .mat-form-field-infix {
-  min-height: 56px !important;
-  font-size: 1.13rem !important;
+  min-height: 56px !important;           /* Altura mínima fija */
+  font-size: 1.13rem !important;         /* Tamaño de fuente */
 }
 
+/* Elementos de entrada y selección */
+/* Tamaño de fuente consistente */
 .mat-input-element, .mat-select-value-text {
-  font-size: 1.13rem !important;
+  font-size: 1.13rem !important;         /* Tamaño de fuente */
 }
 
+/* Sección de acciones del formulario */
+/* Contenedor para los botones de acción */
 .form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 18px;
+  display: flex;                         /* Layout flexbox */
+  justify-content: flex-end;             /* Alineación a la derecha */
+  gap: 16px;                            /* Espaciado entre botones */
+  margin-top: 18px;                     /* Margen superior */
 }
 
+/* Botón de guardar */
+/* Estilo principal con color corporativo */
 .btn-guardar {
-  font-weight: 700;
-  border-radius: 8px;
-  background: #aa262b;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(170,38,43,0.08);
-  transition: background 0.2s;
+  font-weight: 700;                      /* Peso de fuente bold */
+  border-radius: 8px;                    /* Bordes redondeados */
+  background: #aa262b;                   /* Color corporativo TALC */
+  color: #fff;                           /* Color de texto blanco */
+  box-shadow: 0 2px 8px rgba(170,38,43,0.08);  /* Sombra sutil */
+  transition: background 0.2s;           /* Transición suave */
 }
 
+/* Efecto hover del botón guardar */
 .btn-guardar:hover {
-  background: #d32f2f;
+  background: #d32f2f;                   /* Color más oscuro al hover */
 }
 
+/* Botón de cancelar */
+/* Estilo secundario con borde */
 .btn-cancelar {
-  font-weight: 600;
-  border-radius: 8px;
-  color: #aa262b;
-  border-color: #aa262b;
+  font-weight: 600;                      /* Peso de fuente semi-bold */
+  border-radius: 8px;                    /* Bordes redondeados */
+  color: #aa262b;                        /* Color corporativo TALC */
+  border-color: #aa262b;                 /* Color del borde */
 }
 
-// Grid para el formulario
+/* Sistema de grid para el formulario */
+/* Layout responsivo con columnas */
 .grid-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  display: flex;                         /* Layout flexbox */
+  flex-direction: column;                /* Dirección vertical */
+  gap: 0;                               /* Sin espaciado entre filas */
 }
+
+/* Fila de formulario */
+/* Grid de 2 columnas con espaciado */
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 22px;
+  display: grid;                         /* Layout grid */
+  grid-template-columns: 1fr 1fr;       /* 2 columnas de igual tamaño */
+  gap: 32px;                            /* Espaciado entre columnas */
+  margin-bottom: 22px;                  /* Margen inferior */
 }
+
+/* Última fila sin margen inferior */
 .form-row:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0;                     /* Sin margen inferior */
 }
-// Hora ocupa toda la fila
+
+/* Tercera fila (hora) ocupa toda la fila */
 .form-row:nth-child(3) {
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr;           /* 1 columna completa */
 }
 
+/* Fila de hora centrada */
 .form-row.hora-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 22px;
+  display: flex;                         /* Layout flexbox */
+  justify-content: center;               /* Centrado horizontal */
+  margin-bottom: 22px;                  /* Margen inferior */
 }
+
+/* Campo de hora en fila centrada */
 .form-row.hora-row .form-field {
-  max-width: 200px;
-  min-width: 160px;
-  width: 100%;
+  max-width: 200px;                     /* Ancho máximo */
+  min-width: 160px;                     /* Ancho mínimo */
+  width: 100%;                          /* Ancho completo */
 }
 
+/* Fila de 2 columnas */
 .row-2-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 22px;
+  display: grid;                         /* Layout grid */
+  grid-template-columns: 1fr 1fr;       /* 2 columnas de igual tamaño */
+  gap: 32px;                            /* Espaciado entre columnas */
+  margin-bottom: 22px;                  /* Margen inferior */
 }
+
+/* Fila de 3 columnas */
 .row-3-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 22px;
+  display: grid;                         /* Layout grid */
+  grid-template-columns: 1fr 1fr 1fr;   /* 3 columnas de igual tamaño */
+  gap: 32px;                            /* Espaciado entre columnas */
+  margin-bottom: 22px;                  /* Margen inferior */
 }
 
+/* Columnas anchas */
 .wide-cols {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;       /* 2 columnas de igual tamaño */
 }
 
+/* Fila de hora alineada a la derecha */
 .hora-row-right {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 22px;
+  display: grid;                         /* Layout grid */
+  grid-template-columns: 1fr 1fr 1fr;   /* 3 columnas de igual tamaño */
+  gap: 32px;                            /* Espaciado entre columnas */
+  margin-bottom: 22px;                  /* Margen inferior */
 }
+
+/* Contenedor de hora */
 .hora-container {
-  width: 100%;
-  max-width: none;
+  width: 100%;                          /* Ancho completo */
+  max-width: none;                      /* Sin ancho máximo */
 }
+
+/* Campo de hora */
 .hora-field {
-  width: 100%;
-  min-width: 0;
-  max-width: none;
+  width: 100%;                          /* Ancho completo */
+  min-width: 0;                         /* Ancho mínimo */
+  max-width: none;                      /* Sin ancho máximo */
 }
 
+/* Diseño responsivo para pantallas medianas */
 @media (max-width: 1100px) {
+  /* Tarjeta del formulario */
   .nuevo-turno-card {
-    max-width: 98vw;
-    padding: 18px 4vw 18px 4vw;
+    max-width: 98vw;                    /* Ancho máximo del viewport */
+    padding: 18px 4vw 18px 4vw;         /* Espaciado interno adaptativo */
   }
+  
+  /* Columnas anchas y de 2 columnas se convierten en 1 */
   .wide-cols, .row-2-cols {
-    grid-template-columns: 1fr;
-    gap: 0;
+    grid-template-columns: 1fr;         /* 1 columna */
+    gap: 0;                             /* Sin espaciado */
   }
+  
+  /* Fila de hora se convierte en 1 columna */
   .hora-row-right {
-    grid-template-columns: 1fr;
-    gap: 0;
+    grid-template-columns: 1fr;         /* 1 columna */
+    gap: 0;                             /* Sin espaciado */
   }
 }
 
+/* Diseño responsivo para pantallas pequeñas */
 @media (max-width: 600px) {
+  /* Tarjeta del formulario */
   .nuevo-turno-card {
-    max-width: 98vw;
-    padding: 18px 4vw 18px 4vw;
+    max-width: 98vw;                    /* Ancho máximo del viewport */
+    padding: 18px 4vw 18px 4vw;         /* Espaciado interno adaptativo */
   }
+  
+  /* Título más pequeño en móviles */
   .nuevo-turno-title {
-    font-size: 1.4rem;
+    font-size: 1.4rem;                  /* Tamaño de fuente reducido */
   }
 } 

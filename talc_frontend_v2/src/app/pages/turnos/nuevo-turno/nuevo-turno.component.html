@@ -1,0 +1,225 @@
+<!--
+  Template del componente de creación/edición de turnos
+  Este archivo define la interfaz de usuario para el formulario de citas médicas
+  del sistema TALC, permitiendo crear nuevos turnos y editar existentes.
+
+  Características principales:
+  - Formulario reactivo con validaciones
+  - Selección de paciente con autocompletado
+  - Selección de profesional y especialidad
+  - Selector de fecha y hora
+  - Verificación de disponibilidad
+  - Estados de carga y envío
+  - Diseño responsivo con Material Design
+  - Modo edición vs creación
+  - Validaciones en tiempo real
+-->
+
+<!-- Contenedor principal del formulario de turnos -->
+<div class="nuevo-turno-container">
+  <!-- Overlay de carga: Se muestra durante operaciones asíncronas -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Formulario principal de turnos -->
+  <form [formGroup]="turnoForm" (ngSubmit)="guardarTurno()" class="turno-form">
+    <!-- Encabezado del formulario -->
+    <div class="form-header">
+      <h2 class="form-title">
+        <mat-icon class="title-icon">{{ isEditing ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditing ? 'Editar Turno' : 'Nuevo Turno' }}
+      </h2>
+      <p class="form-subtitle">
+        {{ isEditing ? 'Modifica los datos del turno seleccionado' : 'Completa los datos para crear un nuevo turno' }}
+      </p>
+    </div>
+
+    <!-- Sección de información del paciente -->
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>person</mat-icon>
+          Información del Paciente
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <!-- Campo de selección de paciente con autocompletado -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Paciente *</mat-label>
+            <input type="text"
+                   matInput
+                   formControlName="Paciente"
+                   [matAutocomplete]="auto"
+                   placeholder="Buscar paciente...">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPaciente">
+              <mat-option *ngFor="let paciente of pacientesFiltrados" [value]="paciente">
+                {{ paciente.DNI }} - {{ paciente.Nombre }} {{ paciente.Apellido }}
+              </mat-option>
+            </mat-autocomplete>
+            <!-- Icono de búsqueda -->
+            <mat-icon matSuffix>search</mat-icon>
+            <!-- Mensaje de error para campo requerido -->
+            <mat-error *ngIf="turnoForm.get('Paciente')?.hasError('required')">
+              El paciente es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección de información del profesional -->
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>medical_services</mat-icon>
+          Información del Profesional
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <!-- Selector de profesional -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Profesional *</mat-label>
+            <mat-select formControlName="Profesional" (selectionChange)="onProfesionalChange()">
+              <mat-option *ngFor="let profesional of profesionales" [value]="profesional.ID">
+                {{ profesional.Nombre }} {{ profesional.Apellido }}
+              </mat-option>
+            </mat-select>
+            <!-- Icono de profesional -->
+            <mat-icon matSuffix>person</mat-icon>
+            <!-- Mensaje de error para campo requerido -->
+            <mat-error *ngIf="turnoForm.get('Profesional')?.hasError('required')">
+              El profesional es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Selector de especialidad (se carga dinámicamente según el profesional) -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Especialidad *</mat-label>
+            <mat-select formControlName="Especialidad">
+              <mat-option *ngFor="let especialidad of especialidades" [value]="especialidad.ID">
+                {{ especialidad.Nombre }}
+              </mat-option>
+            </mat-select>
+            <!-- Icono de especialidad -->
+            <mat-icon matSuffix>local_hospital</mat-icon>
+            <!-- Mensaje de error para campo requerido -->
+            <mat-error *ngIf="turnoForm.get('Especialidad')?.hasError('required')">
+              La especialidad es requerida
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección de fecha y hora -->
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Fecha y Hora
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <!-- Selector de fecha -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Fecha *</mat-label>
+            <input matInput
+                   [matDatepicker]="picker"
+                   formControlName="Fecha"
+                   placeholder="Seleccionar fecha"
+                   (dateChange)="onFechaChange()">
+            <!-- Icono de calendario -->
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <!-- Mensaje de error para campo requerido -->
+            <mat-error *ngIf="turnoForm.get('Fecha')?.hasError('required')">
+              La fecha es requerida
+            </mat-error>
+            <!-- Mensaje de error para fecha pasada -->
+            <mat-error *ngIf="turnoForm.get('Fecha')?.hasError('fechaPasada')">
+              No se pueden crear turnos en fechas pasadas
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Selector de hora -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Hora *</mat-label>
+            <mat-select formControlName="Hora" (selectionChange)="onHoraChange()">
+              <mat-option *ngFor="let hora of horasDisponibles" [value]="hora">
+                {{ hora }}
+              </mat-option>
+            </mat-select>
+            <!-- Icono de reloj -->
+            <mat-icon matSuffix>access_time</mat-icon>
+            <!-- Mensaje de error para campo requerido -->
+            <mat-error *ngIf="turnoForm.get('Hora')?.hasError('required')">
+              La hora es requerida
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Información de disponibilidad -->
+        <div *ngIf="mostrarInfoDisponibilidad" class="availability-info">
+          <mat-icon [class]="disponibilidadInfo.iconClass">{{ disponibilidadInfo.icon }}</mat-icon>
+          <span [class]="disponibilidadInfo.textClass">{{ disponibilidadInfo.message }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección de estado (solo en modo edición) -->
+    <mat-card *ngIf="isEditing" class="form-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Estado del Turno
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <!-- Selector de estado -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="Estado">
+              <mat-option value="Agendado">Agendado</mat-option>
+              <mat-option value="Confirmado">Confirmado</mat-option>
+              <mat-option value="Cancelado">Cancelado</mat-option>
+              <mat-option value="Completado">Completado</mat-option>
+              <mat-option value="Ausente">Ausente</mat-option>
+            </mat-select>
+            <!-- Icono de estado -->
+            <mat-icon matSuffix>flag</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección de acciones del formulario -->
+    <div class="form-actions">
+      <!-- Botón de cancelar -->
+      <button type="button"
+              mat-button
+              class="cancel-btn"
+              (click)="cancelar()"
+              [disabled]="isSubmitting">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+
+      <!-- Botón de guardar -->
+      <button type="submit"
+              mat-raised-button
+              color="primary"
+              class="save-btn"
+              [disabled]="turnoForm.invalid || isSubmitting">
+        <mat-icon *ngIf="!isSubmitting">{{ isEditing ? 'save' : 'add' }}</mat-icon>
+        <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+        {{ isSubmitting ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear Turno') }}
+      </button>
+    </div>
+  </form>
+</div> 

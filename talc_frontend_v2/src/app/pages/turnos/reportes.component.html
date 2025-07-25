@@ -1,23 +1,50 @@
+<!--
+  Template del componente de reportes y estadísticas de turnos
+  Este archivo define la interfaz de usuario para la visualización
+  de estadísticas y reportes gráficos del sistema TALC.
+
+  Características principales:
+  - Filtros de fecha (desde/hasta) para análisis temporal
+  - Gráficos de torta para distribución de estados y especialidades
+  - Gráficos de barras para análisis por profesional
+  - Gráfico de barras apiladas para porcentaje de asistencia
+  - Layout responsivo con flexbox
+  - Integración con ApexCharts
+  - Botón para limpiar filtros
+  - Diseño adaptativo para diferentes tamaños de pantalla
+-->
+
+<!-- Contenedor principal de reportes -->
 <div class="reportes-container">
+  
+  <!-- Título principal de la página -->
   <h1 class="titulo-reportes" style="margin-bottom: 2.5rem;">Reportes y Estadísticas de Turnos</h1>
 
+  <!-- Sección de filtros de fecha -->
   <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+    <!-- Filtro de fecha desde -->
     <mat-form-field appearance="outline">
       <mat-label>Desde</mat-label>
       <input matInput [matDatepicker]="pickerDesde" [formControl]="fechaDesde">
       <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
       <mat-datepicker #pickerDesde></mat-datepicker>
     </mat-form-field>
+    
+    <!-- Filtro de fecha hasta -->
     <mat-form-field appearance="outline">
       <mat-label>Hasta</mat-label>
       <input matInput [matDatepicker]="pickerHasta" [formControl]="fechaHasta">
       <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
       <mat-datepicker #pickerHasta></mat-datepicker>
     </mat-form-field>
+    
+    <!-- Botón para limpiar filtros -->
     <button mat-raised-button class="new-appointment-btn" (click)="limpiarFechas()">Limpiar</button>
   </div>
 
+  <!-- Primera fila de gráficos: Estados y Especialidades -->
   <div class="graficos-row" style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+    <!-- Gráfico de torta: Turnos por estado de asistencia -->
     <div style="flex: 1 1 400px; min-width: 320px; max-width: 500px;">
       <h3>Turnos por estado de asistencia</h3>
       <apx-chart
@@ -28,6 +55,8 @@
         [legend]="chartOptions.legend">
       </apx-chart>
     </div>
+    
+    <!-- Gráfico de torta: Turnos por especialidad -->
     <div style="flex: 1 1 400px; min-width: 320px; max-width: 500px;">
       <h3>Turnos por especialidad</h3>
       <apx-chart
@@ -40,7 +69,9 @@
     </div>
   </div>
 
+  <!-- Segunda fila de gráficos: Profesionales -->
   <div class="graficos-row" style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 3rem;">
+    <!-- Gráfico de barras: Turnos por profesional -->
     <div style="flex: 1 1 400px; min-width: 320px; max-width: 600px;">
       <h3>Turnos por profesional</h3>
       <apx-chart
@@ -56,6 +87,8 @@
         [tooltip]="barChartOptions.tooltip">
       </apx-chart>
     </div>
+    
+    <!-- Gráfico de torta: Turnos por profesional (porcentaje) -->
     <div style="flex: 1 1 400px; min-width: 320px; max-width: 500px;">
       <h3>Turnos por profesional (porcentaje)</h3>
       <apx-chart
@@ -68,6 +101,7 @@
     </div>
   </div>
 
+  <!-- Gráfico de barras apiladas: Porcentaje de asistencia por profesional -->
   <div style="max-width: 1100px; margin: 2rem auto;">
     <h3>Porcentaje de asistencia por profesional</h3>
     <apx-chart
@@ -84,5 +118,6 @@
     </apx-chart>
   </div>
 
+  <!-- Espacio reservado para futuros gráficos y estadísticas -->
   <!-- Aquí irán más gráficos y estadísticas -->
 </div> 

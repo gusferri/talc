@@ -1,124 +1,144 @@
+/* ========================================
+   DASHBOARD COMPONENT STYLES
+   ========================================
+   
+   Este archivo contiene todos los estilos específicos para el componente Dashboard.
+   El dashboard es el panel principal de control del sistema TALC que muestra:
+   - Estadísticas generales del sistema
+   - Acciones rápidas para navegación
+   - Lista de turnos del día actual
+   - Información de bienvenida personalizada
+*/
+
+/* Contenedor principal del dashboard */
 .dashboard-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  position: relative;
+  padding: 24px;                    /* Espaciado interno del contenedor */
+  max-width: 1400px;                /* Ancho máximo para mantener legibilidad */
+  margin: 0 auto;                   /* Centra el contenido horizontalmente */
+  position: relative;               /* Contexto de posicionamiento para elementos hijos */
 }
 
-// Loading Overlay
+/* Overlay de carga: Se muestra mientras se cargan los datos del dashboard */
 .loading-overlay {
-  position: fixed;
+  position: fixed;                  /* Posición fija para cubrir toda la pantalla */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.9);  /* Fondo semi-transparente */
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  gap: 16px;
+  flex-direction: column;           /* Organiza elementos verticalmente */
+  align-items: center;              /* Centra horizontalmente */
+  justify-content: center;          /* Centra verticalmente */
+  z-index: 1000;                    /* Asegura que esté por encima de otros elementos */
+  gap: 16px;                        /* Espacio entre el spinner y el texto */
 
   p {
-    color: #666;
+    color: #666;                    /* Color de texto gris */
     margin: 0;
     font-size: 16px;
   }
 }
 
-// Welcome Section
+/* Sección de bienvenida: Muestra saludo personalizado y fecha actual */
 .welcome-section {
-  margin-bottom: 56px;
+  margin-bottom: 56px;              /* Espacio inferior para separar de la siguiente sección */
 
   .welcome-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
+    display: flex;                  /* Layout flexible para organizar elementos */
+    justify-content: space-between; /* Distribuye elementos en los extremos */
+    align-items: center;            /* Alinea elementos verticalmente */
+    flex-wrap: wrap;                /* Permite que los elementos se envuelvan en pantallas pequeñas */
+    gap: 16px;                      /* Espacio entre elementos */
 
+    /* Texto de bienvenida con icono y nombre del usuario */
     .welcome-text {
       .welcome-title {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 12px;                  /* Espacio entre icono y texto */
         margin: 0 0 8px 0;
-        font-size: 32px;
-        font-weight: 600;
-        color: #333;
+        font-size: 32px;            /* Tamaño de fuente grande para el título */
+        font-weight: 600;           /* Peso de fuente semi-bold */
+        color: #333;                /* Color de texto oscuro */
 
         .welcome-icon {
-          color: #aa262b;
-          font-size: 36px;
+          color: #aa262b;           /* Color corporativo rojo */
+          font-size: 36px;          /* Icono ligeramente más grande que el texto */
         }
       }
 
       .welcome-subtitle {
         margin: 0;
-        color: #666;
+        color: #666;                /* Color de texto gris para subtítulo */
         font-size: 18px;
       }
     }
 
+    /* Información de fecha y hora actual */
     .welcome-time {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border-radius: 12px;
+      padding: 12px 20px;           /* Espaciado interno */
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);  /* Gradiente sutil */
+      border-radius: 12px;          /* Bordes redondeados */
       color: #666;
       font-weight: 500;
 
       mat-icon {
-        color: #aa262b;
+        color: #aa262b;             /* Color corporativo para el icono */
       }
     }
   }
 }
 
-// Section Titles
+/* Títulos de sección: Estilo común para todos los títulos de sección */
 .section-title {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 0 0 24px 0;
-  font-size: 24px;
+  font-size: 24px;                  /* Tamaño de fuente para títulos de sección */
   font-weight: 600;
   color: #333;
 
   mat-icon {
-    color: #aa262b;
+    color: #aa262b;                 /* Color corporativo para iconos de sección */
     font-size: 28px;
   }
 }
 
-// Statistics Section
+/* Sección de estadísticas: Muestra métricas importantes del sistema */
 .stats-section {
-  margin-bottom: 40px;
+  margin-bottom: 40px;              /* Espacio inferior para separar secciones */
 
+  /* Grid de tarjetas de estadísticas: Responsive y adaptable */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));  /* Grid responsive */
+    gap: 20px;                      /* Espacio entre tarjetas */
 
+    /* Tarjeta individual de estadística */
     .stat-card {
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      cursor: pointer;
-      transition: all 0.3s ease;
+      border-radius: 12px;          /* Bordes redondeados */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
+      cursor: pointer;              /* Indica que es clickeable */
+      transition: all 0.3s ease;    /* Transición suave para efectos hover */
 
+      /* Efecto hover: Eleva la tarjeta y aumenta la sombra */
       &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-4px);  /* Mueve la tarjeta hacia arriba */
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);  /* Sombra más pronunciada */
       }
 
+      /* Contenido interno de la tarjeta de estadística */
       .stat-content {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 16px;                  /* Espacio entre icono y texto */
 
+        /* Icono de la estadística con color personalizado */
         .stat-icon {
           width: 60px;
           height: 60px;
@@ -126,24 +146,25 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: white;             /* Icono blanco sobre fondo de color */
 
           mat-icon {
-            font-size: 28px;
+            font-size: 28px;        /* Tamaño del icono */
           }
         }
 
+        /* Información de la estadística: valor y título */
         .stat-info {
           .stat-value {
             margin: 0 0 4px 0;
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 32px;        /* Valor grande y prominente */
+            font-weight: 700;       /* Peso de fuente bold */
             color: #333;
           }
 
           .stat-title {
             margin: 0;
-            color: #666;
+            color: #666;            /* Color gris para el título */
             font-size: 14px;
             font-weight: 500;
           }
@@ -153,31 +174,36 @@
   }
 }
 
-// Quick Actions Section
+/* Sección de acciones rápidas: Acceso directo a funcionalidades principales */
 .quick-actions-section {
   margin-bottom: 40px;
 
+  /* Grid de tarjetas de acciones rápidas */
   .quick-actions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));  /* Grid responsive */
     gap: 20px;
 
+    /* Tarjeta individual de acción rápida */
     .action-card {
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       cursor: pointer;
       transition: all 0.3s ease;
 
+      /* Efecto hover similar a las tarjetas de estadísticas */
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       }
 
+      /* Contenido interno de la tarjeta de acción */
       .action-content {
         display: flex;
         align-items: center;
         gap: 16px;
 
+        /* Icono de la acción con color personalizado */
         .action-icon {
           width: 50px;
           height: 50px;
@@ -192,8 +218,9 @@
           }
         }
 
+        /* Información de la acción: título y descripción */
         .action-info {
-          flex: 1;
+          flex: 1;                  /* Toma el espacio restante */
 
           .action-title {
             margin: 0 0 4px 0;
@@ -224,24 +251,24 @@
   }
 }
 
-// Recent Appointments Section
+/* Sección de turnos recientes: Muestra los turnos programados para el día actual */
 .recent-appointments-section {
-  margin-bottom: 40px;
+  margin-bottom: 40px;              /* Espacio inferior para separar secciones */
 
   .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+    display: flex;                  /* Layout flexible para organizar elementos */
+    justify-content: space-between; /* Distribuye elementos en los extremos */
+    align-items: center;            /* Alinea elementos verticalmente */
+    margin-bottom: 24px;            /* Espacio inferior para separar de la lista */
 
     .view-all-btn {
-      height: 40px;
-      padding: 0 16px;
-      border-radius: 8px;
-      font-weight: 500;
+      height: 40px;                  /* Altura del botón */
+      padding: 0 16px;               /* Espaciado interno */
+      border-radius: 8px;           /* Bordes redondeados */
+      font-weight: 500;             /* Peso de fuente semi-bold */
 
       mat-icon {
-        margin-left: 8px;
+        margin-left: 8px;            /* Espacio a la izquierda del icono */
       }
     }
   }
@@ -292,7 +319,7 @@
           gap: 16px;
 
           .appointment-main {
-            flex: 1;
+            flex: 1;                  /* Toma el espacio restante */
 
             .patient-name {
               margin: 0 0 4px 0;
@@ -346,7 +373,7 @@
   }
 }
 
-// System Status Section
+/* Sección de estado del sistema: Muestra la disponibilidad de los componentes */
 .system-status-section {
   .status-card {
     border-radius: 12px;
@@ -402,7 +429,7 @@
   }
 }
 
-// Responsive Design
+/* Diseño responsivo para pantallas pequeñas */
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 16px;
@@ -455,6 +482,7 @@
   }
 }
 
+/* Diseño responsivo para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .dashboard-container {
     padding: 12px;
@@ -487,7 +515,7 @@
   }
 }
 
-// Animations
+/* Animaciones: Se aplican a las tarjetas y elementos de lista para una transición suave */
 .stat-card,
 .action-card,
 .appointment-item {

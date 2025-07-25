@@ -1,114 +1,149 @@
+/**
+ * Estilos para el componente de Login del sistema TALC
+ * 
+ * Este archivo define todos los estilos específicos para la página de autenticación,
+ * incluyendo layout, animaciones, responsive design y elementos visuales.
+ * 
+ * Características principales:
+ * - Diseño centrado y moderno
+ * - Animaciones suaves de entrada
+ * - Gradientes y sombras para profundidad visual
+ * - Diseño responsive para diferentes dispositivos
+ * - Consistencia con la identidad visual del sistema
+ */
+
+/* Contenedor principal de la página de login */
+/* Proporciona el fondo con gradiente y centrado del contenido */
 .login-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #F1ECE6 0%, #aa262b 100%);
-  padding: 20px;
+  display: flex;                    /* Layout flexbox para centrado */
+  align-items: center;              /* Centrado vertical */
+  justify-content: center;          /* Centrado horizontal */
+  min-height: 100vh;                /* Altura completa de la ventana */
+  background: linear-gradient(135deg, #F1ECE6 0%, #aa262b 100%);  /* Gradiente de fondo */
+  padding: 20px;                    /* Espaciado interno */
 }
 
+/* Tarjeta principal del formulario */
+/* Contiene el formulario con diseño moderno y sombras */
 .login-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
-  animation: slideUp 0.6s ease-out;
+  background: white;                /* Fondo blanco para contraste */
+  border-radius: 16px;              /* Bordes redondeados */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);  /* Sombra profunda */
+  padding: 40px;                    /* Espaciado interno */
+  width: 100%;                      /* Ancho completo */
+  max-width: 400px;                 /* Ancho máximo para legibilidad */
+  animation: slideUp 0.6s ease-out; /* Animación de entrada */
 }
 
+/* Animación de entrada para la tarjeta */
+/* Crea un efecto de deslizamiento hacia arriba */
 @keyframes slideUp {
   from {
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 0;                     /* Inicia transparente */
+    transform: translateY(30px);    /* Inicia 30px abajo */
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1;                     /* Termina completamente visible */
+    transform: translateY(0);       /* Termina en su posición final */
   }
 }
 
+/* Encabezado de la página de login */
+/* Contiene los títulos de bienvenida */
 .login-header {
-  text-align: center;
-  margin-bottom: 32px;
+  text-align: center;               /* Centrado del texto */
+  margin-bottom: 32px;              /* Espaciado inferior */
 
+  /* Título principal de bienvenida */
   .welcome-text {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;                /* Tamaño de fuente grande */
+    font-weight: 600;               /* Peso de fuente semi-bold */
+    color: #333;                    /* Color de texto oscuro */
+    margin-bottom: 8px;             /* Espaciado inferior */
+    font-family: 'Montserrat', sans-serif;  /* Fuente personalizada */
   }
 
+  /* Subtítulo de la página */
   .login-text {
-    font-size: 18px;
-    color: #666;
-    font-weight: 400;
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;                /* Tamaño de fuente mediano */
+    color: #666;                    /* Color de texto gris */
+    font-weight: 400;               /* Peso de fuente normal */
+    margin: 0;                      /* Sin márgenes */
+    font-family: 'Montserrat', sans-serif;  /* Fuente personalizada */
   }
 }
 
+/* Formulario de autenticación */
+/* Contiene todos los campos de entrada y botones */
 .login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: flex;                    /* Layout flexbox */
+  flex-direction: column;           /* Dirección vertical */
+  gap: 20px;                        /* Espaciado entre elementos */
 
+  /* Campo de ancho completo */
   .full-width {
-    width: 100%;
+    width: 100%;                    /* Ocupa todo el ancho disponible */
   }
 
+  /* Botón principal de login */
   .login-button {
-    height: 48px;
-    font-size: 16px;
-    font-weight: 500;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);
-    color: white;
-    transition: all 0.3s ease;
-    margin-top: 8px;
+    height: 48px;                   /* Altura fija del botón */
+    font-size: 16px;                /* Tamaño de fuente */
+    font-weight: 500;               /* Peso de fuente medium */
+    border-radius: 8px;             /* Bordes redondeados */
+    background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);  /* Gradiente rojo */
+    color: white;                   /* Texto blanco */
+    transition: all 0.3s ease;      /* Transición suave */
+    margin-top: 8px;                /* Espaciado superior */
 
+    /* Efecto hover del botón */
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(170, 38, 43, 0.3);
+      transform: translateY(-2px);  /* Se eleva ligeramente */
+      box-shadow: 0 8px 20px rgba(170, 38, 43, 0.3);  /* Sombra con color */
     }
 
+    /* Icono dentro del botón */
     mat-icon {
-      margin-right: 8px;
+      margin-right: 8px;            /* Espaciado derecho */
     }
   }
 
+  /* Mensaje de error */
+  /* Se muestra cuando hay problemas de autenticación */
   .error-message {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #f44336;
-    font-size: 14px;
-    padding: 12px;
-    background-color: #ffebee;
-    border-radius: 8px;
-    border-left: 4px solid #f44336;
+    display: flex;                  /* Layout flexbox */
+    align-items: center;            /* Centrado vertical */
+    gap: 8px;                       /* Espaciado entre elementos */
+    color: #f44336;                 /* Color rojo para errores */
+    font-size: 14px;                /* Tamaño de fuente pequeño */
+    padding: 12px;                  /* Espaciado interno */
+    background-color: #ffebee;      /* Fondo rojo claro */
+    border-radius: 8px;             /* Bordes redondeados */
+    border-left: 4px solid #f44336; /* Borde izquierdo rojo */
 
+    /* Icono de error */
     mat-icon {
-      font-size: 18px;
+      font-size: 18px;              /* Tamaño del icono */
     }
   }
 }
 
-// Responsive design
+/* Diseño responsive para dispositivos móviles */
 @media (max-width: 480px) {
+  /* Ajustes para la tarjeta en pantallas pequeñas */
   .login-card {
-    padding: 24px;
-    margin: 16px;
+    padding: 24px;                  /* Menos padding */
+    margin: 16px;                   /* Márgenes externos */
   }
 
+  /* Ajustes para el encabezado en pantallas pequeñas */
   .login-header {
     .welcome-text {
-      font-size: 20px;
+      font-size: 20px;              /* Tamaño de fuente reducido */
     }
 
     .login-text {
-      font-size: 16px;
+      font-size: 16px;              /* Tamaño de fuente reducido */
     }
   }
 } 
