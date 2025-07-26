@@ -23,5 +23,6 @@ export const environment = {
   production: false,
   
   /** URL base del backend para todas las peticiones HTTP */
-  apiBaseUrl: 'http://192.168.2.41:8000'
+  //apiBaseUrl: 'http://192.168.2.41:8000'
+  apiBaseUrl: 'http://localhost:8000'
 }; 

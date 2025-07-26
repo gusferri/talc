@@ -9,7 +9,8 @@ import mimetypes
 
 router = APIRouter()
 
-UPLOAD_DIR = "/app/uploads"
+# ✅ Define una ruta relativa para funcionar fuera de Docker
+UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/adjuntos")
@@ -27,7 +28,7 @@ async def subir_archivo(
     try:
         with open(ruta_archivo, "wb") as buffer:
             shutil.copyfileobj(archivo.file, buffer)
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Error al guardar el archivo")
 
     try:
@@ -65,7 +66,6 @@ async def subir_archivo(
 
 @router.get("/adjuntos/{id_paciente}")
 async def obtener_adjuntos_paciente(id_paciente: int):
-    """Obtener todos los adjuntos de un paciente"""
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -96,7 +96,6 @@ async def obtener_adjuntos_paciente(id_paciente: int):
 
 @router.get("/adjuntos/descargar/{documento_id}")
 async def descargar_adjunto(documento_id: int):
-    """Descargar un archivo adjunto"""
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -118,7 +117,6 @@ async def descargar_adjunto(documento_id: int):
         if not os.path.exists(ruta_archivo):
             raise HTTPException(status_code=404, detail="Archivo no encontrado en el servidor")
         
-        # Determinar el tipo MIME
         mime_type, _ = mimetypes.guess_type(ruta_archivo)
         if not mime_type:
             mime_type = 'application/octet-stream'
@@ -133,7 +131,6 @@ async def descargar_adjunto(documento_id: int):
 
 @router.get("/adjuntos/visualizar/{documento_id}")
 async def visualizar_adjunto(documento_id: int):
-    """Obtener URL para visualizar un archivo adjunto"""
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -155,12 +152,10 @@ async def visualizar_adjunto(documento_id: int):
         if not os.path.exists(ruta_archivo):
             raise HTTPException(status_code=404, detail="Archivo no encontrado en el servidor")
         
-        # Determinar el tipo MIME
         mime_type, _ = mimetypes.guess_type(ruta_archivo)
         if not mime_type:
             mime_type = 'application/octet-stream'
         
-        # Para archivos que se pueden visualizar en el navegador
         tipos_visualizables = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain']
         
         if mime_type in tipos_visualizables:
@@ -170,18 +165,15 @@ async def visualizar_adjunto(documento_id: int):
             )
         else:
             raise HTTPException(status_code=400, detail="Tipo de archivo no visualizable")
-            
     except mysql.connector.Error as db_err:
         raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")
 
 @router.delete("/adjuntos/{documento_id}")
 async def eliminar_adjunto(documento_id: int):
-    """Eliminar un archivo adjunto"""
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Primero obtener la información del archivo
         cursor.execute("""
             SELECT RutaArchivo
             FROM Paciente_Documentos
@@ -196,7 +188,6 @@ async def eliminar_adjunto(documento_id: int):
         
         ruta_archivo = documento['RutaArchivo']
         
-        # Eliminar de la base de datos
         cursor.execute("DELETE FROM Paciente_Documentos WHERE ID = %s", (documento_id,))
         
         if cursor.rowcount == 0:
@@ -208,15 +199,12 @@ async def eliminar_adjunto(documento_id: int):
         cursor.close()
         conn.close()
         
-        # Eliminar el archivo físico
         try:
             if os.path.exists(ruta_archivo):
                 os.remove(ruta_archivo)
         except Exception as e:
             print(f"⚠️ Error al eliminar archivo físico: {e}")
-            # No fallamos si no se puede eliminar el archivo físico
         
         return {"mensaje": "Documento eliminado correctamente"}
-        
     except mysql.connector.Error as db_err:
         raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")

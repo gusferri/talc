@@ -471,17 +471,24 @@ def obtener_turnos_por_paciente(
             t.Hora, 
             t.ID_Especialidad, 
             e.Nombre AS Especialidad,
-            t.ID_NotaVoz,
             t.ID_EstadoTurno,
-            est.Nombre AS EstadoTurno
+            est.Descripcion AS EstadoTurno,
+            nv.ID AS ID_NotaVoz
         FROM Turno t
         JOIN Especialidad e ON t.ID_Especialidad = e.ID_Especialidad
-        JOIN EstadoTurno est ON t.ID_EstadoTurno = est.ID
+        JOIN Turno_Estado est ON t.ID_EstadoTurno = est.ID
+        LEFT JOIN NotaVoz nv ON t.ID = nv.ID_Turno
         WHERE t.ID_Paciente = %s AND t.ID_Profesional = %s
         ORDER BY t.Fecha DESC, t.Hora DESC
         """
         cursor.execute(sql, (id_paciente, profesional["ID_Profesional"]))
         turnos = cursor.fetchall()
+
+        # Convertir timedelta a time para el campo Hora
+        for turno in turnos:
+            if isinstance(turno["Hora"], timedelta):
+                td = turno["Hora"]
+                turno["Hora"] = (datetime.min + td).time()
 
         return turnos
     except Exception as e:
@@ -596,20 +603,27 @@ def obtener_turnos(
             t.Hora, 
             t.ID_Especialidad, 
             e.Nombre AS Especialidad,
-            t.ID_NotaVoz,
             t.ID_EstadoTurno,
-            est.Nombre AS EstadoTurno,
+            est.Descripcion AS EstadoTurno,
             p.Nombre AS NombrePaciente,
-            p.Apellido AS ApellidoPaciente
+            p.Apellido AS ApellidoPaciente,
+            nv.ID AS ID_NotaVoz
         FROM Turno t
         JOIN Especialidad e ON t.ID_Especialidad = e.ID_Especialidad
-        JOIN EstadoTurno est ON t.ID_EstadoTurno = est.ID
+        JOIN Turno_Estado est ON t.ID_EstadoTurno = est.ID
         JOIN Paciente p ON t.ID_Paciente = p.ID
+        LEFT JOIN NotaVoz nv ON t.ID = nv.ID_Turno
         WHERE t.ID_Profesional = %s
         ORDER BY t.Fecha DESC, t.Hora DESC
         """
         cursor.execute(sql, (profesional["ID_Profesional"],))
         turnos = cursor.fetchall()
+
+        # Convertir timedelta a time para el campo Hora
+        for turno in turnos:
+            if isinstance(turno["Hora"], timedelta):
+                td = turno["Hora"]
+                turno["Hora"] = (datetime.min + td).time()
 
         return turnos
     except Exception as e:

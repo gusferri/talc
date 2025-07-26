@@ -218,9 +218,24 @@ def obtener_turno_por_id(turno_id: int):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT ID, ID_Paciente, ID_Profesional, ID_Especialidad, Fecha, Hora, ID_EstadoTurno
-        FROM Turno
-        WHERE ID = %s
+        SELECT 
+            t.ID, 
+            t.ID_Paciente, 
+            p.Nombre AS NombrePaciente, 
+            p.Apellido AS ApellidoPaciente,
+            t.ID_Profesional, 
+            pr.Nombre AS NombreProfesional, 
+            pr.Apellido AS ApellidoProfesional,
+            t.ID_Especialidad, 
+            e.Nombre AS Especialidad,
+            t.Fecha, 
+            t.Hora, 
+            t.ID_EstadoTurno
+        FROM Turno t
+        JOIN Paciente p ON t.ID_Paciente = p.ID
+        JOIN Profesional pr ON t.ID_Profesional = pr.ID
+        JOIN Especialidad e ON t.ID_Especialidad = e.ID_Especialidad
+        WHERE t.ID = %s
     """, (turno_id,))
     resultado = cursor.fetchone()
     cursor.close()

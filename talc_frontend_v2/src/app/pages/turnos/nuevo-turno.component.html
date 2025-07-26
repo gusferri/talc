@@ -80,12 +80,23 @@
           <!-- Selector de especialidad (se carga dinámicamente según el profesional) -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Especialidad</mat-label>
-            <mat-select formControlName="ID_Especialidad" [disabled]="modoEdicion" required>
+            <mat-icon matPrefix>medical_services</mat-icon>
+            <!-- En modo edición: solo input con el nombre -->
+            <input *ngIf="modoEdicion" 
+                   matInput 
+                   [value]="form.get('Especialidad')?.value" 
+                   disabled>
+            <!-- En modo creación: solo select -->
+            <mat-select *ngIf="!modoEdicion" 
+                       formControlName="ID_Especialidad" 
+                       required>
               <mat-option *ngFor="let esp of especialidadesFiltradas" [value]="esp.ID">
                 {{ esp.Nombre }}
               </mat-option>
             </mat-select>
           </mat-form-field>
+          <!-- Campo oculto para el ID de la especialidad -->
+          <input type="hidden" formControlName="ID_Especialidad">
 
           <!-- Selector de fecha con datepicker -->
           <mat-form-field appearance="outline" class="form-field">

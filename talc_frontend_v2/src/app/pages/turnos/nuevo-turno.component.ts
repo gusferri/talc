@@ -193,6 +193,7 @@ export class NuevoTurnoComponent implements OnInit {
       ID_Profesional: [null, Validators.required],
       profesionalCtrl: [''],
       ID_Especialidad: [null, Validators.required],
+      Especialidad: [''], // Campo para mostrar el nombre de la especialidad en modo edición
       Fecha: [null, Validators.required],
       Hora: [null, Validators.required],
     });
@@ -225,9 +226,14 @@ export class NuevoTurnoComponent implements OnInit {
             ID_Profesional: turno.ID_Profesional,
             profesionalCtrl: profesionalObj,
             ID_Especialidad: turno.ID_Especialidad,
+            Especialidad: turno.Especialidad, // Asignar el nombre de la especialidad
             Fecha: this.parsearFecha(turno.Fecha),
             Hora: horaValue
           }, { emitEvent: false });
+          
+          console.log('🔍 Turno cargado:', turno);
+          console.log('🔍 Especialidad del turno:', turno.Especialidad);
+          console.log('🔍 Valor en el formulario:', this.form.get('Especialidad')?.value);
           
           // Deshabilitar campos en modo edición
           this.form.get('ID_Paciente')?.disable();

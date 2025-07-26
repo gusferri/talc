@@ -5,7 +5,13 @@ from typing import Optional
 class TurnoOut(BaseModel):
     ID: int
     ID_Paciente: int
+    NombrePaciente: str
+    ApellidoPaciente: str
     ID_Profesional: int
+    NombreProfesional: str
+    ApellidoProfesional: str
+    ID_Especialidad: int
+    Especialidad: str
     Fecha: date
     Hora: time
     ID_EstadoTurno: int

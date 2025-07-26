@@ -118,7 +118,7 @@ export class TurnosService {
    * @returns Observable con los datos del turno
    */
   obtenerTurnoPorId(id: number) {
-    return this.http.get<any>(`${environment.apiBaseUrl}/pacientes/turno/${id}`);
+    return this.http.get<any>(`${environment.apiBaseUrl}/turnos/${id}`);
   }
 
   /**
