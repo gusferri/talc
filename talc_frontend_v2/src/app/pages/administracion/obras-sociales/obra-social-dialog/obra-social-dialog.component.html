@@ -29,21 +29,6 @@
         <mat-hint>Nombre de la obra social (requerido)</mat-hint>
       </mat-form-field>
 
-      <!-- Campo Descripción -->
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Descripción</mat-label>
-        <textarea matInput 
-                  formControlName="Descripcion" 
-                  placeholder="Descripción opcional de la obra social..."
-                  rows="3"
-                  [class.mat-error]="tieneError('Descripcion')"></textarea>
-        <mat-icon matSuffix>description</mat-icon>
-        <mat-error *ngIf="tieneError('Descripcion')">
-          {{ obtenerMensajeError('Descripcion') }}
-        </mat-error>
-        <mat-hint>Descripción opcional (máximo 500 caracteres)</mat-hint>
-      </mat-form-field>
-
       <!-- Información adicional -->
       <div class="info-section">
         <mat-card class="info-card">
@@ -54,7 +39,6 @@
                 <h4>Información importante</h4>
                 <ul>
                   <li>El nombre de la obra social es obligatorio</li>
-                  <li>La descripción es opcional pero recomendada</li>
                   <li>Los cambios se aplicarán inmediatamente</li>
                 </ul>
               </div>

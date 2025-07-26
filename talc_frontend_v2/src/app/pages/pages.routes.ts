@@ -275,4 +275,74 @@ export const PagesRoutes: Routes = [
     },
     canActivate: [AdminGuard], // Proteger la ruta con el guard
   },
+
+  /**
+   * Escuelas: Gestión de escuelas del sistema
+   * Solo accesible para usuarios con rol de administrador
+   * Permite crear, editar y eliminar escuelas con información de ciudad y provincia
+   */
+      {
+      path: 'administracion/escuelas',
+      loadComponent: () => import('./administracion/escuelas/escuelas.component').then(m => m.EscuelasComponent),
+      data: {
+        title: 'Gestión de Escuelas',
+        urls: [
+          { title: 'Dashboard', url: '/dashboard' },
+          { title: 'Administración', url: '/administracion' },
+          { title: 'Escuelas' }
+        ],
+      },
+      canActivate: [AdminGuard], // Proteger la ruta con el guard
+    },
+    {
+      path: 'administracion/profesionales',
+      loadComponent: () => import('./administracion/profesionales/profesionales.component').then(m => m.ProfesionalesComponent),
+      data: {
+        title: 'Gestión de Profesionales',
+        urls: [
+          { title: 'Dashboard', url: '/dashboard' },
+          { title: 'Administración', url: '/administracion' },
+          { title: 'Profesionales' }
+        ],
+      },
+      canActivate: [AdminGuard], // Proteger la ruta con el guard
+    },
+
+    /**
+     * Usuarios: Gestión de usuarios del sistema
+     * Solo accesible para usuarios con rol de administrador
+     * Permite crear, editar y gestionar usuarios del sistema
+     */
+    {
+      path: 'administracion/usuarios',
+      loadComponent: () => import('./administracion/usuarios/usuarios.component').then(m => m.UsuariosComponent),
+      data: {
+        title: 'Gestión de Usuarios',
+        urls: [
+          { title: 'Dashboard', url: '/dashboard' },
+          { title: 'Administración', url: '/administracion' },
+          { title: 'Usuarios' }
+        ],
+      },
+      canActivate: [AdminGuard], // Proteger la ruta con el guard
+    },
+
+  /**
+   * Especialidades: Gestión de especialidades médicas del sistema
+   * Solo accesible para usuarios con rol de administrador
+   * Permite crear, editar y gestionar especialidades médicas
+   */
+  {
+    path: 'administracion/especialidades',
+    loadComponent: () => import('./administracion/especialidades/especialidades.component').then(m => m.EspecialidadesComponent),
+    data: {
+      title: 'Gestión de Especialidades',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Administración', url: '/administracion' },
+        { title: 'Especialidades' }
+      ],
+    },
+    canActivate: [AdminGuard], // Proteger la ruta con el guard
+  },
 ];

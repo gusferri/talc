@@ -1,0 +1,145 @@
+<!-- 
+  Template del componente de gestión de usuarios
+  Este archivo define la interfaz de usuario para la gestión completa de usuarios
+  del sistema TALC, incluyendo listado, búsqueda, ordenamiento y navegación.
+  
+  Características principales:
+  - Interfaz responsiva con Material Design
+  - Tabla dinámica con ordenamiento y paginación
+  - Búsqueda en tiempo real
+  - Acciones contextuales por usuario
+  - Estados de carga y vacío
+  - Control de acceso basado en roles
+-->
+
+<!-- Contenedor principal del componente de gestión de usuarios -->
+<div class="usuarios-container">
+  <!-- Sección de encabezado: Título de la página y botón para crear nuevo usuario -->
+  <div class="header-section">
+    <div class="header-content">
+      <!-- Área del título con icono y descripción -->
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">people</mat-icon>
+          Gestión de Usuarios
+        </h1>
+        <p class="page-subtitle">Administre los usuarios del sistema TALC</p>
+      </div>
+      <!-- Botón para crear un nuevo usuario -->
+      <button mat-raised-button 
+              color="primary" 
+              class="new-usuario-btn"
+              (click)="abrirDialogoNuevoUsuario()">
+        <mat-icon>add</mat-icon>
+        Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  <!-- Sección de búsqueda y filtros: Campo de búsqueda para filtrar usuarios -->
+  <mat-card class="search-card">
+    <div class="search-section search-section-flex-between">
+      <div class="search-filters-row">
+        <!-- Campo de búsqueda principal -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar usuario</mat-label>
+          <input matInput [(ngModel)]="filtroNombre" (input)="aplicarFiltros()" placeholder="Buscar por username, nombre, email o rol...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Sección de tabla de usuarios: Contiene la tabla principal con los datos -->
+  <mat-card class="table-card">
+    <div class="table-container">
+      <!-- Estado de carga: Se muestra mientras se cargan los datos -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando usuarios...</p>
+      </div>
+
+      <!-- Estado vacío: Se muestra cuando no hay usuarios registrados -->
+      <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">people</mat-icon>
+        <h3>No hay usuarios registrados</h3>
+        <p>Comienza agregando tu primer usuario</p>
+        <!-- Botón de acción para agregar usuario desde estado vacío -->
+        <button mat-raised-button 
+                color="primary" 
+                (click)="abrirDialogoNuevoUsuario()">
+          <mat-icon>add</mat-icon>
+          Agregar Usuario
+        </button>
+      </div>
+
+      <!-- Tabla de usuarios: Se muestra cuando hay datos disponibles -->
+      <table *ngIf="!isLoading && dataSource.data.length > 0" 
+             mat-table 
+             [dataSource]="dataSource" 
+             matSort
+             class="usuarios-table">
+        
+        <!-- Columna Username: Muestra el nombre de usuario -->
+        <ng-container matColumnDef="Username">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Username </th>
+          <td mat-cell *matCellDef="let usuario"> {{usuario.Username}} </td>
+        </ng-container>
+
+        <!-- Columna Nombre Completo: Muestra el nombre completo del usuario -->
+        <ng-container matColumnDef="NombreCompleto">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre Completo </th>
+          <td mat-cell *matCellDef="let usuario"> {{usuario.NombreCompleto}} </td>
+        </ng-container>
+
+        <!-- Columna Email: Muestra el email del usuario -->
+        <ng-container matColumnDef="Email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+          <td mat-cell *matCellDef="let usuario"> {{usuario.Email}} </td>
+        </ng-container>
+
+        <!-- Columna Rol: Muestra el rol del usuario -->
+        <ng-container matColumnDef="Rol">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Rol </th>
+          <td mat-cell *matCellDef="let usuario"> {{usuario.Rol}} </td>
+        </ng-container>
+
+        <!-- Columna Estado: Muestra si el usuario está activo o no -->
+        <ng-container matColumnDef="Estado">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+          <td mat-cell *matCellDef="let usuario">
+            <div class="status-indicator" [class.active]="usuario.Activo === true" [class.inactive]="usuario.Activo === false">
+              <div class="status-dot"></div>
+              <span class="status-text">{{usuario.Activo === true ? 'Activo' : 'Inactivo'}}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Columna Acciones: Contiene botones de editar -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let usuario">
+            <div class="actions-buttons">
+              <button mat-icon-button 
+                      (click)="abrirDialogoEditarUsuario(usuario)"
+                      matTooltip="Editar usuario"
+                      class="edit-btn">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Paginador: Control de paginación de la tabla -->
+      <mat-paginator *ngIf="!isLoading && dataSource.data.length > 0"
+                    [pageSizeOptions]="[5, 10, 25, 50]" 
+                    showFirstLastButtons 
+                    aria-label="Seleccionar página de usuarios">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div> 

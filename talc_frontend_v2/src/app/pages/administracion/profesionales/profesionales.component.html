@@ -1,0 +1,145 @@
+<!-- 
+  Template del componente de gestión de profesionales
+  Este archivo define la interfaz de usuario para la gestión completa de profesionales
+  del sistema TALC, incluyendo listado, búsqueda, ordenamiento y navegación.
+  
+  Características principales:
+  - Interfaz responsiva con Material Design
+  - Tabla dinámica con ordenamiento y paginación
+  - Búsqueda en tiempo real
+  - Acciones contextuales por profesional
+  - Estados de carga y vacío
+  - Control de acceso basado en roles
+-->
+
+<!-- Contenedor principal del componente de gestión de profesionales -->
+<div class="profesionales-container">
+  <!-- Sección de encabezado: Título de la página y botón para crear nuevo profesional -->
+  <div class="header-section">
+    <div class="header-content">
+      <!-- Área del título con icono y descripción -->
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">medical_services</mat-icon>
+          Gestión de Profesionales
+        </h1>
+        <p class="page-subtitle">Administre los profesionales del sistema TALC</p>
+      </div>
+      <!-- Botón para crear un nuevo profesional -->
+      <button mat-raised-button 
+              color="primary" 
+              class="new-profesional-btn"
+              (click)="abrirDialogoNuevoProfesional()">
+        <mat-icon>add</mat-icon>
+        Nuevo Profesional
+      </button>
+    </div>
+  </div>
+
+  <!-- Sección de búsqueda y filtros: Campo de búsqueda para filtrar profesionales -->
+  <mat-card class="search-card">
+    <div class="search-section search-section-flex-between">
+      <div class="search-filters-row">
+        <!-- Campo de búsqueda principal -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar profesional</mat-label>
+          <input matInput [(ngModel)]="filtroNombre" (input)="aplicarFiltros()" placeholder="Buscar por nombre, apellido o especialidad...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Sección de tabla de profesionales: Contiene la tabla principal con los datos -->
+  <mat-card class="table-card">
+    <div class="table-container">
+      <!-- Estado de carga: Se muestra mientras se cargan los datos -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando profesionales...</p>
+      </div>
+
+      <!-- Estado vacío: Se muestra cuando no hay profesionales registrados -->
+      <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">medical_services</mat-icon>
+        <h3>No hay profesionales registrados</h3>
+        <p>Comienza agregando tu primer profesional</p>
+        <!-- Botón de acción para agregar profesional desde estado vacío -->
+        <button mat-raised-button 
+                color="primary" 
+                (click)="abrirDialogoNuevoProfesional()">
+          <mat-icon>add</mat-icon>
+          Agregar Profesional
+        </button>
+      </div>
+
+      <!-- Tabla de profesionales: Se muestra cuando hay datos disponibles -->
+      <table *ngIf="!isLoading && dataSource.data.length > 0" 
+             mat-table 
+             [dataSource]="dataSource" 
+             matSort
+             class="profesionales-table">
+        
+        <!-- Columna DNI: Muestra el DNI del profesional -->
+        <ng-container matColumnDef="DNI">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> DNI </th>
+          <td mat-cell *matCellDef="let profesional"> {{profesional.DNI || 'Sin DNI'}} </td>
+        </ng-container>
+        
+        <!-- Columna Nombre: Muestra el nombre del profesional -->
+        <ng-container matColumnDef="Nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+          <td mat-cell *matCellDef="let profesional"> {{profesional.Nombre}} </td>
+        </ng-container>
+
+        <!-- Columna Apellido: Muestra el apellido del profesional -->
+        <ng-container matColumnDef="Apellido">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Apellido </th>
+          <td mat-cell *matCellDef="let profesional"> {{profesional.Apellido}} </td>
+        </ng-container>
+
+        <!-- Columna Especialidad: Muestra la especialidad del profesional -->
+        <ng-container matColumnDef="Especialidad">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Especialidad </th>
+          <td mat-cell *matCellDef="let profesional"> {{profesional.Especialidad || 'Sin especialidad'}} </td>
+        </ng-container>
+
+        <!-- Columna Estado: Muestra si el profesional está activo o no -->
+        <ng-container matColumnDef="Estado">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+          <td mat-cell *matCellDef="let profesional">
+            <div class="status-indicator" [class.active]="profesional.Activo === true" [class.inactive]="profesional.Activo === false">
+              <div class="status-dot"></div>
+              <span class="status-text">{{profesional.Activo === true ? 'Activo' : 'Inactivo'}}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Columna Acciones: Contiene botones de editar -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let profesional">
+            <div class="actions-buttons">
+              <button mat-icon-button 
+                      (click)="abrirDialogoEditarProfesional(profesional)"
+                      matTooltip="Editar profesional"
+                      class="edit-btn">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Paginador: Control de paginación de la tabla -->
+      <mat-paginator *ngIf="!isLoading && dataSource.data.length > 0"
+                    [pageSizeOptions]="[5, 10, 25, 50]" 
+                    showFirstLastButtons 
+                    aria-label="Seleccionar página de profesionales">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div> 

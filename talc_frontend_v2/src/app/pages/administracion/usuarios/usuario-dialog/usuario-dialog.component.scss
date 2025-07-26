@@ -1,0 +1,180 @@
+/**
+ * Estilos para el diálogo de usuario
+ * 
+ * Este archivo define el diseño y presentación visual del diálogo
+ * para crear y editar usuarios, incluyendo:
+ * - Layout del diálogo con header y contenido
+ * - Formulario reactivo con validaciones
+ * - Campos de entrada con estilos consistentes
+ * - Botones de acción con estados
+ * - Diseño responsivo
+ */
+
+/* Encabezado del diálogo */
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+
+  h2[mat-dialog-title] {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+
+    .dialog-icon {
+      color: #aa262b;
+      font-size: 24px;
+    }
+  }
+
+  .close-btn {
+    color: #666;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      color: #333;
+    }
+  }
+}
+
+/* Contenido del diálogo */
+.dialog-content {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  form {
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+
+      .form-field {
+        flex: 1;
+        min-width: 0; // Para evitar desbordamiento
+
+        ::ng-deep .mat-mdc-form-field {
+          width: 100%;
+        }
+
+        .required {
+          color: #f44336;
+          font-weight: bold;
+        }
+      }
+    }
+
+    /* Toggle para usuario activo */
+    .active-toggle {
+      margin: 16px 0;
+
+      .toggle-label {
+        margin-left: 8px;
+        font-weight: 500;
+        color: #333;
+      }
+
+      ::ng-deep .mat-mdc-slide-toggle {
+        .mdc-switch--selected .mdc-switch__track {
+          background-color: #aa262b;
+        }
+
+        .mdc-switch--selected .mdc-switch__handle-track {
+          background-color: #aa262b;
+        }
+      }
+    }
+  }
+}
+
+/* Acciones del diálogo */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+
+  button {
+    min-width: 100px;
+    height: 40px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &.submit-btn {
+      background: linear-gradient(135deg, #aa262b 0%, #c62828 100%);
+      color: #f5f1eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(170, 38, 43, 0.3);
+      }
+
+      &:disabled {
+        background: #ccc;
+        color: #666;
+      }
+    }
+
+    &:not(.submit-btn) {
+      color: #666;
+      border: 1px solid #ddd;
+
+      &:hover:not(:disabled) {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+    }
+  }
+}
+
+/* Diseño responsivo */
+@media (max-width: 600px) {
+  .dialog-content {
+    padding: 16px;
+
+    form {
+      .form-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+/* Estilos para errores de validación */
+::ng-deep {
+  .mat-mdc-form-field.mat-form-field-invalid {
+    .mat-mdc-form-field-focus-overlay {
+      background-color: rgba(244, 67, 54, 0.04);
+    }
+  }
+
+  .mat-mdc-form-field-error {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+} 

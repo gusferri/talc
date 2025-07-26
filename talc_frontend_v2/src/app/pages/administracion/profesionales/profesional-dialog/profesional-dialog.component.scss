@@ -1,0 +1,265 @@
+/**
+ * Estilos para el diálogo de Profesionales
+ * Mantiene consistencia con el diseño del sistema TALC
+ */
+
+.dialog-container {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 8px;
+
+  // Header del diálogo
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0 24px;
+    border-bottom: 1px solid #e9ecef;
+
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+
+      .title-icon {
+        margin-right: 12px;
+        color: #dc3545;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .close-button {
+      color: #666;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+
+  // Contenido del formulario
+  .dialog-content {
+    padding: 24px;
+
+    // Sección de información
+    .info-section {
+      margin-bottom: 24px;
+
+      .info-card {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+
+        .info-content {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+
+          .info-icon {
+            color: #2196f3;
+            margin-top: 4px;
+          }
+
+          .info-text {
+            h4 {
+              margin: 0 0 8px 0;
+              color: #1976d2;
+              font-size: 16px;
+              font-weight: 600;
+            }
+
+            ul {
+              margin: 0;
+              padding-left: 20px;
+              color: #1565c0;
+
+              li {
+                margin-bottom: 4px;
+                font-size: 14px;
+
+                .required {
+                  color: #f44336;
+                  font-weight: bold;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Secciones del formulario
+    .form-section {
+      margin-bottom: 32px;
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        margin: 0 0 16px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 8px;
+
+        .section-icon {
+          margin-right: 8px;
+          color: #dc3545;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      // Filas del formulario
+      .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+        align-items: flex-start;
+
+        .form-field {
+          flex: 1;
+          min-width: 0; // Para evitar overflow
+
+          &.full-width {
+            flex: 1 1 100%;
+          }
+
+          // Estilos para campos requeridos
+          .required {
+            color: #f44336;
+            font-weight: bold;
+          }
+
+          // Estilos para textarea
+          textarea {
+            resize: vertical;
+            min-height: 80px;
+          }
+        }
+
+        // Toggle field
+        .toggle-field {
+          width: 100%;
+          margin-top: 8px;
+
+          .toggle-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .toggle-icon {
+              color: #dc3545;
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+
+            span {
+              font-size: 14px;
+              color: #333;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Acciones del diálogo
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px 24px 24px;
+    border-top: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+
+    button {
+      min-width: 120px;
+
+      &.submit-btn {
+        background-color: #dc3545;
+        color: #f8f9fa;
+        
+        &:hover:not(:disabled) {
+          background-color: #c82333;
+        }
+
+        &:disabled {
+          background-color: #6c757d;
+          color: #adb5bd;
+        }
+
+        mat-spinner {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .dialog-container {
+    max-width: 95vw;
+    margin: 16px;
+
+    .dialog-header {
+      padding: 16px 16px 0 16px;
+
+      .dialog-title {
+        font-size: 20px;
+
+        .title-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+
+    .dialog-content {
+      padding: 16px;
+
+      .form-section {
+        .form-row {
+          flex-direction: column;
+          gap: 12px;
+
+          .form-field {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .dialog-actions {
+      padding: 16px;
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Estilos para notificaciones
+::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+} 

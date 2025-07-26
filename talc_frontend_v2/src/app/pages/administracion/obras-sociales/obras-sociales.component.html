@@ -1,144 +1,128 @@
-<!-- Contenedor principal del módulo de obras sociales -->
-<div class="obras-sociales-container">
-  <!-- Overlay de carga: Se muestra mientras se cargan los datos -->
-  <div *ngIf="isLoading" class="loading-overlay">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>Cargando obras sociales...</p>
-  </div>
+<!-- 
+  Template del componente de gestión de obras sociales
+  Este archivo define la interfaz de usuario para la gestión completa de obras sociales
+  del sistema TALC, incluyendo listado, búsqueda, ordenamiento y navegación.
+  
+  Características principales:
+  - Interfaz responsiva con Material Design
+  - Tabla dinámica con ordenamiento y paginación
+  - Búsqueda en tiempo real
+  - Acciones contextuales por obra social
+  - Estados de carga y vacío
+  - Control de acceso basado en roles
+-->
 
-  <!-- Header del módulo -->
-  <div class="module-header">
+<!-- Contenedor principal del componente de gestión de obras sociales -->
+<div class="obras-sociales-container">
+  <!-- Sección de encabezado: Título de la página y botón para crear nueva obra social -->
+  <div class="header-section">
     <div class="header-content">
-      <div class="header-title">
-        <button mat-icon-button (click)="volverAAdministracion()" class="back-button">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <h1 class="module-title">
-          <mat-icon class="title-icon">health_and_safety</mat-icon>
+      <!-- Área del título con icono y descripción -->
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">local_hospital</mat-icon>
           Gestión de Obras Sociales
         </h1>
+        <p class="page-subtitle">Administre las obras sociales del sistema TALC</p>
       </div>
-      <p class="module-subtitle">Administre las obras sociales del sistema TALC</p>
+      <!-- Botón para crear una nueva obra social -->
+      <button mat-raised-button 
+              color="primary" 
+              class="new-obra-social-btn"
+              (click)="abrirDialogoNuevaObraSocial()">
+        <mat-icon>add</mat-icon>
+        Nueva Obra Social
+      </button>
     </div>
   </div>
 
-  <!-- Sección de filtros y acciones -->
-  <div class="filters-section">
-    <div class="filters-content">
-      <!-- Filtro por nombre -->
-      <div class="filter-group">
-        <mat-form-field appearance="outline" class="filter-field">
+  <!-- Sección de búsqueda y filtros: Campo de búsqueda para filtrar obras sociales -->
+  <mat-card class="search-card">
+    <div class="search-section search-section-flex-between">
+      <div class="search-filters-row">
+        <!-- Campo de búsqueda principal -->
+        <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar obra social</mat-label>
-          <input matInput [(ngModel)]="filtroNombre" 
-                 (input)="aplicarFiltros()"
-                 placeholder="Nombre o descripción...">
+          <input matInput [(ngModel)]="filtroNombre" (input)="aplicarFiltros()" placeholder="Buscar por nombre...">
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
       </div>
+    </div>
+  </mat-card>
 
-      <!-- Botones de acción -->
-      <div class="actions-group">
-        <button mat-stroked-button (click)="limpiarFiltros()" class="clear-filters-btn">
-          <mat-icon>clear</mat-icon>
-          Limpiar filtros
-        </button>
-        <button mat-raised-button color="primary" (click)="abrirDialogoNuevaObraSocial()" class="add-btn">
+  <!-- Sección de tabla de obras sociales: Contiene la tabla principal con los datos -->
+  <mat-card class="table-card">
+    <div class="table-container">
+      <!-- Estado de carga: Se muestra mientras se cargan los datos -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando obras sociales...</p>
+      </div>
+
+      <!-- Estado vacío: Se muestra cuando no hay obras sociales registradas -->
+      <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">local_hospital</mat-icon>
+        <h3>No hay obras sociales registradas</h3>
+        <p>Comienza agregando tu primera obra social</p>
+        <!-- Botón de acción para agregar obra social desde estado vacío -->
+        <button mat-raised-button 
+                color="primary" 
+                (click)="abrirDialogoNuevaObraSocial()">
           <mat-icon>add</mat-icon>
-          Nueva Obra Social
+          Agregar Obra Social
         </button>
       </div>
+
+      <!-- Tabla de obras sociales: Se muestra cuando hay datos disponibles -->
+      <table *ngIf="!isLoading && dataSource.data.length > 0" 
+             mat-table 
+             [dataSource]="dataSource" 
+             matSort
+             class="obras-sociales-table">
+        
+        <!-- Columna ID: Muestra el identificador de la obra social -->
+        <ng-container matColumnDef="ID">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> RNOS </th>
+          <td mat-cell *matCellDef="let obraSocial"> {{obraSocial.ID}} </td>
+        </ng-container>
+
+        <!-- Columna Nombre: Muestra el nombre de la obra social -->
+        <ng-container matColumnDef="Nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+          <td mat-cell *matCellDef="let obraSocial"> {{obraSocial.Nombre}} </td>
+        </ng-container>
+
+        <!-- Columna Acciones: Contiene botones de editar y eliminar -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let obraSocial">
+            <div class="actions-buttons">
+              <button mat-icon-button 
+                      (click)="abrirDialogoEditarObraSocial(obraSocial)"
+                      matTooltip="Editar obra social"
+                      class="edit-btn">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      (click)="eliminarObraSocial(obraSocial)"
+                      matTooltip="Eliminar obra social"
+                      class="delete-btn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Paginador: Control de paginación de la tabla -->
+      <mat-paginator *ngIf="!isLoading && dataSource.data.length > 0"
+                    [pageSizeOptions]="[5, 10, 25, 50]" 
+                    showFirstLastButtons 
+                    aria-label="Seleccionar página de obras sociales">
+      </mat-paginator>
     </div>
-  </div>
-
-  <!-- Mensaje de error -->
-  <div *ngIf="errorMessage" class="error-message">
-    <mat-card class="error-card">
-      <mat-card-content>
-        <div class="error-content">
-          <mat-icon class="error-icon">error</mat-icon>
-          <span>{{ errorMessage }}</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <!-- Tabla de obras sociales -->
-  <div class="table-section" *ngIf="!isLoading && !errorMessage">
-    <mat-card class="table-card">
-      <mat-card-content>
-        <!-- Tabla -->
-        <div class="table-container">
-          <table mat-table [dataSource]="dataSource" matSort class="obras-sociales-table">
-            
-            <!-- Columna ID -->
-            <ng-container matColumnDef="ID">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-              <td mat-cell *matCellDef="let obra"> {{ obra.ID }} </td>
-            </ng-container>
-
-            <!-- Columna Nombre -->
-            <ng-container matColumnDef="Nombre">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
-              <td mat-cell *matCellDef="let obra"> {{ obra.Nombre }} </td>
-            </ng-container>
-
-            <!-- Columna Descripción -->
-            <ng-container matColumnDef="Descripcion">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
-              <td mat-cell *matCellDef="let obra"> 
-                {{ obra.Descripcion || 'Sin descripción' }} 
-              </td>
-            </ng-container>
-
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-              <th mat-header-cell *matHeaderCellDef> Acciones </th>
-              <td mat-cell *matCellDef="let obra">
-                <div class="actions-buttons">
-                  <button mat-icon-button 
-                          (click)="abrirDialogoEditarObraSocial(obra)"
-                          matTooltip="Editar obra social"
-                          class="edit-btn">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button 
-                          (click)="eliminarObraSocial(obra)"
-                          matTooltip="Eliminar obra social"
-                          class="delete-btn">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-
-          <!-- Paginador -->
-          <mat-paginator [pageSizeOptions]="[5, 10, 25, 50]" 
-                        showFirstLastButtons 
-                        aria-label="Seleccionar página de obras sociales">
-          </mat-paginator>
-        </div>
-
-        <!-- Mensaje cuando no hay datos -->
-        <div *ngIf="dataSource.data.length === 0" class="no-data-message">
-          <mat-card class="no-data-card">
-            <mat-card-content>
-              <div class="no-data-content">
-                <mat-icon class="no-data-icon">health_and_safety</mat-icon>
-                <h3>No hay obras sociales</h3>
-                <p>No se encontraron obras sociales en el sistema.</p>
-                <button mat-raised-button color="primary" (click)="abrirDialogoNuevaObraSocial()">
-                  <mat-icon>add</mat-icon>
-                  Crear primera obra social
-                </button>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  </mat-card>
 </div> 

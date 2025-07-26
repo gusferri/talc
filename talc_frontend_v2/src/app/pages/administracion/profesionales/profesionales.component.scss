@@ -1,8 +1,8 @@
 /**
- * Estilos para el componente de gestión de obras sociales
+ * Estilos para el componente de gestión de profesionales
  * 
  * Este archivo define el diseño y presentación visual de la interfaz
- * para gestión de obras sociales, incluyendo:
+ * para gestión de profesionales, incluyendo:
  * - Layout responsivo con header y secciones
  * - Diseño de tarjetas para búsqueda y tabla
  * - Estados de carga y vacío
@@ -14,14 +14,14 @@
 
 /* Contenedor principal de la página */
 /* Proporciona el layout base y centrado del contenido */
-.obras-sociales-container {
+.profesionales-container {
   padding: 24px;                    /* Espaciado interno */
   max-width: 1400px;                /* Ancho máximo para legibilidad */
   margin: 0 auto;                   /* Centrado horizontal */
 }
 
 /* Sección del encabezado de la página */
-/* Contiene el título, subtítulo y botón de nueva obra social */
+/* Contiene el título, subtítulo y botón de nuevo profesional */
 .header-section {
   margin-bottom: 24px;              /* Espaciado inferior */
 
@@ -58,8 +58,8 @@
       }
     }
 
-    /* Botón para crear nueva obra social */
-    .new-obra-social-btn {
+    /* Botón para crear nuevo profesional */
+    .new-profesional-btn {
       height: 48px;                 /* Altura fija */
       padding: 0 24px;              /* Espaciado interno */
       font-weight: 500;             /* Peso de fuente medium */
@@ -83,7 +83,7 @@
 }
 
 /* Tarjeta de búsqueda */
-/* Contiene el campo de búsqueda para filtrar obras sociales */
+/* Contiene el campo de búsqueda para filtrar profesionales */
 .search-card {
   margin-bottom: 24px;              /* Espaciado inferior */
   border-radius: 12px;              /* Bordes redondeados */
@@ -101,7 +101,7 @@
 }
 
 /* Tarjeta de tabla */
-/* Contiene la tabla principal con los datos de obras sociales */
+/* Contiene la tabla principal con los datos de profesionales */
 .table-card {
   border-radius: 12px;              /* Bordes redondeados */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
@@ -176,8 +176,8 @@
       }
     }
 
-    /* Tabla de obras sociales */
-    .obras-sociales-table {
+    /* Tabla de profesionales */
+    .profesionales-table {
       width: 100%;                  /* Ancho completo */
       border-collapse: collapse;    /* Colapso de bordes */
 
@@ -220,20 +220,89 @@
         text-align: center;         /* Centrado */
       }
 
+      /* Columna DNI */
+      .mat-column-DNI {
+        min-width: 120px;           /* Ancho mínimo */
+        text-align: center;         /* Centrado */
+        font-weight: 500;           /* Peso de fuente medium */
+      }
+
       /* Columna Nombre */
       .mat-column-Nombre {
         font-weight: 500;           /* Peso de fuente medium */
+        min-width: 150px;           /* Ancho mínimo */
+      }
+
+      /* Columna Apellido */
+      .mat-column-Apellido {
+        font-weight: 500;           /* Peso de fuente medium */
+        min-width: 150px;           /* Ancho mínimo */
+      }
+
+      /* Columna Especialidad */
+      .mat-column-Especialidad {
+        min-width: 180px;           /* Ancho mínimo */
+      }
+
+      /* Columna Estado */
+      .mat-column-Estado {
+        width: 120px;               /* Ancho fijo */
+        text-align: center;         /* Centrado */
+
+        /* Indicador de estado */
+        .status-indicator {
+          display: flex;                    /* Layout flexbox */
+          align-items: center;              /* Centrado vertical */
+          gap: 8px;                         /* Espaciado entre elementos */
+          padding: 4px 8px;                 /* Espaciado interno */
+          border-radius: 16px;              /* Bordes redondeados */
+          font-size: 12px;                  /* Tamaño de fuente pequeño */
+          font-weight: 500;                 /* Peso de fuente medium */
+          transition: all 0.2s ease;        /* Transición suave */
+
+          /* Punto indicador del estado */
+          .status-dot {
+            width: 8px;                     /* Ancho del punto */
+            height: 8px;                    /* Alto del punto */
+            border-radius: 50%;             /* Forma circular */
+            flex-shrink: 0;                 /* No se encoge */
+          }
+
+          /* Texto del estado */
+          .status-text {
+            white-space: nowrap;            /* No se rompe en líneas */
+          }
+
+          /* Estado activo */
+          &.active {
+            background-color: rgba(76, 175, 80, 0.1);  /* Fondo verde claro */
+            color: #2e7d32;                 /* Color verde oscuro */
+
+            .status-dot {
+              background-color: #4caf50;    /* Punto verde */
+            }
+          }
+
+          /* Estado inactivo */
+          &.inactive {
+            background-color: rgba(244, 67, 54, 0.1);  /* Fondo rojo claro */
+            color: #c62828;                 /* Color rojo oscuro */
+
+            .status-dot {
+              background-color: #f44336;    /* Punto rojo */
+            }
+          }
+        }
       }
 
       /* Columna Acciones */
       .mat-column-acciones {
-        width: 120px;               /* Ancho fijo */
+        width: 80px;               /* Ancho fijo reducido */
         text-align: center;         /* Centrado */
 
         /* Botones de acción */
         .actions-buttons {
           display: flex;            /* Layout flexbox */
-          gap: 8px;                 /* Espaciado entre botones */
           justify-content: center;  /* Centrado horizontal */
 
           /* Botón de editar */
@@ -243,17 +312,6 @@
 
             &:hover {
               background-color: rgba(33, 150, 243, 0.1);  /* Fondo azul claro */
-              transform: scale(1.1);  /* Escalado ligero */
-            }
-          }
-
-          /* Botón de eliminar */
-          .delete-btn {
-            color: #f44336;         /* Color rojo */
-            transition: all 0.2s ease;  /* Transición suave */
-
-            &:hover {
-              background-color: rgba(244, 67, 54, 0.1);  /* Fondo rojo claro */
               transform: scale(1.1);  /* Escalado ligero */
             }
           }
@@ -272,7 +330,7 @@
 /* Diseño responsivo */
 /* Adaptación para dispositivos móviles y tablets */
 @media (max-width: 768px) {
-  .obras-sociales-container {
+  .profesionales-container {
     padding: 16px;                  /* Espaciado reducido */
   }
 
@@ -291,7 +349,7 @@
         }
       }
 
-      .new-obra-social-btn {
+      .new-profesional-btn {
         width: 100%;                /* Ancho completo */
       }
     }
@@ -309,12 +367,12 @@
     .table-container {
       overflow-x: auto;             /* Scroll horizontal */
 
-      .obras-sociales-table {
+      .profesionales-table {
         min-width: 600px;           /* Ancho mínimo para legibilidad */
 
         /* Ocultar columnas menos importantes en móviles */
-        .mat-column-ID {
-          display: none;            /* Ocultar columna ID */
+        .mat-column-Especialidad {
+          display: none;            /* Ocultar columna Especialidad */
         }
       }
     }

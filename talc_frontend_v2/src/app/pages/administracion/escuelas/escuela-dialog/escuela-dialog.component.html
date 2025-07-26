@@ -1,0 +1,89 @@
+<!-- Diálogo para crear/editar escuelas -->
+<div class="escuela-dialog-container">
+  <!-- Header del diálogo -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      <mat-icon class="title-icon">school</mat-icon>
+      {{ dialogTitle }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Formulario -->
+  <form [formGroup]="escuelaForm" (ngSubmit)="onSubmit()" class="escuela-form">
+    <div class="form-content">
+      
+      <!-- Campo Nombre -->
+      <div class="form-field-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre de la Escuela</mat-label>
+          <input matInput 
+                 formControlName="Nombre"
+                 placeholder="Ingrese el nombre de la escuela"
+                 [class.error-field]="hasError('Nombre')">
+          <mat-error *ngIf="hasError('Nombre')">
+            {{ getErrorMessage('Nombre') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Campo Ciudad -->
+      <div class="form-field-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ciudad</mat-label>
+          <mat-select formControlName="ID_Ciudad" 
+                      [class.error-field]="hasError('ID_Ciudad')">
+            <mat-option value="">Seleccione una ciudad</mat-option>
+            <mat-option *ngFor="let ciudad of ciudades" [value]="ciudad.ID">
+              {{ ciudad.Ciudad }} - {{ obtenerProvinciaDeCiudad(ciudad.ID) }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="hasError('ID_Ciudad')">
+            {{ getErrorMessage('ID_Ciudad') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="info-section">
+        <mat-card class="info-card">
+          <mat-card-content>
+            <div class="info-content">
+              <mat-icon class="info-icon">info</mat-icon>
+              <div class="info-text">
+                <h4>Información importante</h4>
+                <ul>
+                  <li>El nombre de la escuela es obligatorio</li>
+                  <li>La ciudad es obligatoria y determina la provincia</li>
+                  <li>Los cambios se aplicarán inmediatamente</li>
+                </ul>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="dialog-actions">
+      <button type="button" 
+              mat-stroked-button 
+              (click)="onCancel()"
+              [disabled]="isSubmitting"
+              class="cancel-btn">
+        Cancelar
+      </button>
+      <button type="submit" 
+              mat-raised-button 
+              color="primary"
+              [disabled]="escuelaForm.invalid || isSubmitting"
+              class="submit-btn">
+        <mat-spinner *ngIf="isSubmitting" diameter="20" class="spinner"></mat-spinner>
+        <span *ngIf="!isSubmitting">{{ submitButtonText }}</span>
+      </button>
+    </div>
+  </form>
+</div> 

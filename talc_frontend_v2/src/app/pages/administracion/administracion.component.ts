@@ -106,6 +106,13 @@ export class AdministracionComponent implements OnInit {
       icon: 'school',
       color: '#9c27b0',
       route: '/administracion/escuelas'
+    },
+    {
+      title: 'Especialidades',
+      description: 'Gestionar especialidades médicas y terapéuticas',
+      icon: 'psychology',
+      color: '#e91e63',
+      route: '/administracion/especialidades'
     }
   ];
 
@@ -141,6 +148,13 @@ export class AdministracionComponent implements OnInit {
       icon: 'school',
       color: '#9c27b0',
       description: 'Instituciones educativas'
+    },
+    {
+      title: 'Especialidades',
+      value: 0,
+      icon: 'psychology',
+      color: '#e91e63',
+      description: 'Especialidades médicas disponibles'
     }
   ];
 
@@ -183,25 +197,35 @@ export class AdministracionComponent implements OnInit {
 
   /**
    * Carga las estadísticas del sistema desde el backend
-   * Actualiza los valores mostrados en las tarjetas de estadísticas
    */
   cargarEstadisticas(): void {
-    console.log('📊 Cargando estadísticas del sistema...');
-    
+    console.log('🔍 Iniciando carga de estadísticas...');
     this.adminService.obtenerEstadisticas().subscribe({
-      next: (estadisticas: EstadisticasSistema) => {
-        console.log('📊 Estadísticas recibidas:', estadisticas);
+      next: (stats) => {
+        console.log('✅ Estadísticas recibidas:', stats);
         
-        // Actualizar las estadísticas con datos reales
-        this.adminStats[0].value = estadisticas.total_profesionales;
-        this.adminStats[1].value = estadisticas.total_usuarios;
-        this.adminStats[2].value = estadisticas.total_obras_sociales;
-        this.adminStats[3].value = estadisticas.total_escuelas;
+        // Actualizar valores de estadísticas
+        this.adminStats[0].value = stats.total_profesionales;
+        this.adminStats[1].value = stats.total_usuarios;
+        this.adminStats[2].value = stats.total_obras_sociales;
+        this.adminStats[3].value = stats.total_escuelas;
+        this.adminStats[4].value = stats.total_especialidades;
         
+        // Actualizar contadores en módulos
+        this.adminModules[0].count = stats.total_profesionales;
+        this.adminModules[1].count = stats.total_usuarios;
+        this.adminModules[2].count = stats.total_obras_sociales;
+        this.adminModules[3].count = stats.total_escuelas;
+        this.adminModules[4].count = stats.total_especialidades;
+        
+        // Marcar como cargado
         this.isLoading = false;
+        console.log('✅ Carga de estadísticas completada');
       },
       error: (error) => {
         console.error('❌ Error al cargar estadísticas:', error);
+        console.error('❌ Detalles del error:', error.error);
+        // Marcar como cargado incluso si hay error
         this.isLoading = false;
       }
     });

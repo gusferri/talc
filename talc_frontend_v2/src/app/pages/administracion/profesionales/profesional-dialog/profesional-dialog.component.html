@@ -1,0 +1,235 @@
+<!-- Diálogo para crear/editar profesional -->
+<div class="dialog-container">
+  <!-- Header del diálogo -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      <mat-icon class="title-icon">medical_services</mat-icon>
+      {{ isEditMode ? 'Editar Profesional' : 'Nuevo Profesional' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido del formulario -->
+  <form [formGroup]="profesionalForm" (ngSubmit)="onSubmit()" class="dialog-content">
+    
+    <!-- Información importante -->
+    <div class="info-section">
+      <mat-card class="info-card">
+        <mat-card-content>
+          <div class="info-content">
+            <mat-icon class="info-icon">info</mat-icon>
+            <div class="info-text">
+              <h4>Información importante</h4>
+              <ul>
+                <li>Los campos marcados con <span class="required">*</span> son obligatorios</li>
+                <li>El email debe ser único en el sistema</li>
+                <li>La especialidad debe ser específica y clara</li>
+                <li>Los datos de contacto son importantes para la comunicación</li>
+              </ul>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Datos personales -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon class="section-icon">person</mat-icon>
+        Datos Personales
+      </h3>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre <span class="required">*</span></mat-label>
+          <input matInput formControlName="Nombre" placeholder="Ingrese el nombre">
+          <mat-error *ngIf="isFieldInvalid('Nombre')">
+            {{ getErrorMessage('Nombre') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Apellido <span class="required">*</span></mat-label>
+          <input matInput formControlName="Apellido" placeholder="Ingrese el apellido">
+          <mat-error *ngIf="isFieldInvalid('Apellido')">
+            {{ getErrorMessage('Apellido') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>DNI <span class="required">*</span></mat-label>
+          <input matInput formControlName="DNI" placeholder="Ingrese el DNI" maxlength="8">
+          <mat-error *ngIf="isFieldInvalid('DNI')">
+            {{ getErrorMessage('DNI') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Fecha de Nacimiento</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="FechaNacimiento" placeholder="Seleccione fecha">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Género</mat-label>
+          <mat-select formControlName="Genero" placeholder="Seleccione género">
+            <mat-option *ngFor="let genero of generos" [value]="genero.value">
+              {{ genero.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Matrícula <span class="required">*</span></mat-label>
+          <input matInput formControlName="Matricula" placeholder="Ingrese la matrícula">
+          <mat-error *ngIf="isFieldInvalid('Matricula')">
+            {{ getErrorMessage('Matricula') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Información profesional -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon class="section-icon">work</mat-icon>
+        Información Profesional
+      </h3>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email <span class="required">*</span></mat-label>
+          <input matInput formControlName="Email" placeholder="Ingrese el email" type="email">
+          <mat-error *ngIf="isFieldInvalid('Email')">
+            {{ getErrorMessage('Email') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Teléfono <span class="required">*</span></mat-label>
+          <input matInput formControlName="Telefono" placeholder="Ingrese el teléfono">
+          <mat-error *ngIf="isFieldInvalid('Telefono')">
+            {{ getErrorMessage('Telefono') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Especialidades</mat-label>
+          <mat-select formControlName="Especialidades" multiple placeholder="Seleccione especialidades">
+            <mat-option *ngFor="let especialidad of especialidades" [value]="especialidad.ID_Especialidad">
+              {{ especialidad.Nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Puede seleccionar múltiples especialidades</mat-hint>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Información de ubicación -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon class="section-icon">location_on</mat-icon>
+        Información de Ubicación
+      </h3>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Domicilio</mat-label>
+          <input matInput formControlName="Domicilio" placeholder="Ingrese el domicilio completo">
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <!-- Campo Provincia con autocompletado -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Provincia</mat-label>
+          <input matInput 
+                 formControlName="ID_Provincia"
+                 placeholder="Buscar provincia..."
+                 [matAutocomplete]="provinciaAuto">
+          <mat-autocomplete #provinciaAuto="matAutocomplete" 
+                           [displayWith]="mostrarNombreProvincia">
+            <mat-option *ngFor="let provincia of provinciasFiltradas" [value]="provincia">
+              {{provincia.Provincia}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <!-- Campo Ciudad con autocompletado dependiente de provincia -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ciudad</mat-label>
+          <input matInput 
+                 formControlName="ID_Ciudad"
+                 placeholder="Buscar ciudad..."
+                 [matAutocomplete]="ciudadAuto">
+          <mat-autocomplete #ciudadAuto="matAutocomplete" 
+                           [displayWith]="mostrarNombreCiudad">
+            <mat-option *ngFor="let ciudad of ciudadesFiltradas" [value]="ciudad">
+              {{ciudad.Ciudad}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Configuración adicional -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon class="section-icon">settings</mat-icon>
+        Configuración Adicional
+      </h3>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput formControlName="Observaciones" 
+                    placeholder="Ingrese observaciones adicionales"
+                    rows="3"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-slide-toggle formControlName="UsaIntegracionCalendar" class="toggle-field">
+          <div class="toggle-content">
+            <mat-icon class="toggle-icon">calendar_today</mat-icon>
+            <span>Usar integración con Google Calendar</span>
+          </div>
+        </mat-slide-toggle>
+      </div>
+
+      <!-- Switch de estado (solo en modo edición) -->
+      <div class="form-row" *ngIf="isEditMode">
+        <mat-slide-toggle formControlName="Activo" class="toggle-field">
+          <div class="toggle-content">
+            <mat-icon class="toggle-icon">person</mat-icon>
+            <span>Profesional Activo</span>
+          </div>
+        </mat-slide-toggle>
+      </div>
+    </div>
+  </form>
+
+  <!-- Acciones del diálogo -->
+  <div class="dialog-actions">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">
+      Cancelar
+    </button>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="onSubmit()" 
+            [disabled]="profesionalForm.invalid || isLoading"
+            class="submit-btn">
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">{{ isEditMode ? 'Actualizar' : 'Crear' }} Profesional</span>
+    </button>
+  </div>
+</div> 

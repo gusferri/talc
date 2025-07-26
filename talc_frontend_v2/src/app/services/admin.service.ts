@@ -31,6 +31,7 @@ export interface EstadisticasSistema {
   total_usuarios: number;
   total_obras_sociales: number;
   total_escuelas: number;
+  total_especialidades: number;
 }
 
 /**
@@ -40,10 +41,29 @@ export interface Profesional {
   ID: number;
   Nombre: string;
   Apellido: string;
-  Especialidad: string;
   Email: string;
   Telefono: string;
-  Activo: boolean;
+  DNI?: string;
+  Matricula?: string;
+  FechaNacimiento?: string;
+  Genero?: string;
+  NombreGenero?: string;
+  Domicilio?: string;
+  ID_Provincia?: number;
+  ID_Ciudad?: number;
+  Observaciones?: string;
+  UsaIntegracionCalendar?: boolean;
+  Activo?: boolean;
+  Especialidad?: string;
+  Especialidades?: number[];
+  NombreCiudad?: string;
+  NombreProvincia?: string;
+}
+
+export interface Especialidad {
+  ID_Especialidad: number;
+  Nombre: string;
+  Descripcion?: string;
 }
 
 /**
@@ -52,11 +72,10 @@ export interface Profesional {
 export interface Usuario {
   ID: number;
   Username: string;
-  Nombre: string;
-  Apellido: string;
+  NombreCompleto: string;
   Email: string;
+  Rol: string;
   Activo: boolean;
-  roles: string[];
 }
 
 /**
@@ -65,8 +84,6 @@ export interface Usuario {
 export interface ObraSocial {
   ID: number;
   Nombre: string;
-  Descripcion?: string;
-  Activo: boolean;
 }
 
 /**
@@ -75,10 +92,9 @@ export interface ObraSocial {
 export interface Escuela {
   ID: number;
   Nombre: string;
-  Direccion?: string;
   ID_Ciudad: number;
   Ciudad?: string;
-  Activo: boolean;
+  Provincia?: string;
 }
 
 @Injectable({
@@ -136,6 +152,46 @@ export class AdminService {
   }
 
   /**
+   * Obtiene todas las especialidades del sistema
+   * 
+   * @returns Observable con array de especialidades
+   */
+  obtenerEspecialidades(): Observable<Especialidad[]> {
+    return this.http.get<Especialidad[]>(`${this.apiUrl}/administracion/especialidades`);
+  }
+
+  /**
+   * Crea una nueva especialidad
+   * 
+   * @param especialidad - Datos de la especialidad a crear
+   * @returns Observable con la especialidad creada
+   */
+  crearEspecialidad(especialidad: Omit<Especialidad, 'ID_Especialidad'>): Observable<Especialidad> {
+    return this.http.post<Especialidad>(`${this.apiUrl}/administracion/especialidades`, especialidad);
+  }
+
+  /**
+   * Actualiza una especialidad existente
+   * 
+   * @param id - ID de la especialidad a actualizar
+   * @param especialidad - Datos actualizados de la especialidad
+   * @returns Observable con la especialidad actualizada
+   */
+  actualizarEspecialidad(id: number, especialidad: Partial<Especialidad>): Observable<Especialidad> {
+    return this.http.put<Especialidad>(`${this.apiUrl}/administracion/especialidades/${id}`, especialidad);
+  }
+
+  /**
+   * Elimina una especialidad (solo si no está en uso)
+   * 
+   * @param id - ID de la especialidad a eliminar
+   * @returns Observable con confirmación
+   */
+  eliminarEspecialidad(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/administracion/especialidades/${id}`);
+  }
+
+  /**
    * Crea un nuevo profesional
    * 
    * @param profesional - Datos del profesional a crear
@@ -157,20 +213,7 @@ export class AdminService {
   }
 
   /**
-   * Elimina un profesional (marca como inactivo)
-   * 
-   * @param id - ID del profesional a eliminar
-   * @returns Observable con confirmación
-   */
-  eliminarProfesional(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/administracion/profesionales/${id}`);
-  }
-
-  /**
    * Crea un nuevo usuario
-   * 
-   * @param usuario - Datos del usuario a crear
-   * @returns Observable con el usuario creado
    */
   crearUsuario(usuario: Omit<Usuario, 'ID'>): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/administracion/usuarios`, usuario);
@@ -178,20 +221,13 @@ export class AdminService {
 
   /**
    * Actualiza un usuario existente
-   * 
-   * @param id - ID del usuario a actualizar
-   * @param usuario - Datos actualizados del usuario
-   * @returns Observable con el usuario actualizado
    */
   actualizarUsuario(id: number, usuario: Partial<Usuario>): Observable<Usuario> {
     return this.http.put<Usuario>(`${this.apiUrl}/administracion/usuarios/${id}`, usuario);
   }
 
   /**
-   * Elimina un usuario (marca como inactivo)
-   * 
-   * @param id - ID del usuario a eliminar
-   * @returns Observable con confirmación
+   * Elimina un usuario
    */
   eliminarUsuario(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/administracion/usuarios/${id}`);

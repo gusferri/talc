@@ -1,0 +1,63 @@
+<!-- Contenedor principal del diálogo -->
+<div class="dialog-container">
+  <!-- Encabezado del diálogo -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="header-icon">psychology</mat-icon>
+      {{ isEditMode ? 'Editar' : 'Nueva' }} Especialidad
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido del diálogo -->
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="especialidadForm" (ngSubmit)="onSubmit()">
+      <!-- Campo Nombre -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre de la Especialidad <span class="required">*</span></mat-label>
+        <input matInput 
+               formControlName="Nombre"
+               placeholder="Ej: Psicología Clínica"
+               maxlength="100">
+        <mat-error *ngIf="isFieldInvalid('Nombre')">
+          {{ getErrorMessage('Nombre') }}
+        </mat-error>
+        <mat-hint>{{ especialidadForm.get('Nombre')?.value?.length || 0 }}/100</mat-hint>
+      </mat-form-field>
+
+      <!-- Campo Descripción -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput 
+                  formControlName="Descripcion"
+                  placeholder="Descripción opcional de la especialidad..."
+                  rows="3"
+                  maxlength="500"></textarea>
+        <mat-error *ngIf="isFieldInvalid('Descripcion')">
+          {{ getErrorMessage('Descripcion') }}
+        </mat-error>
+        <mat-hint>{{ especialidadForm.get('Descripcion')?.value?.length || 0 }}/500</mat-hint>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Acciones del diálogo -->
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button 
+            (click)="onCancel()"
+            [disabled]="isLoading"
+            class="cancel-btn">
+      Cancelar
+    </button>
+    <button mat-raised-button 
+            color="primary"
+            (click)="onSubmit()"
+            [disabled]="especialidadForm.invalid || isLoading"
+            class="submit-btn">
+      <mat-spinner *ngIf="isLoading" diameter="20" class="spinner"></mat-spinner>
+      <span *ngIf="!isLoading">{{ isEditMode ? 'Actualizar' : 'Crear' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div> 

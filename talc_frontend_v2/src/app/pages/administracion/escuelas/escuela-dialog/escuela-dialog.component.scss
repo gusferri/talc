@@ -1,0 +1,233 @@
+/**
+ * Estilos para el diálogo de Gestión de Escuelas
+ * Mantiene consistencia con el diseño del sistema TALC
+ */
+
+.escuela-dialog-container {
+  padding: 0;
+  max-width: 600px;
+  width: 100%;
+
+  // Header del diálogo
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0 24px;
+    margin-bottom: 24px;
+
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+
+      .title-icon {
+        margin-right: 12px;
+        color: #dc3545;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .close-button {
+      color: #666;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+
+  // Formulario
+  .escuela-form {
+    .form-content {
+      padding: 0 24px;
+
+      .form-field-group {
+        margin-bottom: 20px;
+
+        .form-field {
+          width: 100%;
+
+          // Estilos para campos con error
+          &.error-field {
+            .mat-form-field-outline {
+              color: #f44336;
+            }
+          }
+
+          // Estilos para el input
+          input, mat-select {
+            font-size: 16px;
+          }
+
+          // Estilos para las etiquetas
+          mat-label {
+            color: #495057;
+            font-weight: 500;
+          }
+
+          // Estilos para los errores
+          mat-error {
+            font-size: 12px;
+            color: #f44336;
+          }
+        }
+      }
+
+      // Sección de información
+      .info-section {
+        margin-top: 24px;
+
+        .info-card {
+          background-color: #f8f9fa;
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+
+          .info-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+
+            .info-icon {
+              color: #2196f3;
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
+              margin-top: 2px;
+            }
+
+            .info-text {
+              flex: 1;
+
+              h4 {
+                margin: 0 0 8px 0;
+                color: #495057;
+                font-size: 16px;
+                font-weight: 600;
+              }
+
+              ul {
+                margin: 0;
+                padding-left: 20px;
+                color: #6c757d;
+                font-size: 14px;
+                line-height: 1.5;
+
+                li {
+                  margin-bottom: 4px;
+
+                  &:last-child {
+                    margin-bottom: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Botones de acción
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 24px;
+      border-top: 1px solid #e9ecef;
+      margin-top: 24px;
+
+      .cancel-btn {
+        color: #666;
+        border-color: #ddd;
+        
+        &:hover {
+          background-color: #f5f5f5;
+        }
+
+        &:disabled {
+          color: #ccc;
+          border-color: #eee;
+        }
+      }
+
+      .submit-btn {
+        background-color: #dc3545;
+        color: #f8f9fa;
+        min-width: 120px;
+        
+        &:hover {
+          background-color: #c82333;
+        }
+
+        &:disabled {
+          background-color: #e9ecef;
+          color: #6c757d;
+        }
+
+        .spinner {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+// Estilos para el diálogo de Material
+::ng-deep {
+  .mat-mdc-dialog-container {
+    .mat-mdc-dialog-surface {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+  }
+
+  // Estilos para notificaciones
+  .success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .escuela-dialog-container {
+    .dialog-header {
+      padding: 16px 16px 0 16px;
+
+      .dialog-title {
+        font-size: 20px;
+
+        .title-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+
+    .escuela-form {
+      .form-content {
+        padding: 0 16px;
+      }
+
+      .dialog-actions {
+        padding: 16px;
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+} 

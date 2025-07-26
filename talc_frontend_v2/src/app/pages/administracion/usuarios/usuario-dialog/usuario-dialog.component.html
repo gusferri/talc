@@ -1,0 +1,111 @@
+<!-- 
+  Template del diálogo de usuario
+  Este archivo define la interfaz para crear y editar usuarios
+  del sistema TALC.
+-->
+
+<!-- Encabezado del diálogo -->
+<div class="dialog-header">
+  <h2 mat-dialog-title>
+    <mat-icon class="dialog-icon">{{modo === 'crear' ? 'person_add' : 'edit'}}</mat-icon>
+    {{modo === 'crear' ? 'Nuevo Usuario' : 'Editar Usuario'}}
+  </h2>
+  <button mat-icon-button (click)="onCancel()" class="close-btn">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<!-- Contenido del diálogo -->
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <!-- Campo Username -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Username <span class="required">*</span></mat-label>
+        <input matInput formControlName="Username" placeholder="Ingrese el nombre de usuario">
+        <mat-error *ngIf="usuarioForm.get('Username')?.hasError('required')">
+          {{getErrorMessage('Username')}}
+        </mat-error>
+        <mat-error *ngIf="usuarioForm.get('Username')?.hasError('minlength') || usuarioForm.get('Username')?.hasError('maxlength')">
+          {{getErrorMessage('Username')}}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Campo Nombre Completo -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre Completo <span class="required">*</span></mat-label>
+        <input matInput formControlName="NombreCompleto" placeholder="Ingrese el nombre completo">
+        <mat-error *ngIf="usuarioForm.get('NombreCompleto')?.hasError('required')">
+          {{getErrorMessage('NombreCompleto')}}
+        </mat-error>
+        <mat-error *ngIf="usuarioForm.get('NombreCompleto')?.hasError('minlength') || usuarioForm.get('NombreCompleto')?.hasError('maxlength')">
+          {{getErrorMessage('NombreCompleto')}}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <!-- Campo Email -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Email <span class="required">*</span></mat-label>
+        <input matInput formControlName="Email" type="email" placeholder="Ingrese el email">
+        <mat-error *ngIf="usuarioForm.get('Email')?.hasError('required')">
+          {{getErrorMessage('Email')}}
+        </mat-error>
+        <mat-error *ngIf="usuarioForm.get('Email')?.hasError('email')">
+          {{getErrorMessage('Email')}}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Campo Rol -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Rol <span class="required">*</span></mat-label>
+        <mat-select formControlName="Rol" placeholder="Seleccione el rol">
+          <mat-option *ngFor="let rol of roles" [value]="rol">
+            {{rol}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="usuarioForm.get('Rol')?.hasError('required')">
+          {{getErrorMessage('Rol')}}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <!-- Campo Contraseña -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Contraseña <span class="required" *ngIf="modo === 'crear'">*</span></mat-label>
+        <input matInput formControlName="Password" type="password" 
+               [placeholder]="modo === 'crear' ? 'Ingrese la contraseña' : 'Dejar en blanco para no cambiar'">
+        <mat-error *ngIf="usuarioForm.get('Password')?.hasError('required') && modo === 'crear'">
+          {{getErrorMessage('Password')}}
+        </mat-error>
+        <mat-error *ngIf="usuarioForm.get('Password')?.hasError('minlength')">
+          {{getErrorMessage('Password')}}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Campo Activo -->
+    <div class="form-row">
+      <mat-slide-toggle formControlName="Activo" class="active-toggle">
+        <span class="toggle-label">Usuario Activo</span>
+      </mat-slide-toggle>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<!-- Acciones del diálogo -->
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="isLoading">
+    Cancelar
+  </button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()" 
+          [disabled]="usuarioForm.invalid || isLoading"
+          class="submit-btn">
+    <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+    <span *ngIf="!isLoading">{{modo === 'crear' ? 'Crear' : 'Actualizar'}}</span>
+  </button>
+</mat-dialog-actions> 

@@ -1,21 +1,21 @@
 /**
- * Componente Obras Sociales - Gestión de obras sociales del sistema TALC
+ * Componente Profesionales - Gestión de profesionales del sistema TALC
  * 
- * Este componente permite gestionar las obras sociales del sistema,
- * incluyendo la visualización, creación, edición y eliminación de obras sociales.
+ * Este componente permite gestionar los profesionales del sistema,
+ * incluyendo la visualización, creación, edición y eliminación de profesionales.
  * Solo accesible para usuarios con rol de administrador.
  * 
  * Funcionalidades principales:
- * - Listar todas las obras sociales del sistema
- * - Crear nuevas obras sociales
- * - Editar obras sociales existentes
- * - Eliminar obras sociales (marcar como inactivas)
- * - Filtrado y búsqueda de obras sociales
+ * - Listar todos los profesionales del sistema con ciudad y provincia
+ * - Crear nuevos profesionales
+ * - Editar profesionales existentes
+ * - Eliminar profesionales (marcar como inactivos)
+ * - Filtrado y búsqueda de profesionales
  * 
  * Responsabilidades:
  * - Verificar permisos de administrador
  * - Gestionar el estado de carga y errores
- * - Proporcionar interfaz para CRUD de obras sociales
+ * - Proporcionar interfaz para CRUD de profesionales
  * - Manejar notificaciones de éxito/error
  */
 
@@ -32,36 +32,36 @@ import { FormsModule } from '@angular/forms';
 
 // Importaciones de servicios
 import { AuthService } from '../../../services/auth.service';
-import { AdminService, ObraSocial } from '../../../services/admin.service';
+import { AdminService, Profesional } from '../../../services/admin.service';
 
 // Importaciones de componentes
-import { ObraSocialDialogComponent } from './obra-social-dialog/obra-social-dialog.component';
+import { ProfesionalDialogComponent } from './profesional-dialog/profesional-dialog.component';
 
 /**
- * Interfaz para los datos de la tabla de obras sociales
+ * Interfaz para los datos de la tabla de profesionales
  */
-interface ObraSocialTableItem extends ObraSocial {
+interface ProfesionalTableItem extends Profesional {
   acciones?: any; // Para las columnas de acciones
 }
 
 /**
- * Componente principal de gestión de obras sociales
+ * Componente principal de gestión de profesionales
  */
 @Component({
-  selector: 'app-obras-sociales',
-  templateUrl: './obras-sociales.component.html',
-  styleUrls: ['./obras-sociales.component.scss'],
+  selector: 'app-profesionales',
+  templateUrl: './profesionales.component.html',
+  styleUrls: ['./profesionales.component.scss'],
   imports: [CommonModule, MaterialModule, FormsModule],
   standalone: true
 })
-export class ObrasSocialesComponent implements OnInit, AfterViewInit {
+export class ProfesionalesComponent implements OnInit, AfterViewInit {
   // Referencias a componentes de Material
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   // Configuración de la tabla
-  displayedColumns: string[] = ['ID', 'Nombre', 'acciones'];
-  dataSource = new MatTableDataSource<ObraSocialTableItem>([]);
+  displayedColumns: string[] = ['DNI', 'Nombre', 'Apellido', 'Especialidad', 'Estado', 'acciones'];
+  dataSource = new MatTableDataSource<ProfesionalTableItem>([]);
 
   // Estado del componente
   isLoading = true;
@@ -71,7 +71,7 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
   filtroNombre = '';
 
   // Datos originales para filtrado
-  datosOriginales: ObraSocialTableItem[] = [];
+  datosOriginales: ProfesionalTableItem[] = [];
 
   /**
    * Constructor del componente
@@ -94,8 +94,8 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Cargar las obras sociales
-    this.cargarObrasSociales();
+    // Cargar los profesionales
+    this.cargarProfesionales();
   }
 
   /**
@@ -107,92 +107,73 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Carga las obras sociales desde el backend
+   * Carga los profesionales desde el backend
    */
-  cargarObrasSociales(): void {
+  cargarProfesionales(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminService.obtenerObrasSociales().subscribe({
-      next: (obrasSociales: ObraSocial[]) => {
-        console.log('🏥 Obras sociales cargadas:', obrasSociales);
+    this.adminService.obtenerProfesionales().subscribe({
+      next: (profesionales: Profesional[]) => {
+        console.log('👨‍⚕️ Profesionales cargados:', profesionales);
         
         // Convertir a formato de tabla
-        const obrasSocialesTable = obrasSociales.map(obra => ({
-          ...obra,
+        const profesionalesTable = profesionales.map(profesional => ({
+          ...profesional,
           acciones: null // Placeholder para las acciones
         }));
 
-        this.datosOriginales = [...obrasSocialesTable];
-        this.dataSource.data = obrasSocialesTable;
+        this.datosOriginales = [...profesionalesTable];
+        this.dataSource.data = profesionalesTable;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('❌ Error al cargar obras sociales:', error);
-        this.errorMessage = 'Error al cargar las obras sociales';
+        console.error('❌ Error al cargar profesionales:', error);
+        this.errorMessage = 'Error al cargar los profesionales';
         this.isLoading = false;
       }
     });
   }
 
   /**
-   * Abre el diálogo para crear una nueva obra social
+   * Abre el diálogo para crear un nuevo profesional
    */
-  abrirDialogoNuevaObraSocial(): void {
-    const dialogRef = this.dialog.open(ObraSocialDialogComponent, {
-      width: '500px',
+  abrirDialogoNuevoProfesional(): void {
+    const dialogRef = this.dialog.open(ProfesionalDialogComponent, {
+      width: '700px',
       disableClose: false,
       data: { modo: 'crear' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('🏥 Nueva obra social creada:', result);
-        this.mostrarNotificacion('Obra social creada exitosamente', 'success');
-        this.cargarObrasSociales(); // Recargar datos
+        console.log('👨‍⚕️ Nuevo profesional creado:', result);
+        this.mostrarNotificacion('Profesional creado exitosamente', 'success');
+        this.cargarProfesionales(); // Recargar datos
       }
     });
   }
 
   /**
-   * Abre el diálogo para editar una obra social existente
+   * Abre el diálogo para editar un profesional existente
    */
-  abrirDialogoEditarObraSocial(obraSocial: ObraSocial): void {
-    const dialogRef = this.dialog.open(ObraSocialDialogComponent, {
-      width: '500px',
+  abrirDialogoEditarProfesional(profesional: Profesional): void {
+    const dialogRef = this.dialog.open(ProfesionalDialogComponent, {
+      width: '700px',
       disableClose: false,
       data: { 
         modo: 'editar',
-        obraSocial: obraSocial
+        profesional: profesional
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('🏥 Obra social editada:', result);
-        this.mostrarNotificacion('Obra social actualizada exitosamente', 'success');
-        this.cargarObrasSociales(); // Recargar datos
+        console.log('👨‍⚕️ Profesional editado:', result);
+        this.mostrarNotificacion('Profesional actualizado exitosamente', 'success');
+        this.cargarProfesionales(); // Recargar datos
       }
     });
-  }
-
-  /**
-   * Elimina una obra social (marca como inactiva)
-   */
-  eliminarObraSocial(obraSocial: ObraSocial): void {
-    if (confirm(`¿Está seguro que desea eliminar la obra social "${obraSocial.Nombre}"?`)) {
-      this.adminService.eliminarObraSocial(obraSocial.ID).subscribe({
-        next: () => {
-          console.log('🏥 Obra social eliminada:', obraSocial.ID);
-          this.mostrarNotificacion('Obra social eliminada exitosamente', 'success');
-          this.cargarObrasSociales(); // Recargar datos
-        },
-        error: (error) => {
-          console.error('❌ Error al eliminar obra social:', error);
-          this.mostrarNotificacion('Error al eliminar la obra social', 'error');
-        }
-      });
-    }
   }
 
   /**
@@ -201,11 +182,12 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
   aplicarFiltros(): void {
     let datosFiltrados = [...this.datosOriginales];
 
-    // Filtro por nombre
+    // Filtro por nombre o apellido
     if (this.filtroNombre.trim()) {
       const filtro = this.filtroNombre.toLowerCase().trim();
-      datosFiltrados = datosFiltrados.filter(obra =>
-        obra.Nombre.toLowerCase().includes(filtro)
+      datosFiltrados = datosFiltrados.filter(profesional =>
+        profesional.Nombre.toLowerCase().includes(filtro) ||
+        profesional.Apellido.toLowerCase().includes(filtro)
       );
     }
 

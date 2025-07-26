@@ -81,15 +81,13 @@ export class ObraSocialDialogComponent implements OnInit {
    */
   inicializarFormulario(): void {
     this.obraSocialForm = this.formBuilder.group({
-      Nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      Descripcion: ['', [Validators.maxLength(500)]]
+      Nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]]
     });
 
     // Si es modo editar, cargar datos existentes
     if (this.data.modo === 'editar' && this.data.obraSocial) {
       this.obraSocialForm.patchValue({
-        Nombre: this.data.obraSocial.Nombre,
-        Descripcion: this.data.obraSocial.Descripcion || ''
+        Nombre: this.data.obraSocial.Nombre
       });
     }
   }

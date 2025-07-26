@@ -1,8 +1,8 @@
 /**
- * Estilos para el componente de gestión de obras sociales
+ * Estilos para el componente de gestión de escuelas
  * 
  * Este archivo define el diseño y presentación visual de la interfaz
- * para gestión de obras sociales, incluyendo:
+ * para gestión de escuelas, incluyendo:
  * - Layout responsivo con header y secciones
  * - Diseño de tarjetas para búsqueda y tabla
  * - Estados de carga y vacío
@@ -14,14 +14,14 @@
 
 /* Contenedor principal de la página */
 /* Proporciona el layout base y centrado del contenido */
-.obras-sociales-container {
+.escuelas-container {
   padding: 24px;                    /* Espaciado interno */
   max-width: 1400px;                /* Ancho máximo para legibilidad */
   margin: 0 auto;                   /* Centrado horizontal */
 }
 
 /* Sección del encabezado de la página */
-/* Contiene el título, subtítulo y botón de nueva obra social */
+/* Contiene el título, subtítulo y botón de nueva escuela */
 .header-section {
   margin-bottom: 24px;              /* Espaciado inferior */
 
@@ -58,8 +58,8 @@
       }
     }
 
-    /* Botón para crear nueva obra social */
-    .new-obra-social-btn {
+    /* Botón para crear nueva escuela */
+    .new-escuela-btn {
       height: 48px;                 /* Altura fija */
       padding: 0 24px;              /* Espaciado interno */
       font-weight: 500;             /* Peso de fuente medium */
@@ -83,7 +83,7 @@
 }
 
 /* Tarjeta de búsqueda */
-/* Contiene el campo de búsqueda para filtrar obras sociales */
+/* Contiene el campo de búsqueda para filtrar escuelas */
 .search-card {
   margin-bottom: 24px;              /* Espaciado inferior */
   border-radius: 12px;              /* Bordes redondeados */
@@ -101,7 +101,7 @@
 }
 
 /* Tarjeta de tabla */
-/* Contiene la tabla principal con los datos de obras sociales */
+/* Contiene la tabla principal con los datos de escuelas */
 .table-card {
   border-radius: 12px;              /* Bordes redondeados */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);  /* Sombra sutil */
@@ -176,8 +176,8 @@
       }
     }
 
-    /* Tabla de obras sociales */
-    .obras-sociales-table {
+    /* Tabla de escuelas */
+    .escuelas-table {
       width: 100%;                  /* Ancho completo */
       border-collapse: collapse;    /* Colapso de bordes */
 
@@ -223,6 +223,17 @@
       /* Columna Nombre */
       .mat-column-Nombre {
         font-weight: 500;           /* Peso de fuente medium */
+        min-width: 200px;           /* Ancho mínimo */
+      }
+
+      /* Columna Ciudad */
+      .mat-column-Ciudad {
+        min-width: 150px;           /* Ancho mínimo */
+      }
+
+      /* Columna Provincia */
+      .mat-column-Provincia {
+        min-width: 150px;           /* Ancho mínimo */
       }
 
       /* Columna Acciones */
@@ -272,7 +283,7 @@
 /* Diseño responsivo */
 /* Adaptación para dispositivos móviles y tablets */
 @media (max-width: 768px) {
-  .obras-sociales-container {
+  .escuelas-container {
     padding: 16px;                  /* Espaciado reducido */
   }
 
@@ -291,7 +302,7 @@
         }
       }
 
-      .new-obra-social-btn {
+      .new-escuela-btn {
         width: 100%;                /* Ancho completo */
       }
     }
@@ -309,12 +320,16 @@
     .table-container {
       overflow-x: auto;             /* Scroll horizontal */
 
-      .obras-sociales-table {
+      .escuelas-table {
         min-width: 600px;           /* Ancho mínimo para legibilidad */
 
         /* Ocultar columnas menos importantes en móviles */
         .mat-column-ID {
           display: none;            /* Ocultar columna ID */
+        }
+
+        .mat-column-Provincia {
+          display: none;            /* Ocultar columna Provincia */
         }
       }
     }

@@ -1,0 +1,210 @@
+/* Contenedor principal del diálogo */
+.dialog-container {
+  min-width: 400px;                 /* Ancho mínimo */
+  max-width: 500px;                 /* Ancho máximo */
+}
+
+/* Encabezado del diálogo */
+.dialog-header {
+  display: flex;                    /* Layout flexbox */
+  justify-content: space-between;   /* Distribución horizontal */
+  align-items: center;              /* Centrado vertical */
+  padding: 20px 24px 0 24px;        /* Espaciado interno */
+  margin-bottom: 16px;              /* Espaciado inferior */
+
+  /* Título del diálogo */
+  h2[mat-dialog-title] {
+    margin: 0;                      /* Sin márgenes */
+    font-size: 20px;                /* Tamaño de fuente */
+    font-weight: 600;               /* Peso de fuente semibold */
+    color: #333;                    /* Color de texto oscuro */
+    display: flex;                  /* Layout flexbox */
+    align-items: center;            /* Centrado vertical */
+    gap: 12px;                      /* Espaciado entre elementos */
+
+    /* Icono del encabezado */
+    .header-icon {
+      color: #e91e63;               /* Color rosa */
+      font-size: 24px;              /* Tamaño de icono */
+      width: 24px;                  /* Ancho fijo */
+      height: 24px;                 /* Alto fijo */
+    }
+  }
+
+  /* Botón de cerrar */
+  .close-btn {
+    color: #666;                    /* Color gris */
+    transition: all 0.2s ease;      /* Transición suave */
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);  /* Fondo gris claro */
+      transform: scale(1.1);        /* Escalado ligero */
+    }
+  }
+}
+
+/* Contenido del diálogo */
+.dialog-content {
+  padding: 0 24px;                  /* Espaciado interno */
+  max-height: 400px;                /* Altura máxima */
+  overflow-y: auto;                 /* Scroll vertical si es necesario */
+
+  /* Formulario */
+  form {
+    display: flex;                  /* Layout flexbox */
+    flex-direction: column;         /* Dirección vertical */
+    gap: 20px;                      /* Espaciado entre campos */
+
+    /* Campos del formulario */
+    .form-field {
+      width: 100%;                  /* Ancho completo */
+
+      /* Campo requerido */
+      .required {
+        color: #f44336;             /* Color rojo */
+        font-weight: bold;          /* Peso de fuente bold */
+      }
+
+      /* Estilo del campo de texto */
+      ::ng-deep .mat-mdc-form-field {
+        width: 100%;                /* Ancho completo */
+      }
+
+      /* Estilo del wrapper del campo */
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        background-color: #fafafa;  /* Fondo gris muy claro */
+        border-radius: 8px;         /* Bordes redondeados */
+      }
+
+      /* Estilo del campo cuando está enfocado */
+      ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+        background-color: white;    /* Fondo blanco */
+        box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.2);  /* Sombra rosa */
+      }
+
+      /* Estilo del campo cuando tiene error */
+      ::ng-deep .mat-mdc-form-field.mat-form-field-invalid .mat-mdc-text-field-wrapper {
+        box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);  /* Sombra roja */
+      }
+
+      /* Estilo del textarea */
+      ::ng-deep textarea.mat-mdc-input-element {
+        resize: vertical;           /* Solo redimensionar verticalmente */
+        min-height: 80px;           /* Altura mínima */
+      }
+
+      /* Estilo de los mensajes de error */
+      ::ng-deep .mat-mdc-form-field-error {
+        color: #f44336;             /* Color rojo */
+        font-size: 12px;            /* Tamaño de fuente pequeño */
+      }
+
+      /* Estilo de las pistas */
+      ::ng-deep .mat-mdc-form-field-hint {
+        color: #666;                /* Color gris */
+        font-size: 12px;            /* Tamaño de fuente pequeño */
+      }
+    }
+  }
+}
+
+/* Acciones del diálogo */
+.dialog-actions {
+  display: flex;                    /* Layout flexbox */
+  justify-content: flex-end;        /* Alineación a la derecha */
+  gap: 12px;                        /* Espaciado entre botones */
+  padding: 20px 24px 24px 24px;     /* Espaciado interno */
+  margin: 0;                        /* Sin márgenes */
+
+  /* Botón de cancelar */
+  .cancel-btn {
+    color: #666;                    /* Color gris */
+    font-weight: 500;               /* Peso de fuente medium */
+    padding: 8px 16px;              /* Espaciado interno */
+    border-radius: 6px;             /* Bordes redondeados */
+    transition: all 0.2s ease;      /* Transición suave */
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.04);  /* Fondo gris claro */
+    }
+
+    &:disabled {
+      color: #ccc;                  /* Color gris claro */
+    }
+  }
+
+  /* Botón de enviar */
+  .submit-btn {
+    background: linear-gradient(135deg, #e91e63, #c2185b);  /* Gradiente rosa */
+    color: white;                   /* Texto blanco */
+    font-weight: 500;               /* Peso de fuente medium */
+    padding: 8px 24px;              /* Espaciado interno */
+    border-radius: 6px;             /* Bordes redondeados */
+    transition: all 0.3s ease;      /* Transición suave */
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);  /* Sombra rosa */
+    display: flex;                  /* Layout flexbox */
+    align-items: center;            /* Centrado vertical */
+    gap: 8px;                       /* Espaciado entre elementos */
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);  /* Movimiento hacia arriba */
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);  /* Sombra más intensa */
+    }
+
+    &:disabled {
+      background: #ccc;             /* Fondo gris */
+      box-shadow: none;             /* Sin sombra */
+      transform: none;              /* Sin transformación */
+    }
+
+    /* Spinner de carga */
+    .spinner {
+      margin-right: 4px;            /* Espaciado derecho */
+    }
+  }
+}
+
+/* Diseño responsivo */
+@media (max-width: 600px) {
+  .dialog-container {
+    min-width: 300px;               /* Ancho mínimo reducido */
+    max-width: 90vw;                /* Ancho máximo relativo */
+  }
+
+  .dialog-header {
+    padding: 16px 20px 0 20px;      /* Espaciado reducido */
+
+    h2[mat-dialog-title] {
+      font-size: 18px;              /* Tamaño de fuente reducido */
+    }
+  }
+
+  .dialog-content {
+    padding: 0 20px;                /* Espaciado reducido */
+  }
+
+  .dialog-actions {
+    padding: 16px 20px 20px 20px;   /* Espaciado reducido */
+    flex-direction: column;         /* Dirección vertical */
+    gap: 8px;                       /* Espaciado reducido */
+
+    .cancel-btn,
+    .submit-btn {
+      width: 100%;                  /* Ancho completo */
+      justify-content: center;      /* Centrado horizontal */
+    }
+  }
+}
+
+/* Estilos para notificaciones */
+::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50;      /* Fondo verde */
+    color: white;                   /* Texto blanco */
+  }
+
+  .error-snackbar {
+    background-color: #f44336;      /* Fondo rojo */
+    color: white;                   /* Texto blanco */
+  }
+} 

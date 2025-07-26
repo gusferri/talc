@@ -1,21 +1,21 @@
 /**
- * Componente Obras Sociales - Gestión de obras sociales del sistema TALC
+ * Componente Escuelas - Gestión de escuelas del sistema TALC
  * 
- * Este componente permite gestionar las obras sociales del sistema,
- * incluyendo la visualización, creación, edición y eliminación de obras sociales.
+ * Este componente permite gestionar las escuelas del sistema,
+ * incluyendo la visualización, creación, edición y eliminación de escuelas.
  * Solo accesible para usuarios con rol de administrador.
  * 
  * Funcionalidades principales:
- * - Listar todas las obras sociales del sistema
- * - Crear nuevas obras sociales
- * - Editar obras sociales existentes
- * - Eliminar obras sociales (marcar como inactivas)
- * - Filtrado y búsqueda de obras sociales
+ * - Listar todas las escuelas del sistema con ciudad y provincia
+ * - Crear nuevas escuelas
+ * - Editar escuelas existentes
+ * - Eliminar escuelas (marcar como inactivas)
+ * - Filtrado y búsqueda de escuelas
  * 
  * Responsabilidades:
  * - Verificar permisos de administrador
  * - Gestionar el estado de carga y errores
- * - Proporcionar interfaz para CRUD de obras sociales
+ * - Proporcionar interfaz para CRUD de escuelas
  * - Manejar notificaciones de éxito/error
  */
 
@@ -32,36 +32,36 @@ import { FormsModule } from '@angular/forms';
 
 // Importaciones de servicios
 import { AuthService } from '../../../services/auth.service';
-import { AdminService, ObraSocial } from '../../../services/admin.service';
+import { AdminService, Escuela } from '../../../services/admin.service';
 
 // Importaciones de componentes
-import { ObraSocialDialogComponent } from './obra-social-dialog/obra-social-dialog.component';
+import { EscuelaDialogComponent } from './escuela-dialog/escuela-dialog.component';
 
 /**
- * Interfaz para los datos de la tabla de obras sociales
+ * Interfaz para los datos de la tabla de escuelas
  */
-interface ObraSocialTableItem extends ObraSocial {
+interface EscuelaTableItem extends Escuela {
   acciones?: any; // Para las columnas de acciones
 }
 
 /**
- * Componente principal de gestión de obras sociales
+ * Componente principal de gestión de escuelas
  */
 @Component({
-  selector: 'app-obras-sociales',
-  templateUrl: './obras-sociales.component.html',
-  styleUrls: ['./obras-sociales.component.scss'],
+  selector: 'app-escuelas',
+  templateUrl: './escuelas.component.html',
+  styleUrls: ['./escuelas.component.scss'],
   imports: [CommonModule, MaterialModule, FormsModule],
   standalone: true
 })
-export class ObrasSocialesComponent implements OnInit, AfterViewInit {
+export class EscuelasComponent implements OnInit, AfterViewInit {
   // Referencias a componentes de Material
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   // Configuración de la tabla
-  displayedColumns: string[] = ['ID', 'Nombre', 'acciones'];
-  dataSource = new MatTableDataSource<ObraSocialTableItem>([]);
+  displayedColumns: string[] = ['ID', 'Nombre', 'Ciudad', 'Provincia', 'acciones'];
+  dataSource = new MatTableDataSource<EscuelaTableItem>([]);
 
   // Estado del componente
   isLoading = true;
@@ -71,7 +71,7 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
   filtroNombre = '';
 
   // Datos originales para filtrado
-  datosOriginales: ObraSocialTableItem[] = [];
+  datosOriginales: EscuelaTableItem[] = [];
 
   /**
    * Constructor del componente
@@ -94,8 +94,8 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Cargar las obras sociales
-    this.cargarObrasSociales();
+    // Cargar las escuelas
+    this.cargarEscuelas();
   }
 
   /**
@@ -107,89 +107,89 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Carga las obras sociales desde el backend
+   * Carga las escuelas desde el backend
    */
-  cargarObrasSociales(): void {
+  cargarEscuelas(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.adminService.obtenerObrasSociales().subscribe({
-      next: (obrasSociales: ObraSocial[]) => {
-        console.log('🏥 Obras sociales cargadas:', obrasSociales);
+    this.adminService.obtenerEscuelas().subscribe({
+      next: (escuelas: Escuela[]) => {
+        console.log('🏫 Escuelas cargadas:', escuelas);
         
         // Convertir a formato de tabla
-        const obrasSocialesTable = obrasSociales.map(obra => ({
-          ...obra,
+        const escuelasTable = escuelas.map(escuela => ({
+          ...escuela,
           acciones: null // Placeholder para las acciones
         }));
 
-        this.datosOriginales = [...obrasSocialesTable];
-        this.dataSource.data = obrasSocialesTable;
+        this.datosOriginales = [...escuelasTable];
+        this.dataSource.data = escuelasTable;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('❌ Error al cargar obras sociales:', error);
-        this.errorMessage = 'Error al cargar las obras sociales';
+        console.error('❌ Error al cargar escuelas:', error);
+        this.errorMessage = 'Error al cargar las escuelas';
         this.isLoading = false;
       }
     });
   }
 
   /**
-   * Abre el diálogo para crear una nueva obra social
+   * Abre el diálogo para crear una nueva escuela
    */
-  abrirDialogoNuevaObraSocial(): void {
-    const dialogRef = this.dialog.open(ObraSocialDialogComponent, {
-      width: '500px',
+  abrirDialogoNuevaEscuela(): void {
+    const dialogRef = this.dialog.open(EscuelaDialogComponent, {
+      width: '600px',
       disableClose: false,
       data: { modo: 'crear' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('🏥 Nueva obra social creada:', result);
-        this.mostrarNotificacion('Obra social creada exitosamente', 'success');
-        this.cargarObrasSociales(); // Recargar datos
+        console.log('🏫 Nueva escuela creada:', result);
+        this.mostrarNotificacion('Escuela creada exitosamente', 'success');
+        this.cargarEscuelas(); // Recargar datos
       }
     });
   }
 
   /**
-   * Abre el diálogo para editar una obra social existente
+   * Abre el diálogo para editar una escuela existente
    */
-  abrirDialogoEditarObraSocial(obraSocial: ObraSocial): void {
-    const dialogRef = this.dialog.open(ObraSocialDialogComponent, {
-      width: '500px',
+  abrirDialogoEditarEscuela(escuela: Escuela): void {
+    const dialogRef = this.dialog.open(EscuelaDialogComponent, {
+      width: '600px',
       disableClose: false,
       data: { 
         modo: 'editar',
-        obraSocial: obraSocial
+        escuela: escuela
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('🏥 Obra social editada:', result);
-        this.mostrarNotificacion('Obra social actualizada exitosamente', 'success');
-        this.cargarObrasSociales(); // Recargar datos
+        console.log('🏫 Escuela editada:', result);
+        this.mostrarNotificacion('Escuela actualizada exitosamente', 'success');
+        this.cargarEscuelas(); // Recargar datos
       }
     });
   }
 
   /**
-   * Elimina una obra social (marca como inactiva)
+   * Elimina una escuela (marca como inactiva)
    */
-  eliminarObraSocial(obraSocial: ObraSocial): void {
-    if (confirm(`¿Está seguro que desea eliminar la obra social "${obraSocial.Nombre}"?`)) {
-      this.adminService.eliminarObraSocial(obraSocial.ID).subscribe({
+  eliminarEscuela(escuela: Escuela): void {
+    if (confirm(`¿Está seguro que desea eliminar la escuela "${escuela.Nombre}"?`)) {
+      this.adminService.eliminarEscuela(escuela.ID).subscribe({
         next: () => {
-          console.log('🏥 Obra social eliminada:', obraSocial.ID);
-          this.mostrarNotificacion('Obra social eliminada exitosamente', 'success');
-          this.cargarObrasSociales(); // Recargar datos
+          console.log('🏫 Escuela eliminada:', escuela.ID);
+          this.mostrarNotificacion('Escuela eliminada exitosamente', 'success');
+          this.cargarEscuelas(); // Recargar datos
         },
         error: (error) => {
-          console.error('❌ Error al eliminar obra social:', error);
-          this.mostrarNotificacion('Error al eliminar la obra social', 'error');
+          console.error('❌ Error al eliminar escuela:', error);
+          this.mostrarNotificacion('Error al eliminar la escuela', 'error');
         }
       });
     }
@@ -204,8 +204,10 @@ export class ObrasSocialesComponent implements OnInit, AfterViewInit {
     // Filtro por nombre
     if (this.filtroNombre.trim()) {
       const filtro = this.filtroNombre.toLowerCase().trim();
-      datosFiltrados = datosFiltrados.filter(obra =>
-        obra.Nombre.toLowerCase().includes(filtro)
+      datosFiltrados = datosFiltrados.filter(escuela =>
+        escuela.Nombre.toLowerCase().includes(filtro) ||
+        (escuela.Ciudad && escuela.Ciudad.toLowerCase().includes(filtro)) ||
+        (escuela.Provincia && escuela.Provincia.toLowerCase().includes(filtro))
       );
     }
 

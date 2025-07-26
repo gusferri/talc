@@ -1,0 +1,122 @@
+<!-- 
+  Template del componente de gestión de especialidades
+  Este archivo define la interfaz de usuario para la gestión completa de especialidades
+  del sistema TALC, incluyendo listado, búsqueda, ordenamiento y navegación.
+  
+  Características principales:
+  - Interfaz responsiva con Material Design
+  - Tabla dinámica con ordenamiento y paginación
+  - Búsqueda en tiempo real
+  - Acciones contextuales por especialidad
+  - Estados de carga y vacío
+  - Control de acceso basado en roles
+-->
+
+<!-- Contenedor principal del componente de gestión de especialidades -->
+<div class="especialidades-container">
+  <!-- Sección de encabezado: Título de la página y botón para crear nueva especialidad -->
+  <div class="header-section">
+    <div class="header-content">
+      <!-- Área del título con icono y descripción -->
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">psychology</mat-icon>
+          Gestión de Especialidades
+        </h1>
+        <p class="page-subtitle">Administre las especialidades del sistema TALC</p>
+      </div>
+      <!-- Botón para crear una nueva especialidad -->
+      <button mat-raised-button 
+              color="primary" 
+              class="new-especialidad-btn"
+              (click)="abrirDialogoNuevaEspecialidad()">
+        <mat-icon>add</mat-icon>
+        Nueva Especialidad
+      </button>
+    </div>
+  </div>
+
+  <!-- Sección de búsqueda y filtros: Campo de búsqueda para filtrar especialidades -->
+  <mat-card class="search-card">
+    <div class="search-section search-section-flex-between">
+      <div class="search-filters-row">
+        <!-- Campo de búsqueda principal -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar especialidad</mat-label>
+          <input matInput [(ngModel)]="filtroNombre" (input)="aplicarFiltros()" placeholder="Buscar por nombre o descripción...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Sección de tabla de especialidades: Contiene la tabla principal con los datos -->
+  <mat-card class="table-card">
+    <div class="table-container">
+      <!-- Estado de carga: Se muestra mientras se cargan los datos -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando especialidades...</p>
+      </div>
+
+      <!-- Estado vacío: Se muestra cuando no hay especialidades registradas -->
+      <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">psychology</mat-icon>
+        <h3>No hay especialidades registradas</h3>
+        <p>Comienza agregando tu primera especialidad</p>
+        <!-- Botón de acción para agregar especialidad desde estado vacío -->
+        <button mat-raised-button 
+                color="primary" 
+                (click)="abrirDialogoNuevaEspecialidad()">
+          <mat-icon>add</mat-icon>
+          Agregar Especialidad
+        </button>
+      </div>
+
+      <!-- Tabla de especialidades: Se muestra cuando hay datos disponibles -->
+      <table *ngIf="!isLoading && dataSource.data.length > 0" 
+             mat-table 
+             [dataSource]="dataSource" 
+             matSort
+             class="especialidades-table">
+        
+        <!-- Columna Nombre: Muestra el nombre de la especialidad -->
+        <ng-container matColumnDef="Nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+          <td mat-cell *matCellDef="let especialidad"> {{especialidad.Nombre}} </td>
+        </ng-container>
+
+        <!-- Columna Descripción: Muestra la descripción de la especialidad -->
+        <ng-container matColumnDef="Descripcion">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
+          <td mat-cell *matCellDef="let especialidad"> {{especialidad.Descripcion || 'Sin descripción'}} </td>
+        </ng-container>
+
+        <!-- Columna Acciones: Contiene botones de editar -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let especialidad">
+            <div class="actions-buttons">
+              <button mat-icon-button 
+                      (click)="abrirDialogoEditarEspecialidad(especialidad)"
+                      matTooltip="Editar especialidad"
+                      class="edit-btn">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Paginador: Control de paginación de la tabla -->
+      <mat-paginator *ngIf="!isLoading && dataSource.data.length > 0"
+                    [pageSizeOptions]="[5, 10, 25, 50]" 
+                    showFirstLastButtons 
+                    aria-label="Seleccionar página de especialidades">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div> 
