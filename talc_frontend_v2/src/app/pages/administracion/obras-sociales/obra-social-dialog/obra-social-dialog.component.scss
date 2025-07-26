@@ -1,0 +1,212 @@
+/**
+ * Estilos para el diálogo de Obras Sociales
+ * Mantiene consistencia con el diseño del sistema TALC
+ */
+
+.dialog-container {
+  min-width: 500px;
+  max-width: 600px;
+
+  // Header del diálogo
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0 24px;
+    margin-bottom: 16px;
+
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+
+      .title-icon {
+        margin-right: 12px;
+        color: #4caf50;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .close-button {
+      color: #666;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+
+  // Contenido del diálogo
+  .dialog-content {
+    padding: 0 24px;
+
+    .obra-social-form {
+      .form-field {
+        width: 100%;
+        margin-bottom: 16px;
+
+        // Estilos para campos con error
+        &.mat-form-field-invalid {
+          .mat-form-field-outline {
+            color: #f44336;
+          }
+        }
+
+        // Estilos para el textarea
+        textarea {
+          resize: vertical;
+          min-height: 80px;
+        }
+      }
+
+      // Sección de información
+      .info-section {
+        margin-top: 24px;
+
+        .info-card {
+          background-color: #f8f9fa;
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+
+          .info-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+
+            .info-icon {
+              color: #2196f3;
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+              margin-top: 2px;
+            }
+
+            .info-text {
+              h4 {
+                margin: 0 0 8px 0;
+                color: #495057;
+                font-size: 14px;
+                font-weight: 600;
+              }
+
+              ul {
+                margin: 0;
+                padding-left: 16px;
+                color: #6c757d;
+                font-size: 13px;
+
+                li {
+                  margin-bottom: 4px;
+
+                  &:last-child {
+                    margin-bottom: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Acciones del diálogo
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 24px;
+    margin-top: 16px;
+    border-top: 1px solid #e9ecef;
+
+    .cancel-btn {
+      color: #666;
+      border: 1px solid #ddd;
+      
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      &:disabled {
+        color: #ccc;
+        border-color: #eee;
+      }
+    }
+
+    .submit-btn {
+      background-color: #4caf50;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        color: #666;
+      }
+
+      mat-spinner {
+        margin-right: 8px;
+      }
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .dialog-container {
+    min-width: auto;
+    width: 100%;
+    margin: 0;
+
+    .dialog-header {
+      padding: 16px 16px 0 16px;
+
+      .dialog-title {
+        font-size: 18px;
+
+        .title-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .dialog-content {
+      padding: 0 16px;
+    }
+
+    .dialog-actions {
+      padding: 16px;
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Estilos para notificaciones
+::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+} 

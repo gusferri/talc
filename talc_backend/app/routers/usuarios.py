@@ -323,3 +323,5 @@ def obtener_paciente_por_notificacion(id_notificacion: int):
     finally:
         cursor.close()
         conn.close()
+
+# El endpoint de debugging se movió a administracion.py

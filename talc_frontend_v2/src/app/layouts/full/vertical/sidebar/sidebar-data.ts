@@ -26,5 +26,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Administración',
     iconName: 'settings',
+    route: '/administracion',
+    roles: ['administrador', 'admin']
   },
 ];

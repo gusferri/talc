@@ -2,7 +2,7 @@
 <div mat-subheader class="nav-caption">
   {{ item.navCap }}
 </div>
-} @if(!item.navCap && !item.external && !item.twoLines) {
+} @if(!item.navCap && !item.external && !item.twoLines && canViewCurrentItem) {
 <a mat-list-item (click)="onItemSelected(item)" [ngClass]="{
       'activeMenu': isRouteActive(item),
       expanded: expanded, activemenu: isChildActive(item),
@@ -27,7 +27,7 @@
 
 <!-- external Link -->
 
-@if(!item.navCap && item.external) {
+@if(!item.navCap && item.external && canViewCurrentItem) {
 <mat-list-item onClick="window.open('//google.com')" class="menu-list-item" target="_blank">
   <i-tabler class="routeIcon" name="{{ item.iconName }}" matListItemIcon></i-tabler>
   <span class="hide-menu">{{ item.displayName | translate }}</span>
@@ -36,6 +36,8 @@
 
 <!-- children -->
 @if(expanded) { @for(child of item.children; track child) {
+@if(canViewMenuItem(child)) {
 <app-nav-item [item]="child" (click)="onSubItemSelected(child)" [depth]="depth + 1">
 </app-nav-item>
+}
 } }

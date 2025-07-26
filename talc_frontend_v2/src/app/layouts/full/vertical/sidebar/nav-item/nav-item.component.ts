@@ -10,6 +10,7 @@ import {
 import { NavItem } from './nav-item';
 import { Router } from '@angular/router';
 import { NavService } from '../../../../../services/nav.service';
+import { AuthService } from '../../../../../services/auth.service';
 import {
   animate,
   state,
@@ -49,7 +50,14 @@ export class AppNavItemComponent implements OnChanges {
   @Input() item: NavItem | any;
   @Input() depth: any;
 
-  constructor(public navService: NavService, public router: Router) {
+  /**
+   * Propiedad computada para verificar si el usuario puede ver el elemento actual
+   */
+  get canViewCurrentItem(): boolean {
+    return this.canViewMenuItem(this.item);
+  }
+
+  constructor(public navService: NavService, public router: Router, private authService: AuthService) {
     if (this.depth === undefined) {
       this.depth = 0;
     }
@@ -61,6 +69,23 @@ export class AppNavItemComponent implements OnChanges {
       this.expanded = url.indexOf(`/${this.item.route}`) === 0;
       this.ariaExpanded = this.expanded;
     }
+  }
+
+  /**
+   * Verifica si el usuario actual puede ver este elemento del menú
+   * basado en los roles configurados
+   * 
+   * @param item - Elemento del menú a verificar
+   * @returns boolean indicando si el usuario puede ver el elemento
+   */
+  public canViewMenuItem(item: NavItem): boolean {
+    // Si no hay roles configurados, cualquier usuario puede ver el elemento
+    if (!item.roles || item.roles.length === 0) {
+      return true;
+    }
+
+    // Verificar si el usuario tiene al menos uno de los roles permitidos
+    return this.authService.tieneAlgunRol(item.roles);
   }
 
   onItemSelected(item: NavItem) {

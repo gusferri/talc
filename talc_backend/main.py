@@ -11,6 +11,7 @@ from app.routers import pacientes
 from app.routers.voz import router as voz_router
 from app.routers import ai
 from app.routers import adjuntos
+from app.routers import administracion
 
 
 app = FastAPI()
@@ -32,6 +33,7 @@ app.include_router(pacientes.router)
 app.include_router(voz_router)
 app.include_router(ai.router)
 app.include_router(adjuntos.router, prefix="/pacientes")
+app.include_router(administracion.router)
 
 @app.on_event("startup")
 async def startup_event():

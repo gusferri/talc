@@ -225,9 +225,13 @@ export class AdjuntarArchivoDialogComponent implements OnInit {
   cargarAdjuntos() {
     console.log('Cargando adjuntos para paciente ID:', this.data.idPaciente);
     this.adjuntosService.obtenerAdjuntos(this.data.idPaciente).subscribe({
-      next: (adjuntos: AdjuntoBackend[]) => {
-        console.log('Adjuntos cargados:', adjuntos);
-        this.adjuntos = adjuntos;
+      next: (adjuntos: any[]) => {
+        // Mapear Titulo a Nombre para compatibilidad con la interfaz AdjuntoBackend
+        this.adjuntos = adjuntos.map(adj => ({
+          ...adj,
+          Nombre: adj.Titulo // Usar el nombre descriptivo
+        }));
+        console.log('Adjuntos cargados:', this.adjuntos);
       },
       error: (error: any) => {
         console.error('Error al cargar adjuntos:', error);

@@ -20,6 +20,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { NotificacionesDialogComponent } from 'src/app/shared/notificaciones-dialog.component';
+import { ChangePasswordDialogComponent } from 'src/app/shared/change-password/change-password-dialog.component';
 import { filter } from 'rxjs/operators';
 
 interface notifications {
@@ -146,10 +147,18 @@ export class HeaderComponent implements OnInit {
 
 
   openChangePasswordDialog() {
-    // Lógica para abrir el diálogo de cambio de contraseña
-    // Puedes reutilizar el método que ya abre el dialog en el login
-    // Por ejemplo:
-    // this.dialog.open(ChangePasswordDialogComponent, { width: '400px', disableClose: true });
+    const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
+      width: '400px',
+      disableClose: false,
+      data: { idUsuario: null } // Para cambio voluntario, no obligatorio
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Contraseña cambiada exitosamente');
+        // Aquí podrías mostrar un mensaje de éxito
+      }
+    });
   }
 
   logout() {

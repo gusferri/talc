@@ -1,0 +1,86 @@
+<!-- Diálogo para crear/editar obra social -->
+<div class="dialog-container">
+  <!-- Header del diálogo -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      <mat-icon class="title-icon">health_and_safety</mat-icon>
+      {{ dialogTitle }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido del diálogo -->
+  <div class="dialog-content">
+    <form [formGroup]="obraSocialForm" (ngSubmit)="onSubmit()" class="obra-social-form">
+      
+      <!-- Campo Nombre -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre de la obra social *</mat-label>
+        <input matInput 
+               formControlName="Nombre" 
+               placeholder="Ej: OSDE, Swiss Medical, etc."
+               [class.mat-error]="tieneError('Nombre')">
+        <mat-icon matSuffix>business</mat-icon>
+        <mat-error *ngIf="tieneError('Nombre')">
+          {{ obtenerMensajeError('Nombre') }}
+        </mat-error>
+        <mat-hint>Nombre de la obra social (requerido)</mat-hint>
+      </mat-form-field>
+
+      <!-- Campo Descripción -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput 
+                  formControlName="Descripcion" 
+                  placeholder="Descripción opcional de la obra social..."
+                  rows="3"
+                  [class.mat-error]="tieneError('Descripcion')"></textarea>
+        <mat-icon matSuffix>description</mat-icon>
+        <mat-error *ngIf="tieneError('Descripcion')">
+          {{ obtenerMensajeError('Descripcion') }}
+        </mat-error>
+        <mat-hint>Descripción opcional (máximo 500 caracteres)</mat-hint>
+      </mat-form-field>
+
+      <!-- Información adicional -->
+      <div class="info-section">
+        <mat-card class="info-card">
+          <mat-card-content>
+            <div class="info-content">
+              <mat-icon class="info-icon">info</mat-icon>
+              <div class="info-text">
+                <h4>Información importante</h4>
+                <ul>
+                  <li>El nombre de la obra social es obligatorio</li>
+                  <li>La descripción es opcional pero recomendada</li>
+                  <li>Los cambios se aplicarán inmediatamente</li>
+                </ul>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </form>
+  </div>
+
+  <!-- Acciones del diálogo -->
+  <div class="dialog-actions">
+    <button mat-button 
+            (click)="onCancel()" 
+            [disabled]="isSubmitting"
+            class="cancel-btn">
+      Cancelar
+    </button>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="onSubmit()" 
+            [disabled]="obraSocialForm.invalid || isSubmitting"
+            class="submit-btn">
+      <mat-spinner diameter="20" *ngIf="isSubmitting"></mat-spinner>
+      <mat-icon *ngIf="!isSubmitting">{{ data.modo === 'crear' ? 'add' : 'save' }}</mat-icon>
+      {{ submitButtonText }}
+    </button>
+  </div>
+</div> 

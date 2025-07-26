@@ -118,11 +118,21 @@ export class LoginComponent {
             localStorage.setItem('username', respuesta.Username);
             localStorage.setItem('usuario', 'true');
             localStorage.setItem('email', respuesta.Email || '');
-            localStorage.setItem('rol', (respuesta.Grupos && respuesta.Grupos.length > 0) ? respuesta.Grupos[0] : '');
+            
+            // Guardar todos los roles del usuario para soporte de múltiples roles
+            if (respuesta.Grupos && respuesta.Grupos.length > 0) {
+              localStorage.setItem('roles', JSON.stringify(respuesta.Grupos));
+              // Mantener compatibilidad con el rol individual (primer rol)
+              localStorage.setItem('rol', respuesta.Grupos[0]);
+            } else {
+              localStorage.setItem('roles', JSON.stringify([]));
+              localStorage.setItem('rol', '');
+            }
             
             // Log para debugging de roles
             console.log('🔐 Login exitoso - Grupos recibidos:', respuesta.Grupos);
-            console.log('🔐 Rol asignado:', localStorage.getItem('rol'));
+            console.log('🔐 Roles guardados:', localStorage.getItem('roles'));
+            console.log('🔐 Rol principal:', localStorage.getItem('rol'));
             
             // Navega al dashboard después del login exitoso
             this.router.navigate(['/dashboard']);

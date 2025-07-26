@@ -13,6 +13,9 @@ import { NuevoTurnoComponent } from './turnos/nuevo-turno.component';
 import { ReportesComponent } from './turnos/reportes.component';
 import { CalendarioComponent } from './turnos/calendario.component';
 
+// Importación del guard de administración
+import { AdminGuard } from '../guards/admin.guard';
+
 /**
  * Configuración de rutas principales del sistema TALC
  * 
@@ -234,5 +237,42 @@ export const PagesRoutes: Routes = [
         { title: 'Calendario' }
       ],
     },
+  },
+  
+  /**
+   * Administración: Panel de gestión administrativa del sistema
+   * Solo accesible para usuarios con rol de administrador
+   * Permite gestionar profesionales, usuarios, obras sociales y escuelas
+   */
+  {
+    path: 'administracion',
+    loadComponent: () => import('./administracion/administracion.component').then(m => m.AdministracionComponent),
+    data: {
+      title: 'Administración',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Administración' }
+      ],
+    },
+    canActivate: [AdminGuard], // Proteger la ruta con el guard
+  },
+
+  /**
+   * Obras Sociales: Gestión de obras sociales del sistema
+   * Solo accesible para usuarios con rol de administrador
+   * Permite crear, editar y eliminar obras sociales
+   */
+  {
+    path: 'administracion/obras-sociales',
+    loadComponent: () => import('./administracion/obras-sociales/obras-sociales.component').then(m => m.ObrasSocialesComponent),
+    data: {
+      title: 'Gestión de Obras Sociales',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Administración', url: '/administracion' },
+        { title: 'Obras Sociales' }
+      ],
+    },
+    canActivate: [AdminGuard], // Proteger la ruta con el guard
   },
 ];

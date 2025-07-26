@@ -1,0 +1,337 @@
+/**
+ * Estilos para el componente de Gestión de Obras Sociales
+ * Mantiene consistencia con el diseño del sistema TALC
+ */
+
+.obras-sociales-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+
+  // Overlay de carga
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    p {
+      margin-top: 16px;
+      color: #666;
+      font-size: 16px;
+    }
+  }
+
+  // Header del módulo
+  .module-header {
+    margin-bottom: 24px;
+
+    .header-content {
+      .header-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .back-button {
+          margin-right: 12px;
+          color: #666;
+          
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+        }
+
+        .module-title {
+          display: flex;
+          align-items: center;
+          margin: 0;
+          font-size: 28px;
+          font-weight: 600;
+          color: #333;
+
+          .title-icon {
+            margin-right: 12px;
+            color: #4caf50;
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+          }
+        }
+      }
+
+      .module-subtitle {
+        margin: 0;
+        color: #666;
+        font-size: 16px;
+        margin-left: 44px; // Alinear con el título
+      }
+    }
+  }
+
+  // Sección de filtros
+  .filters-section {
+    margin-bottom: 24px;
+
+    .filters-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .filter-group {
+        flex: 1;
+        min-width: 300px;
+
+        .filter-field {
+          width: 100%;
+        }
+      }
+
+      .actions-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+
+        .clear-filters-btn {
+          color: #666;
+          border-color: #ddd;
+          
+          &:hover {
+            background-color: #f5f5f5;
+          }
+        }
+
+        .add-btn {
+          background-color: #4caf50;
+          
+          &:hover {
+            background-color: #45a049;
+          }
+        }
+      }
+    }
+  }
+
+  // Mensaje de error
+  .error-message {
+    margin-bottom: 24px;
+
+    .error-card {
+      border-left: 4px solid #f44336;
+      background-color: #ffebee;
+
+      .error-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .error-icon {
+          color: #f44336;
+        }
+
+        span {
+          color: #d32f2f;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Sección de tabla
+  .table-section {
+    .table-card {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+
+      .table-container {
+        overflow-x: auto;
+
+        .obras-sociales-table {
+          width: 100%;
+
+          // Estilos de encabezados
+          th.mat-header-cell {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 16px 12px;
+            border-bottom: 2px solid #dee2e6;
+          }
+
+          // Estilos de celdas
+          td.mat-cell {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            color: #333;
+          }
+
+          // Estilos de filas
+          tr.mat-row {
+            &:hover {
+              background-color: #f8f9fa;
+            }
+          }
+
+          // Columna ID
+          .mat-column-ID {
+            width: 80px;
+            text-align: center;
+          }
+
+          // Columna Nombre
+          .mat-column-Nombre {
+            font-weight: 500;
+          }
+
+          // Columna Descripción
+          .mat-column-Descripcion {
+            max-width: 300px;
+            
+            td {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+
+          // Columna Acciones
+          .mat-column-acciones {
+            width: 120px;
+            text-align: center;
+
+            .actions-buttons {
+              display: flex;
+              gap: 8px;
+              justify-content: center;
+
+              .edit-btn {
+                color: #2196f3;
+                
+                &:hover {
+                  background-color: rgba(33, 150, 243, 0.1);
+                }
+              }
+
+              .delete-btn {
+                color: #f44336;
+                
+                &:hover {
+                  background-color: rgba(244, 67, 54, 0.1);
+                }
+              }
+            }
+          }
+        }
+
+        // Paginador
+        mat-paginator {
+          border-top: 1px solid #e9ecef;
+        }
+      }
+
+      // Mensaje cuando no hay datos
+      .no-data-message {
+        padding: 48px 24px;
+        text-align: center;
+
+        .no-data-card {
+          background-color: #f8f9fa;
+          border: 2px dashed #dee2e6;
+
+          .no-data-content {
+            .no-data-icon {
+              font-size: 64px;
+              width: 64px;
+              height: 64px;
+              color: #adb5bd;
+              margin-bottom: 16px;
+            }
+
+            h3 {
+              margin: 0 0 8px 0;
+              color: #495057;
+              font-size: 20px;
+              font-weight: 600;
+            }
+
+            p {
+              margin: 0 0 24px 0;
+              color: #6c757d;
+              font-size: 16px;
+            }
+
+            button {
+              background-color: #4caf50;
+              
+              &:hover {
+                background-color: #45a049;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .obras-sociales-container {
+    padding: 16px;
+
+    .filters-section {
+      .filters-content {
+        flex-direction: column;
+        align-items: stretch;
+
+        .filter-group {
+          min-width: auto;
+        }
+
+        .actions-group {
+          justify-content: stretch;
+
+          button {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    .table-section {
+      .table-card {
+        .table-container {
+          .obras-sociales-table {
+            .mat-column-Descripcion {
+              display: none; // Ocultar en móviles
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos para notificaciones
+::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+} 

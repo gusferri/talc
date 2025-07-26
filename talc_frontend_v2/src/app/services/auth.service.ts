@@ -10,6 +10,7 @@
  * - Obtención del ID del profesional asociado al usuario
  * - Gestión centralizada de permisos
  * - Eliminación de comparaciones de strings inconsistentes
+ * - Soporte para múltiples roles por usuario
  *
  * Arquitectura:
  * - Servicio inyectable con cache local
@@ -34,6 +35,7 @@ export class AuthService {
   /** Cache local para evitar múltiples llamadas al backend */
   private profesionalCache: { [key: string]: boolean } = {};
   private idProfesionalCache: { [key: string]: number | null } = {};
+  private rolesCache: { [key: string]: string[] } = {};
   
   /** Subject reactivo para cambios en el estado de profesional */
   private esProfesionalSubject = new BehaviorSubject<boolean>(false);
@@ -106,6 +108,36 @@ export class AuthService {
   }
 
   /**
+   * Obtiene todos los roles del usuario actual
+   * Utiliza cache para optimizar rendimiento
+   * 
+   * @param username - Nombre de usuario
+   * @returns Observable con array de roles del usuario
+   */
+  obtenerRolesUsuario(username: string): Observable<string[]> {
+    // Verificar cache primero
+    if (this.rolesCache[username] !== undefined) {
+      return of(this.rolesCache[username]);
+    }
+
+    // Si no está en cache, consultar backend
+    return this.http.get<any>(`${environment.apiBaseUrl}/verificar-grupos/${username}`).pipe(
+      map(res => res?.grupos_nombres || []),
+      tap(roles => {
+        this.rolesCache[username] = roles;
+        // Guardar en localStorage para persistencia
+        localStorage.setItem('roles', JSON.stringify(roles));
+      }),
+      catchError(error => {
+        console.error('Error al obtener roles del usuario:', error);
+        this.rolesCache[username] = [];
+        localStorage.setItem('roles', JSON.stringify([]));
+        return of([]);
+      })
+    );
+  }
+
+  /**
    * Obtiene el estado actual de si el usuario es profesional
    * Lee desde localStorage o cache
    * 
@@ -126,8 +158,10 @@ export class AuthService {
   limpiarCache(): void {
     this.profesionalCache = {};
     this.idProfesionalCache = {};
+    this.rolesCache = {};
     this.esProfesionalSubject.next(false);
     localStorage.removeItem('esProfesional');
+    localStorage.removeItem('roles');
   }
 
   /**
@@ -138,8 +172,6 @@ export class AuthService {
    * @returns Observable con boolean indicando permisos
    */
   tienePermisosProfesional(username: string): Observable<boolean> {
-    const rol = (localStorage.getItem('rol') || '').toLowerCase();
-    
     // Si es secretaria, tiene todos los permisos
     if (this.esSecretaria()) {
       return of(true);
@@ -156,16 +188,74 @@ export class AuthService {
    * @returns boolean indicando si es secretaria
    */
   esSecretaria(): boolean {
-    const rol = (localStorage.getItem('rol') || '').toLowerCase();
-    return rol === 'secretaria' || rol === 'secretario' || rol === 'administrativo' || rol === 'admin';
+    const roles = this.obtenerRoles();
+    return roles.some(rol => 
+      ['secretaria', 'secretario', 'administrativo'].includes(rol.toLowerCase())
+    );
   }
 
   /**
-   * Obtiene el rol actual del usuario
+   * Obtiene el rol principal del usuario (primer rol)
    * 
-   * @returns string con el rol del usuario
+   * @returns string con el rol principal del usuario
    */
   obtenerRol(): string {
-    return localStorage.getItem('rol') || '';
+    const roles = this.obtenerRoles();
+    return roles.length > 0 ? roles[0] : '';
+  }
+
+  /**
+   * Obtiene todos los roles del usuario actual
+   * 
+   * @returns array con todos los roles del usuario
+   */
+  obtenerRoles(): string[] {
+    const rolesCached = localStorage.getItem('roles');
+    if (rolesCached) {
+      return JSON.parse(rolesCached);
+    }
+    
+    // Fallback al rol individual si no hay roles múltiples
+    const rolIndividual = localStorage.getItem('rol');
+    return rolIndividual ? [rolIndividual] : [];
+  }
+
+  /**
+   * Verifica si el usuario actual es administrador
+   * Considera múltiples roles
+   * 
+   * @returns boolean indicando si es administrador
+   */
+  esAdministrador(): boolean {
+    const roles = this.obtenerRoles();
+    return roles.some(rol => 
+      ['administrador', 'admin'].includes(rol.toLowerCase())
+    );
+  }
+
+  /**
+   * Verifica si el usuario tiene un rol específico
+   * Considera múltiples roles
+   * 
+   * @param rol - Rol a verificar
+   * @returns boolean indicando si tiene el rol
+   */
+  tieneRol(rol: string): boolean {
+    const roles = this.obtenerRoles();
+    return roles.some(r => r.toLowerCase() === rol.toLowerCase());
+  }
+
+  /**
+   * Verifica si el usuario tiene al menos uno de los roles especificados
+   * Considera múltiples roles
+   * 
+   * @param roles - Array de roles a verificar
+   * @returns boolean indicando si tiene al menos uno de los roles
+   */
+  tieneAlgunRol(roles: string[]): boolean {
+    const rolesUsuario = this.obtenerRoles();
+    return rolesUsuario.some(rolUsuario => 
+      roles.some(rol => rol.toLowerCase() === rolUsuario.toLowerCase())
+    );
   }
 } 

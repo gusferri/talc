@@ -1,0 +1,391 @@
+/* ========================================
+   ADMINISTRACIÓN COMPONENT STYLES
+   ========================================
+   
+   Este archivo contiene todos los estilos específicos para el componente Administración.
+   El panel de administración es el centro de gestión administrativa del sistema TALC que muestra:
+   - Estadísticas administrativas del sistema
+   - Acceso a módulos de gestión (Profesionales, Usuarios, Obras Sociales, Escuelas)
+   - Información y tips para administradores
+   - Interfaz consistente con el resto del sistema
+*/
+
+/* Contenedor principal de administración */
+.admin-container {
+  padding: 24px;                    /* Espaciado interno del contenedor */
+  max-width: 1400px;                /* Ancho máximo para mantener legibilidad */
+  margin: 0 auto;                   /* Centra el contenido horizontalmente */
+  position: relative;               /* Contexto de posicionamiento para elementos hijos */
+}
+
+/* Overlay de carga: Se muestra mientras se cargan los datos */
+.loading-overlay {
+  position: fixed;                  /* Posición fija para cubrir toda la pantalla */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);  /* Fondo semi-transparente */
+  display: flex;
+  flex-direction: column;           /* Organiza elementos verticalmente */
+  align-items: center;              /* Centra horizontalmente */
+  justify-content: center;          /* Centra verticalmente */
+  z-index: 1000;                    /* Asegura que esté por encima de otros elementos */
+  gap: 16px;                        /* Espacio entre el spinner y el texto */
+
+  p {
+    color: #666;                    /* Color de texto gris */
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+/* Sección de bienvenida: Muestra saludo personalizado y fecha actual */
+.welcome-section {
+  margin-bottom: 56px;              /* Espacio inferior para separar de la siguiente sección */
+
+  .welcome-content {
+    display: flex;                  /* Layout flexible para organizar elementos */
+    justify-content: space-between; /* Distribuye elementos en los extremos */
+    align-items: center;            /* Alinea elementos verticalmente */
+    flex-wrap: wrap;                /* Permite que los elementos se envuelvan en pantallas pequeñas */
+    gap: 16px;                      /* Espacio entre elementos */
+
+    /* Texto de bienvenida con icono y nombre del usuario */
+    .welcome-text {
+      .welcome-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;                  /* Espacio entre icono y texto */
+        margin: 0 0 8px 0;
+        font-size: 32px;            /* Tamaño de fuente grande para el título */
+        font-weight: 600;           /* Peso de fuente semi-bold */
+        color: #333;                /* Color de texto oscuro */
+
+        .welcome-icon {
+          color: #aa262b;           /* Color corporativo rojo */
+          font-size: 36px;          /* Icono ligeramente más grande que el texto */
+        }
+      }
+
+      .welcome-subtitle {
+        margin: 0;
+        color: #666;                /* Color de texto gris para subtítulo */
+        font-size: 18px;
+      }
+    }
+
+    /* Información de fecha y hora actual */
+    .welcome-time {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;           /* Espaciado interno */
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);  /* Gradiente sutil */
+      border-radius: 12px;          /* Bordes redondeados */
+      color: #666;
+      font-weight: 500;
+
+      mat-icon {
+        color: #aa262b;             /* Color corporativo para el icono */
+      }
+    }
+  }
+}
+
+/* Títulos de sección: Estilo común para todos los títulos de sección */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+
+  mat-icon {
+    color: #aa262b;
+    font-size: 28px;
+  }
+}
+
+/* Sección de estadísticas: Muestra métricas importantes del sistema */
+.stats-section {
+  margin-bottom: 56px;
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+
+    .stat-card {
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: default;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+
+      .stat-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        .stat-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          mat-icon {
+            color: white;
+            font-size: 28px;
+          }
+        }
+
+        .stat-info {
+          flex: 1;
+
+          .stat-value {
+            margin: 0 0 4px 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+          }
+
+          .stat-title {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+          }
+
+          .stat-description {
+            margin: 0;
+            font-size: 14px;
+            color: #888;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Sección de módulos: Acceso a funcionalidades de gestión */
+.modules-section {
+  margin-bottom: 56px;
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+
+    .module-card {
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+      }
+
+      .module-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+
+        .module-icon {
+          width: 70px;
+          height: 70px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          mat-icon {
+            color: white;
+            font-size: 32px;
+          }
+        }
+
+        .module-info {
+          flex: 1;
+
+          .module-title {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+          }
+
+          .module-description {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+          }
+
+          .module-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .count-badge {
+              background: #f0f0f0;
+              color: #666;
+              padding: 4px 8px;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: 600;
+            }
+
+            .count-text {
+              font-size: 12px;
+              color: #888;
+            }
+          }
+        }
+
+        .module-arrow {
+          color: #aa262b;
+          font-size: 24px;
+          transition: transform 0.2s ease;
+        }
+      }
+
+      &:hover .module-arrow {
+        transform: translateX(4px);
+      }
+    }
+  }
+}
+
+/* Sección de información: Tips y recordatorios para administradores */
+.info-section {
+  .info-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
+    .info-content {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+
+      .info-icon {
+        width: 50px;
+        height: 50px;
+        background: #aa262b;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        mat-icon {
+          color: white;
+          font-size: 24px;
+        }
+      }
+
+      .info-text {
+        flex: 1;
+
+        h3 {
+          margin: 0 0 12px 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        p {
+          margin: 0 0 16px 0;
+          font-size: 14px;
+          color: #666;
+          line-height: 1.6;
+        }
+
+        .info-list {
+          margin: 0;
+          padding-left: 20px;
+          color: #666;
+          font-size: 14px;
+          line-height: 1.6;
+
+          li {
+            margin-bottom: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive design para pantallas pequeñas */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 16px;
+  }
+
+  .welcome-section {
+    margin-bottom: 40px;
+
+    .welcome-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .welcome-text .welcome-title {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .info-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Animaciones suaves para mejor UX */
+.stat-card,
+.module-card,
+.info-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

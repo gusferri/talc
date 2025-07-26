@@ -190,25 +190,44 @@ export class SeguimientoEvolutivoPorPacienteComponent implements OnInit {
       this.isLoading = true;
       const username = localStorage.getItem('username');
       
+      console.log('🔍 Seleccionado paciente:', paciente.ID, paciente.Nombre, paciente.Apellido);
+      console.log('🔍 Username logueado:', username);
+      
       // Obtener información del profesional logueado
       this.pacienteService.obtenerProfesionalPorUsername(username || '').subscribe((profesional: any) => {
-        const idProfesional = profesional?.ID;
+        const idProfesional = profesional?.ID_Profesional;
+        
+        console.log('🔍 Profesional obtenido:', profesional);
+        console.log('🔍 ID Profesional:', idProfesional);
         
         // Cargar informes del paciente
         this.informesService.getInformesPorPaciente(paciente.ID).subscribe({
           next: (informes: any) => {
+            console.log('🔍 Respuesta completa del backend:', informes);
+            
             // Procesar la respuesta del servicio
             const lista = Array.isArray(informes) ? informes : (informes && (informes as any).informes ? (informes as any).informes : []);
+            
+            console.log('🔍 Lista de informes procesada:', lista);
+            console.log('🔍 Cantidad de informes:', lista.length);
             
             // Filtrar informes según permisos:
             // - Interdisciplinarios (TipoInforme === 2): visibles para todos
             // - Específicos (TipoInforme === 1): solo del profesional logueado
-            this.informes = lista.filter((i: any) =>
-              (i.TipoInforme === 2) || (i.TipoInforme === 1 && i.ID_Profesional === idProfesional)
-            );
+            this.informes = lista.filter((i: any) => {
+              const esInterdisciplinario = i.TipoInforme === 2;
+              const esEspecificoDelProfesional = i.TipoInforme === 1 && i.ID_Profesional === idProfesional;
+              
+              console.log(`🔍 Informe ID ${i.ID}: TipoInforme=${i.TipoInforme}, ID_Profesional=${i.ID_Profesional}, esInterdisciplinario=${esInterdisciplinario}, esEspecificoDelProfesional=${esEspecificoDelProfesional}`);
+              
+              return esInterdisciplinario || esEspecificoDelProfesional;
+            });
+            
+            console.log('🔍 Informes filtrados finales:', this.informes);
             this.isLoading = false;
           },
-          error: () => {
+          error: (error) => {
+            console.error('❌ Error al cargar informes:', error);
             this.informes = [];
             this.isLoading = false;
           }
@@ -268,7 +287,7 @@ export class SeguimientoEvolutivoPorPacienteComponent implements OnInit {
     
     // Obtener información del profesional logueado
     this.pacienteService.obtenerProfesionalPorUsername(username || '').subscribe((profesional: any) => {
-      const idProfesional = profesional?.ID;
+      const idProfesional = profesional?.ID_Profesional;
       
       if (!idProfesional) {
         this.snackBar.open('No se pudo obtener el profesional logueado.', 'Cerrar', { duration: 3000 });

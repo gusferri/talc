@@ -1,0 +1,113 @@
+<!-- Contenedor principal de administración -->
+<div class="admin-container">
+  <!-- Overlay de carga: Se muestra mientras se cargan los datos -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando administración...</p>
+  </div>
+
+  <!-- Sección de bienvenida: Muestra saludo personalizado y fecha actual -->
+  <div class="welcome-section">
+    <div class="welcome-content">
+      <!-- Texto de bienvenida con icono y nombre del usuario -->
+      <div class="welcome-text">
+        <h1 class="welcome-title">
+          <mat-icon class="welcome-icon">admin_panel_settings</mat-icon>
+          Administración, {{ nombreUsuario }}
+        </h1>
+        <p class="welcome-subtitle">Panel de gestión administrativa del sistema TALC</p>
+      </div>
+      <!-- Información de fecha y hora actual -->
+      <div class="welcome-time">
+        <mat-icon>schedule</mat-icon>
+        <span>{{ currentDate | date:'EEEE, d \'de\' MMMM, yyyy' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de estadísticas administrativas: Muestra métricas importantes del sistema -->
+  <div class="stats-section">
+    <h2 class="section-title">
+      <mat-icon>analytics</mat-icon>
+      Estadísticas del Sistema
+    </h2>
+    <!-- Grid de tarjetas de estadísticas administrativas -->
+    <div class="stats-grid">
+      <mat-card *ngFor="let stat of adminStats" 
+                class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <!-- Icono de la estadística con color personalizado -->
+            <div class="stat-icon" [style.background-color]="stat.color">
+              <mat-icon>{{ stat.icon }}</mat-icon>
+            </div>
+            <!-- Información de la estadística: valor y título -->
+            <div class="stat-info">
+              <h3 class="stat-value">{{ stat.value }}</h3>
+              <p class="stat-title">{{ stat.title }}</p>
+              <p class="stat-description">{{ stat.description }}</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Sección de módulos administrativos: Acceso a funcionalidades de gestión -->
+  <div class="modules-section">
+    <h2 class="section-title">
+      <mat-icon>settings</mat-icon>
+      Módulos de Administración
+    </h2>
+    <!-- Grid de tarjetas de módulos administrativos -->
+    <div class="modules-grid">
+      <mat-card *ngFor="let module of adminModules" 
+                class="module-card" 
+                (click)="navegarA(module.route)">
+        <mat-card-content>
+          <div class="module-content">
+            <!-- Icono del módulo con color personalizado -->
+            <div class="module-icon" [style.background-color]="module.color">
+              <mat-icon>{{ module.icon }}</mat-icon>
+            </div>
+            <!-- Información del módulo: título y descripción -->
+            <div class="module-info">
+              <h3 class="module-title">{{ module.title }}</h3>
+              <p class="module-description">{{ module.description }}</p>
+              <!-- Contador opcional de elementos en el módulo -->
+              <div *ngIf="module.count !== undefined" class="module-count">
+                <span class="count-badge">{{ module.count }}</span>
+                <span class="count-text">elementos</span>
+              </div>
+            </div>
+            <!-- Flecha indicadora de navegación -->
+            <mat-icon class="module-arrow">arrow_forward</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Sección de información adicional: Tips y recordatorios para administradores -->
+  <div class="info-section">
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div class="info-content">
+          <div class="info-icon">
+            <mat-icon>info</mat-icon>
+          </div>
+          <div class="info-text">
+            <h3>Información para Administradores</h3>
+            <p>Desde este panel puedes gestionar todos los aspectos administrativos del sistema TALC. 
+               Recuerda que los cambios realizados aquí afectan a todo el sistema.</p>
+            <ul class="info-list">
+              <li>Los profesionales deben tener usuarios asociados para acceder al sistema</li>
+              <li>Las obras sociales y escuelas no se pueden eliminar si están en uso</li>
+              <li>Los cambios en roles de usuario requieren reinicio de sesión</li>
+            </ul>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> 

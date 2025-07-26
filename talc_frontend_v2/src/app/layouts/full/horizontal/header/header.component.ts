@@ -9,6 +9,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { BrandingComponent } from '../../vertical/sidebar/branding.component';
 import { AppSettings } from 'src/app/config';
 import { FormsModule } from '@angular/forms';
+import { ChangePasswordDialogComponent } from 'src/app/shared/change-password/change-password-dialog.component';
 
 @Component({
   selector: 'app-horizontal-header',
@@ -58,10 +59,18 @@ export class AppHorizontalHeaderComponent {
   email = localStorage.getItem('email') || '';
 
   openChangePasswordDialog() {
-    // Lógica para abrir el diálogo de cambio de contraseña
-    // Puedes reutilizar el método que ya abre el dialog en el login
-    // Por ejemplo:
-    // this.dialog.open(ChangePasswordDialogComponent, { width: '400px', disableClose: true });
+    const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
+      width: '400px',
+      disableClose: false,
+      data: { idUsuario: null } // Para cambio voluntario, no obligatorio
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Contraseña cambiada exitosamente');
+        // Aquí podrías mostrar un mensaje de éxito
+      }
+    });
   }
 
   logout() {

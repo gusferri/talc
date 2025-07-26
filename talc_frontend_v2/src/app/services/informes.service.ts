@@ -72,7 +72,7 @@ export class InformesService {
      * @returns Observable con array de informes del paciente
      */
     getInformesPorPaciente(id_paciente: number): Observable<any> {
-        return this.http.get(`${this.apiUrl}informes-por-paciente/${id_paciente}`);
+        return this.http.get(`${this.apiUrl}/informes-por-paciente/${id_paciente}`);
     }
 
     /**
@@ -84,7 +84,7 @@ export class InformesService {
      * @returns Observable con respuesta de la actualización
      */
     actualizarInforme(id: number, texto: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}actualizar-informe/${id}`, { texto });
+        return this.http.post(`${this.apiUrl}/actualizar-informe/${id}`, { texto });
     }
 
     /**
@@ -95,7 +95,7 @@ export class InformesService {
      * @returns Observable con el resumen generado por la IA
      */
     createInformeIA(payload: GenerarInformeRequest): Observable<GenerarInformeResponse> {
-      return this.http.post<GenerarInformeResponse>(`${this.apiUrl}generar-informe`, payload)
+      return this.http.post<GenerarInformeResponse>(`${this.apiUrl}/generar-informe`, payload)
         .pipe(
           catchError(err => {
             console.error('❌ Error al generar informe:', err);
