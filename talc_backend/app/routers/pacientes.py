@@ -39,7 +39,7 @@ def buscar_pacientes(query: str = Query(..., min_length=1)):
 
     sql = """
         SELECT * FROM Paciente
-        WHERE DNI LIKE %s OR Apellido LIKE %s OR Nombre LIKE %s
+        WHERE (DNI LIKE %s OR Apellido LIKE %s OR Nombre LIKE %s) AND Activo = 1
         LIMIT 10
     """
     like_query = f"%{query}%"
@@ -49,6 +49,36 @@ def buscar_pacientes(query: str = Query(..., min_length=1)):
     cursor.close()
     conn.close()
     return resultados
+
+@router.get("/paciente/{dni}")
+def obtener_paciente_por_dni(dni: str):
+    """
+    Obtiene un paciente específico por DNI sin filtrar por estado activo
+    Utilizado para edición de pacientes (activos e inactivos)
+    """
+    print(f"🔍 Obteniendo paciente por DNI: {dni}")
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        sql = """
+            SELECT * FROM Paciente
+            WHERE DNI = %s
+        """
+        cursor.execute(sql, (dni,))
+        paciente = cursor.fetchone()
+
+        if not paciente:
+            raise HTTPException(status_code=404, detail="Paciente no encontrado")
+
+        print(f"✅ Paciente encontrado: {paciente['Nombre']} {paciente['Apellido']} (Activo: {paciente['Activo']})")
+        return paciente
+    except Exception as e:
+        print(f"❌ Error al obtener paciente por DNI: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener paciente")
+    finally:
+        cursor.close()
+        conn.close()
 
 @router.get("/buscarProvincias")
 def buscar_provincias(query: str = Query(..., min_length=1)):
@@ -115,6 +145,32 @@ def buscar_generos():
     conn.close()
     return resultados
 
+@router.get("/completo")
+def obtener_todos_los_pacientes():
+    """
+    Obtiene todos los pacientes del sistema con todos sus campos
+    Utilizado principalmente por secretarias para ver todos los pacientes
+    """
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("""
+            SELECT 
+                ID, DNI, Nombre, Apellido, FechaNacimiento, 
+                ID_Genero, ID_Ciudad, Telefono, Email, 
+                ID_ObraSocial, ID_Escuela, Observaciones, Activo
+            FROM Paciente
+            ORDER BY Apellido, Nombre
+        """)
+        resultados = cursor.fetchall()
+        return resultados
+    except Exception as e:
+        print(f"❌ Error al obtener todos los pacientes: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener pacientes")
+    finally:
+        cursor.close()
+
 @router.get("/buscarEscuelasPorCiudad")
 def buscar_escuelas_por_ciudad(query: str = Query(..., min_length=1), id: int = Query(...)):
     conn = get_connection()
@@ -145,7 +201,7 @@ def grabar_paciente(paciente: dict):
         sql = """
             INSERT INTO Paciente (
                 DNI, Apellido, Nombre, FechaNacimiento, ID_Genero, ID_Ciudad, Telefono, Email,
-                ID_ObraSocial, ID_Escuela, Observaciones, ID_Estado
+                ID_ObraSocial, ID_Escuela, Observaciones, Activo
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(sql, (
@@ -160,7 +216,7 @@ def grabar_paciente(paciente: dict):
             paciente.get("idObraSocial"),  # Puede ser NULL
             paciente.get("idEscuela"),  # Puede ser NULL
             paciente.get("observaciones"),  # Puede ser NULL
-            paciente["idEstado"]  # Obligatorio, por defecto 1
+            paciente.get("activo", 1)  # Activo por defecto (1 = activo, 0 = inactivo)
         ))
         conn.commit()
         return {"message": "Paciente grabado con éxito", "id": cursor.lastrowid}
@@ -219,8 +275,10 @@ def actualizar_paciente(dni: str, paciente: dict):
 
     try:
         # Debug: Imprimir los datos recibidos
-        print(f"Actualizando paciente con DNI: {dni}")
-        print("Datos recibidos para actualizar:", paciente)
+        print(f"🔄 Actualizando paciente con DNI: {dni}")
+        print("📦 Datos completos recibidos para actualizar:", paciente)
+        print(f"🔍 Campo 'activo' recibido: {paciente.get('activo')}")
+        print(f"🔍 Tipo de dato del campo 'activo': {type(paciente.get('activo'))}")
 
         sql = """
             UPDATE Paciente
@@ -233,10 +291,13 @@ def actualizar_paciente(dni: str, paciente: dict):
                 Email = %s,
                 ID_ObraSocial = %s,
                 ID_Escuela = %s,
-                Observaciones = %s
+                Observaciones = %s,
+                Activo = %s
             WHERE DNI = %s
         """
-        cursor.execute(sql, (
+        
+        # Preparar valores para la consulta SQL
+        valores = (
             paciente["apellido"],
             paciente["nombre"],
             paciente["fechaNacimiento"],
@@ -247,19 +308,59 @@ def actualizar_paciente(dni: str, paciente: dict):
             paciente.get("idObraSocial"),  # Puede ser NULL
             paciente.get("idEscuela"),  # Puede ser NULL
             paciente.get("observaciones"),  # Puede ser NULL
+            paciente.get("activo", 1),  # Activo por defecto (1 = activo, 0 = inactivo)
             dni  # El DNI del paciente que se va a actualizar
-        ))
+        )
+        
+        print(f"🔍 Valores que se van a ejecutar en SQL: {valores}")
+        
+        cursor.execute(sql, valores)
         conn.commit()
 
         # Verificar si se actualizó algún registro
         if cursor.rowcount == 0:
+            print(f"❌ No se encontró paciente con DNI: {dni}")
             raise HTTPException(status_code=404, detail="Paciente no encontrado")
 
+        print(f"✅ Paciente actualizado exitosamente. Filas afectadas: {cursor.rowcount}")
         return {"message": "Paciente actualizado con éxito"}
     except Exception as e:
         conn.rollback()
         print(f"❌ Error al actualizar el paciente: {e}")
         raise HTTPException(status_code=500, detail="Error al actualizar el paciente")
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/pacientes/{dni}/estado")
+def actualizar_estado_paciente(dni: str, estado: dict):
+    """
+    Actualiza el estado activo/inactivo de un paciente específico
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Validar que el estado sea válido (0 o 1)
+        activo = estado.get("activo")
+        if activo not in [0, 1]:
+            raise HTTPException(status_code=400, detail="El valor de activo debe ser 0 o 1")
+        
+        cursor.execute("""
+            UPDATE Paciente
+            SET Activo = %s
+            WHERE DNI = %s
+        """, (activo, dni))
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Paciente no encontrado")
+        
+        conn.commit()
+        return {"mensaje": "Estado de paciente actualizado exitosamente"}
+    except Exception as e:
+        conn.rollback()
+        print(f"❌ Error al actualizar estado: {e}")
+        raise HTTPException(status_code=500, detail="Error al actualizar estado")
     finally:
         cursor.close()
         conn.close()
@@ -269,25 +370,32 @@ async def es_profesional_por_shortname(shortname: str):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Obtener Nombre y Apellido desde Usuario
-    cursor.execute("SELECT Nombre, Apellido FROM Usuario WHERE Username = %s", (shortname,))
-    usuario = cursor.fetchone()
+    try:
+        # Obtener ID del usuario desde Username
+        cursor.execute("SELECT ID FROM Usuario WHERE Username = %s", (shortname,))
+        usuario = cursor.fetchone()
 
-    if not usuario:
+        if not usuario:
+            cursor.close()
+            conn.close()
+            return {"esProfesional": False}
+
+        # Buscar en la tabla de mapeo ProfesionalUsuario
+        cursor.execute("""
+            SELECT ID FROM ProfesionalUsuario
+            WHERE ID_Usuario = %s
+        """, (usuario["ID"],))
+        resultado = cursor.fetchone()
+        
+        print(f"Resultado de búsqueda en ProfesionalUsuario: {resultado}")
+        cursor.close()
+        conn.close()
+        return {"esProfesional": resultado is not None}
+    except Exception as e:
+        print(f"❌ Error al verificar profesional: {e}")
         cursor.close()
         conn.close()
         return {"esProfesional": False}
-
-    # Buscar coincidencia con Profesional
-    cursor.execute("""
-        SELECT ID FROM Profesional
-        WHERE Nombre = %s AND Apellido = %s
-    """, (usuario["Nombre"], usuario["Apellido"]))
-    resultado = cursor.fetchone()
-    print(f"Resultado de búsqueda en Profesional: {resultado}")
-    cursor.close()
-    conn.close()
-    return {"esProfesional": resultado is not None}
 
 @router.get("/profesional")
 def obtener_pacientes_por_profesional(shortname: str):
@@ -295,18 +403,18 @@ def obtener_pacientes_por_profesional(shortname: str):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # Obtener Nombre y Apellido del usuario desde Username
-        cursor.execute("SELECT Nombre, Apellido FROM Usuario WHERE Username = %s", (shortname,))
+        # Obtener ID del usuario desde Username
+        cursor.execute("SELECT ID FROM Usuario WHERE Username = %s", (shortname,))
         usuario = cursor.fetchone()
 
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        # Obtener ID del profesional
+        # Obtener ID del profesional usando la tabla de mapeo
         cursor.execute("""
-            SELECT ID FROM Profesional
-            WHERE Nombre = %s AND Apellido = %s
-        """, (usuario["Nombre"], usuario["Apellido"]))
+            SELECT ID_Profesional FROM ProfesionalUsuario
+            WHERE ID_Usuario = %s
+        """, (usuario["ID"],))
         profesional = cursor.fetchone()
 
         if not profesional:
@@ -317,8 +425,8 @@ def obtener_pacientes_por_profesional(shortname: str):
             SELECT DISTINCT p.*
             FROM Paciente p
             JOIN Turno t ON p.ID = t.ID_Paciente
-            WHERE t.ID_Profesional = %s
-        """, (profesional["ID"],))
+            WHERE t.ID_Profesional = %s AND p.Activo = 1
+        """, (profesional["ID_Profesional"],))
         pacientes = cursor.fetchall()
 
         return pacientes
@@ -338,18 +446,18 @@ def obtener_turnos_por_paciente(
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # Obtener Nombre y Apellido del usuario desde Username
-        cursor.execute("SELECT Nombre, Apellido FROM Usuario WHERE Username = %s", (username,))
+        # Obtener ID del usuario desde Username
+        cursor.execute("SELECT ID FROM Usuario WHERE Username = %s", (username,))
         usuario = cursor.fetchone()
 
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        # Obtener ID del profesional
+        # Obtener ID del profesional usando la tabla de mapeo
         cursor.execute("""
-            SELECT ID FROM Profesional
-            WHERE Nombre = %s AND Apellido = %s
-        """, (usuario["Nombre"], usuario["Apellido"]))
+            SELECT ID_Profesional FROM ProfesionalUsuario
+            WHERE ID_Usuario = %s
+        """, (usuario["ID"],))
         profesional = cursor.fetchone()
 
         if not profesional:
@@ -363,28 +471,22 @@ def obtener_turnos_por_paciente(
             t.Hora, 
             t.ID_Especialidad, 
             e.Nombre AS Especialidad,
-            nv.ID AS ID_NotaVoz,
+            t.ID_NotaVoz,
             t.ID_EstadoTurno,
-            te.Descripcion AS EstadoTurno
+            est.Nombre AS EstadoTurno
         FROM Turno t
         JOIN Especialidad e ON t.ID_Especialidad = e.ID_Especialidad
-        JOIN Turno_Estado te ON t.ID_EstadoTurno = te.ID
-        LEFT JOIN NotaVoz nv ON t.ID = nv.ID_Turno
-        WHERE t.ID_Paciente = %s 
-          AND t.ID_Profesional = %s 
-          AND t.ID_EstadoTurno = 5
-        ORDER BY t.Fecha, t.Hora
+        JOIN EstadoTurno est ON t.ID_EstadoTurno = est.ID
+        WHERE t.ID_Paciente = %s AND t.ID_Profesional = %s
+        ORDER BY t.Fecha DESC, t.Hora DESC
         """
-        cursor.execute(sql, (id_paciente, profesional["ID"]))
+        cursor.execute(sql, (id_paciente, profesional["ID_Profesional"]))
         turnos = cursor.fetchall()
-        for turno in turnos:
-            hora_valor = turno["Hora"]
-            if isinstance(hora_valor, timedelta):
-                turno["Hora"] = (datetime.min + hora_valor).time()
+
         return turnos
     except Exception as e:
-        print(f"❌ Error al obtener turnos por paciente: {e}")
-        raise HTTPException(status_code=500, detail="Error al obtener turnos del paciente")
+        print(f"❌ Error al obtener turnos del paciente: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener turnos")
     finally:
         cursor.close()
         conn.close()
@@ -393,25 +495,61 @@ def obtener_turnos_por_paciente(
 # Endpoint para obtener profesional por username
 from fastapi import HTTPException
 
+@router.get("/obtenerIdProfesionalPorUsername")
+def obtener_id_profesional_por_username(username: str):
+    """
+    Obtiene el ID del profesional directamente por username
+    Utilizado para optimizar consultas en el frontend
+    """
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Obtener ID del usuario desde Username
+        cursor.execute("SELECT ID FROM Usuario WHERE Username = %s", (username,))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+        # Buscar el ID del profesional usando la tabla de mapeo
+        cursor.execute("""
+            SELECT ID_Profesional FROM ProfesionalUsuario
+            WHERE ID_Usuario = %s
+        """, (usuario["ID"],))
+        profesional = cursor.fetchone()
+
+        if not profesional:
+            raise HTTPException(status_code=404, detail="Profesional no encontrado")
+
+        return {"idProfesional": profesional["ID_Profesional"]}
+    except Exception as e:
+        print(f"❌ Error al obtener ID del profesional: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener ID del profesional")
+    finally:
+        cursor.close()
+        conn.close()
+
 @router.get("/obtenerProfesionalPorUsername")
 def obtener_profesional_por_username(username: str):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # Buscar el nombre y apellido del usuario por su username
-        cursor.execute("SELECT Nombre, Apellido FROM Usuario WHERE Username = %s", (username,))
+        # Obtener ID del usuario desde Username
+        cursor.execute("SELECT ID FROM Usuario WHERE Username = %s", (username,))
         usuario = cursor.fetchone()
 
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        # Buscar el ID del profesional que coincida con el nombre y apellido
+        # Buscar el ID del profesional usando la tabla de mapeo
         cursor.execute("""
-            SELECT ID, Nombre, Apellido
-            FROM Profesional
-            WHERE Nombre = %s AND Apellido = %s
-        """, (usuario["Nombre"], usuario["Apellido"]))
+            SELECT pu.ID_Profesional, p.Nombre, p.Apellido
+            FROM ProfesionalUsuario pu
+            JOIN Profesional p ON pu.ID_Profesional = p.ID
+            WHERE pu.ID_Usuario = %s
+        """, (usuario["ID"],))
         profesional = cursor.fetchone()
 
         if not profesional:
@@ -433,18 +571,18 @@ def obtener_turnos(
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # Obtener Nombre y Apellido del usuario desde Username
-        cursor.execute("SELECT Nombre, Apellido FROM Usuario WHERE Username = %s", (username,))
+        # Obtener ID del usuario desde Username
+        cursor.execute("SELECT ID FROM Usuario WHERE Username = %s", (username,))
         usuario = cursor.fetchone()
 
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        # Obtener ID del profesional
+        # Obtener ID del profesional usando la tabla de mapeo
         cursor.execute("""
-            SELECT ID FROM Profesional
-            WHERE Nombre = %s AND Apellido = %s
-        """, (usuario["Nombre"], usuario["Apellido"]))
+            SELECT ID_Profesional FROM ProfesionalUsuario
+            WHERE ID_Usuario = %s
+        """, (usuario["ID"],))
         profesional = cursor.fetchone()
 
         if not profesional:
@@ -458,30 +596,25 @@ def obtener_turnos(
             t.Hora, 
             t.ID_Especialidad, 
             e.Nombre AS Especialidad,
-            nv.ID AS ID_NotaVoz,
+            t.ID_NotaVoz,
             t.ID_EstadoTurno,
-            te.Descripcion AS EstadoTurno,
+            est.Nombre AS EstadoTurno,
             p.Nombre AS NombrePaciente,
             p.Apellido AS ApellidoPaciente
         FROM Turno t
         JOIN Especialidad e ON t.ID_Especialidad = e.ID_Especialidad
-        JOIN Turno_Estado te ON t.ID_EstadoTurno = te.ID
+        JOIN EstadoTurno est ON t.ID_EstadoTurno = est.ID
         JOIN Paciente p ON t.ID_Paciente = p.ID
-        LEFT JOIN NotaVoz nv ON t.ID = nv.ID_Turno
-        WHERE t.ID_Profesional = %s 
-          AND t.ID_EstadoTurno != 3
-        ORDER BY t.Fecha, t.Hora
+        WHERE t.ID_Profesional = %s
+        ORDER BY t.Fecha DESC, t.Hora DESC
         """
-        cursor.execute(sql, (profesional["ID"],))
+        cursor.execute(sql, (profesional["ID_Profesional"],))
         turnos = cursor.fetchall()
-        for turno in turnos:
-            hora_valor = turno["Hora"]
-            if isinstance(hora_valor, timedelta):
-                turno["Hora"] = (datetime.min + hora_valor).time()
+
         return turnos
     except Exception as e:
-        print(f"❌ Error al obtener turnos por paciente: {e}")
-        raise HTTPException(status_code=500, detail="Error al obtener turnos del paciente")
+        print(f"❌ Error al obtener turnos: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener turnos")
     finally:
         cursor.close()
         conn.close()

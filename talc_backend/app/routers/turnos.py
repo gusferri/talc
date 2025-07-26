@@ -157,7 +157,7 @@ async def crear_turno(data: TurnoIn):
 def listar_pacientes():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT ID, CONCAT(Nombre, ' ', Apellido) AS nombre FROM Paciente")
+    cursor.execute("SELECT ID, CONCAT(Nombre, ' ', Apellido) AS nombre FROM Paciente WHERE Activo = 1")
     resultados = cursor.fetchall()
     cursor.close()
     conn.close()

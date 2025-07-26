@@ -77,6 +77,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 // ActivatedRoute: Para acceder a parámetros de la ruta
 import { ActivatedRoute } from '@angular/router';
 
+// Servicio para la autenticación y verificación de roles
+import { AuthService } from '../../services/auth.service';
+
 /**
  * Componente principal para gestión de turnos médicos
  * Proporciona una interfaz completa para administrar citas según el rol del usuario
@@ -139,7 +142,8 @@ export class TurnosComponent implements OnInit, AfterViewInit {
     private router: Router,                    // Servicio para navegación entre rutas
     private turnosService: TurnosService,      // Servicio para operaciones con turnos
     private snackBar: MatSnackBar,             // Servicio para mostrar notificaciones
-    private route: ActivatedRoute              // Servicio para acceder a parámetros de ruta
+    private route: ActivatedRoute,             // Servicio para acceder a parámetros de ruta
+    private authService: AuthService           // Servicio para autenticación y roles
   ) {}
 
   /**
@@ -182,15 +186,17 @@ export class TurnosComponent implements OnInit, AfterViewInit {
   cargarTurnos(): void {
     this.isLoading = true;  // Activa el indicador de carga
     
-    const rol = (localStorage.getItem('rol') || '').toLowerCase();  // Obtiene el rol del usuario
     const nombreProfesional = (localStorage.getItem('nombreCompleto') || '');  // Obtiene el nombre del profesional
+    
+    // Verificar si es secretaria usando el servicio centralizado
+    const esSecretaria = this.authService.esSecretaria();
     
     this.turnosService.obtenerTurnos().subscribe({
       next: (data: Turno[]) => {
         let turnosFiltrados = data;
         
         // Filtra turnos según el rol del usuario
-        if (rol !== 'secretaria') {
+        if (!esSecretaria) {
           // Los profesionales solo ven sus propios turnos
           turnosFiltrados = data.filter(turno =>
             turno.Profesional &&

@@ -98,6 +98,17 @@ export class PacienteService {
     }
 
     /**
+     * Obtiene un paciente específico por DNI sin filtrar por estado activo
+     * Utilizado para edición de pacientes (activos e inactivos)
+     * 
+     * @param dni - DNI del paciente a obtener
+     * @returns Observable con los datos del paciente
+     */
+    obtenerPacientePorDni(dni: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/paciente/${dni}`);
+    }
+
+    /**
      * Inserta un nuevo paciente en el sistema
      * 
      * @param paciente - Objeto con los datos del paciente a insertar
@@ -109,12 +120,15 @@ export class PacienteService {
 
     /**
      * Actualiza los datos de un paciente existente
+     * Envía una petición PUT al servidor con los datos actualizados
      * 
      * @param dni - DNI del paciente a actualizar
-     * @param paciente - Objeto con los nuevos datos del paciente
+     * @param paciente - Objeto con los datos actualizados del paciente
      * @returns Observable con la respuesta del servidor
      */
     actualizarPaciente(dni: any, paciente: any): Observable<any> {
+        console.log('🔍 Servicio - DNI a actualizar:', dni);
+        console.log('🔍 Servicio - Datos del paciente a enviar:', paciente);
         return this.http.put(`${this.apiUrl}/actualizarPaciente/${dni}`, paciente);
     }
 
@@ -169,6 +183,19 @@ export class PacienteService {
     }
 
     /**
+     * Obtiene el ID del profesional directamente por username
+     * Optimiza las consultas evitando comparaciones de strings
+     * 
+     * @param username - Nombre de usuario del profesional
+     * @returns Observable con el ID del profesional
+     */
+    obtenerIdProfesionalPorUsername(username: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/obtenerIdProfesionalPorUsername`, {
+            params: { username }
+        });
+    }
+
+    /**
      * Obtiene información de un profesional por su nombre de usuario
      * 
      * @param username - Nombre de usuario del profesional
@@ -215,5 +242,32 @@ export class PacienteService {
      */
     obtenerPacientes() {
         return this.http.get<any[]>(`${environment.apiBaseUrl}/pacientes/completo`);
+    }
+
+    /**
+     * Actualiza el estado activo/inactivo de un paciente específico
+     * Permite activar o desactivar pacientes del sistema
+     * 
+     * @param dni - DNI del paciente a actualizar
+     * @param activo - Nuevo estado (1 = activo, 0 = inactivo)
+     * @returns Observable con la respuesta del servidor
+     */
+    actualizarEstadoPaciente(dni: string, activo: number): Observable<any> {
+        return this.http.put(`${this.apiUrl}/pacientes/${dni}/estado`, {
+            activo: activo
+        });
+    }
+
+    /**
+     * Obtiene las opciones de estado para pacientes
+     * Retorna las opciones disponibles para el campo activo/inactivo
+     * 
+     * @returns Array con las opciones de estado
+     */
+    obtenerOpcionesEstado(): any[] {
+        return [
+            { id: 1, nombre: 'Activo', descripcion: 'Paciente activo en el sistema' },
+            { id: 0, nombre: 'Inactivo', descripcion: 'Paciente inactivo en el sistema' }
+        ];
     }
 } 

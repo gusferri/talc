@@ -422,4 +422,50 @@
     width: 16px;                    /* Ancho fijo */
     height: 16px;                   /* Alto fijo */
   }
+}
+
+/* Estilos para el indicador de estado */
+/* Indicador visual del estado activo/inactivo del paciente */
+.status-indicator {
+  display: flex;                    /* Layout flexbox */
+  align-items: center;              /* Centrado vertical */
+  gap: 8px;                         /* Espaciado entre elementos */
+  padding: 4px 8px;                 /* Espaciado interno */
+  border-radius: 16px;              /* Bordes redondeados */
+  font-size: 12px;                  /* Tamaño de fuente pequeño */
+  font-weight: 500;                 /* Peso de fuente medium */
+  transition: all 0.2s ease;        /* Transición suave */
+
+  /* Punto indicador del estado */
+  .status-dot {
+    width: 8px;                     /* Ancho del punto */
+    height: 8px;                    /* Alto del punto */
+    border-radius: 50%;             /* Forma circular */
+    flex-shrink: 0;                 /* No se encoge */
+  }
+
+  /* Texto del estado */
+  .status-text {
+    white-space: nowrap;            /* No se rompe en líneas */
+  }
+
+  /* Estado activo */
+  &.active {
+    background-color: rgba(76, 175, 80, 0.1);  /* Fondo verde claro */
+    color: #2e7d32;                 /* Color verde oscuro */
+
+    .status-dot {
+      background-color: #4caf50;    /* Punto verde */
+    }
+  }
+
+  /* Estado inactivo */
+  &.inactive {
+    background-color: rgba(244, 67, 54, 0.1);  /* Fondo rojo claro */
+    color: #c62828;                 /* Color rojo oscuro */
+
+    .status-dot {
+      background-color: #f44336;    /* Punto rojo */
+    }
+  }
 } 

@@ -38,17 +38,15 @@
 
   <!-- Sección de búsqueda y filtros: Campo de búsqueda para filtrar pacientes -->
   <mat-card class="search-card">
-    <div class="search-section">
-      <!-- Campo de búsqueda con autocompletado -->
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Buscar pacientes</mat-label>
-        <input matInput 
-               [(ngModel)]="searchTerm"
-               (input)="aplicarFiltro($event)"
-               placeholder="Buscar por nombre, apellido o DNI...">
-        <!-- Icono de búsqueda -->
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
+    <div class="search-section search-section-flex-between">
+      <div class="search-filters-row">
+        <!-- Campo de búsqueda principal -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar pacientes</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (input)="aplicarFiltro()" placeholder="Buscar por DNI, nombre o apellido...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
     </div>
   </mat-card>
 
@@ -141,6 +139,18 @@
           <td mat-cell *matCellDef="let paciente"> 
             <!-- Chip que muestra la edad calculada -->
             <span class="age-chip">{{calcularEdad(paciente.FechaNacimiento)}} años</span>
+          </td>
+        </ng-container>
+
+        <!-- Columna Estado: Muestra el estado activo/inactivo del paciente -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let paciente">
+            <!-- Indicador visual del estado (solo informativo) -->
+            <div class="status-indicator" [class.active]="paciente.Activo === 1" [class.inactive]="paciente.Activo === 0">
+              <div class="status-dot"></div>
+              <span class="status-text">{{paciente.Activo === 1 ? 'Activo' : 'Inactivo'}}</span>
+            </div>
           </td>
         </ng-container>
 

@@ -45,12 +45,13 @@ export class EscuelaService {
      * Busca escuelas que pertenezcan a una ciudad específica
      * Utilizado para filtrar escuelas según la ubicación del paciente
      * 
-     * @param ciudad - Nombre de la ciudad para filtrar escuelas
+     * @param query - Texto para buscar en el nombre de la escuela
+     * @param idCiudad - ID de la ciudad para filtrar escuelas
      * @returns Observable con array de escuelas de la ciudad especificada
      */
-    buscarEscuelasPorCiudad(ciudad: string): Observable<any[]> {
+    buscarEscuelasPorCiudad(query: string, idCiudad: number): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrlBase}/buscarEscuelasPorCiudad`, {
-            params: { ciudad }
+            params: { query, id: idCiudad }
         });
     }
 

@@ -53,6 +53,54 @@ def login(datos: LoginRequest):
     }
 
 
+@router.get("/verificar-grupos/{username}")
+def verificar_grupos_usuario(username: str):
+    """
+    Endpoint para verificar qué grupos tiene asignado un usuario específico
+    Útil para debugging de permisos y roles
+    """
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Obtener el usuario por username
+        cursor.execute("""
+            SELECT ID, Username, Nombre, Apellido
+            FROM Usuario
+            WHERE Username = %s AND Activo = 1
+        """, (username,))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+        # Obtener los grupos del usuario
+        cursor.execute("""
+            SELECT g.ID, g.Grupo
+            FROM Usuario_Grupo ug
+            INNER JOIN Grupo g ON ug.ID_Grupo = g.ID
+            WHERE ug.ID_Usuario = %s
+        """, (usuario['ID'],))
+        grupos = cursor.fetchall()
+
+        return {
+            "usuario": {
+                "ID": usuario["ID"],
+                "Username": usuario["Username"],
+                "Nombre": usuario["Nombre"],
+                "Apellido": usuario["Apellido"]
+            },
+            "grupos": grupos,
+            "grupos_nombres": [g['Grupo'] for g in grupos]
+        }
+    except Exception as e:
+        print(f"❌ Error al verificar grupos del usuario {username}: {e}")
+        raise HTTPException(status_code=500, detail="Error al verificar grupos")
+    finally:
+        cursor.close()
+        conn.close()
+
+
 # Modelo de datos que va a recibir el cambio de contraseña
 class CambiarContrasenaRequest(BaseModel):
     username: str

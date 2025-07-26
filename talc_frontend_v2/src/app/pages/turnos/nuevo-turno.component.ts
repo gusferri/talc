@@ -595,11 +595,13 @@ export class NuevoTurnoComponent implements OnInit {
 
   /**
    * Carga la lista de pacientes desde el servicio
+   * Filtra solo los pacientes activos para mostrar en el autocomplete
    */
   cargarPacientes() {
     this.pacienteService.obtenerPacientes().subscribe({
       next: (data) => {
-        this.pacientes = data;
+        // Filtrar solo pacientes activos (Activo === 1)
+        this.pacientes = data.filter(paciente => paciente.Activo === 1);
         this.pacientesCargados = true;
         this.cdr.detectChanges();
       },

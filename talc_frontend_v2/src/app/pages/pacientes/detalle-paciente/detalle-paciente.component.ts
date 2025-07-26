@@ -127,7 +127,8 @@ export class DetallePacienteComponent implements OnInit {
       obraSocial: [{ value: '', disabled: true }],
       telefono: [{ value: '', disabled: true }],
       email: [{ value: '', disabled: true }],
-      observaciones: [{ value: '', disabled: true }]
+      observaciones: [{ value: '', disabled: true }],
+      activo: [{ value: true, disabled: true }]
     });
   }
 
@@ -176,11 +177,9 @@ export class DetallePacienteComponent implements OnInit {
         this.escuelasFiltradas = catalogos.escuelas;
         
         // Ahora cargar los datos del paciente
-        this.pacienteService.buscarPacientes(dni).subscribe({
-          next: (pacientes) => {
-            if (pacientes && pacientes.length > 0) {
-              const paciente = pacientes[0];
-              
+        this.pacienteService.obtenerPacientePorDni(dni).subscribe({
+          next: (paciente) => {
+            if (paciente) {
               // Buscar objetos relacionados en los catálogos
               let provinciaObj = this.provincias.find(p => p.ID === paciente.ID_Provincia) || '';
               let ciudadObj = this.ciudades.find(c => c.ID === paciente.ID_Ciudad) || '';
@@ -209,7 +208,8 @@ export class DetallePacienteComponent implements OnInit {
                 obraSocial: obraSocialObj,
                 telefono: paciente.Telefono,
                 email: paciente.Email,
-                observaciones: paciente.Observaciones
+                observaciones: paciente.Observaciones,
+                activo: paciente.Activo === 1
               };
               
               // Aplicar valores al formulario
@@ -219,11 +219,18 @@ export class DetallePacienteComponent implements OnInit {
               if (provinciaObj) {
                 this.filtrarCiudades(ciudadObj?.Ciudad || '');
               }
+              
+              console.log('✅ Paciente cargado exitosamente:', paciente.Nombre, paciente.Apellido, '(Activo:', paciente.Activo === 1 ? 'Sí' : 'No', ')');
+            } else {
+              console.error('❌ No se encontró el paciente con DNI:', dni);
             }
             this.isLoading = false;
           },
           error: (error) => {
-            console.error('Error al cargar paciente:', error);
+            console.error('❌ Error al cargar paciente:', error);
+            if (error.status === 404) {
+              console.error('❌ Paciente no encontrado con DNI:', dni);
+            }
             this.isLoading = false;
           }
         });
@@ -330,8 +337,15 @@ export class DetallePacienteComponent implements OnInit {
       this.escuelasFiltradas = [];
       return;
     }
+
+    // Verificar que ciudad tenga el ID necesario
+    if (!ciudad.ID) {
+      console.error('La ciudad seleccionada no tiene ID válido');
+      this.escuelasFiltradas = [];
+      return;
+    }
     
-    this.escuelaService.buscarEscuelasPorCiudad(ciudad.Ciudad || value).subscribe({
+    this.escuelaService.buscarEscuelasPorCiudad(value, ciudad.ID).subscribe({
       next: (escuelas) => { this.escuelasFiltradas = escuelas; },
       error: (error) => { 
         console.error('Error al buscar escuelas:', error); 
@@ -386,12 +400,23 @@ export class DetallePacienteComponent implements OnInit {
     if (this.pacienteForm.valid) {
       const formValue = this.pacienteForm.value;
       
+      // Debug: Log del valor del campo activo
+      console.log('🔍 Valor del campo activo en el formulario:', formValue.activo);
+      console.log('🔍 Tipo de dato del campo activo:', typeof formValue.activo);
+      
+      // Formatear la fecha de nacimiento para MySQL (YYYY-MM-DD)
+      let fechaNacimiento = formValue.fechaNacimiento;
+      if (fechaNacimiento) {
+        const fecha = new Date(fechaNacimiento);
+        fechaNacimiento = fecha.toISOString().split('T')[0];
+      }
+      
       // Preparar objeto con los datos actualizados
       const pacienteActualizado = {
         dni: formValue.dni,
         apellido: formValue.apellido,
         nombre: formValue.nombre,
-        fechaNacimiento: formValue.fechaNacimiento,
+        fechaNacimiento: fechaNacimiento,
         idGenero: formValue.genero?.ID || null,
         idProvincia: formValue.provincia?.ID || null,
         idCiudad: formValue.ciudad?.ID || null,
@@ -399,18 +424,24 @@ export class DetallePacienteComponent implements OnInit {
         idObraSocial: formValue.obraSocial?.ID || null,
         telefono: formValue.telefono,
         email: formValue.email,
-        observaciones: formValue.observaciones
+        observaciones: formValue.observaciones,
+        activo: formValue.activo ? 1 : 0
       };
+
+      // Debug: Log del objeto que se va a enviar
+      console.log('🔍 Objeto paciente a enviar:', pacienteActualizado);
+      console.log('🔍 Valor final del campo activo:', pacienteActualizado.activo);
 
       // Enviar actualización al servidor
       this.pacienteService.actualizarPaciente(this.pacienteId!, pacienteActualizado).subscribe({
         next: (response) => {
-          console.log('Paciente actualizado:', response);
+          console.log('✅ Paciente actualizado exitosamente:', response);
           this.isEditing = false;
           this.pacienteForm.disable();
         },
         error: (error) => {
-          console.error('Error al actualizar paciente:', error);
+          console.error('❌ Error al actualizar paciente:', error);
+          console.error('❌ Detalles del error:', error.error);
         }
       });
     }

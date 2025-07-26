@@ -120,6 +120,10 @@ export class LoginComponent {
             localStorage.setItem('email', respuesta.Email || '');
             localStorage.setItem('rol', (respuesta.Grupos && respuesta.Grupos.length > 0) ? respuesta.Grupos[0] : '');
             
+            // Log para debugging de roles
+            console.log('🔐 Login exitoso - Grupos recibidos:', respuesta.Grupos);
+            console.log('🔐 Rol asignado:', localStorage.getItem('rol'));
+            
             // Navega al dashboard después del login exitoso
             this.router.navigate(['/dashboard']);
           }

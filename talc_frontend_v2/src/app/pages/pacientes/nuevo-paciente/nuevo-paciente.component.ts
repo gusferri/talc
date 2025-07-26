@@ -325,7 +325,14 @@ export class NuevoPacienteComponent implements OnInit {
       return;
     }
 
-    this.escuelaService.buscarEscuelasPorCiudad(ciudad.Ciudad || value).subscribe({
+    // Verificar que ciudad tenga el ID necesario
+    if (!ciudad.ID) {
+      console.error('La ciudad seleccionada no tiene ID válido');
+      this.escuelasFiltradas = [];
+      return;
+    }
+
+    this.escuelaService.buscarEscuelasPorCiudad(value, ciudad.ID).subscribe({
       next: (escuelas) => {
         this.escuelasFiltradas = escuelas;
       },
@@ -436,6 +443,12 @@ export class NuevoPacienteComponent implements OnInit {
       this.isSubmitting = true;
       
       const pacienteData = this.pacienteForm.value;
+      
+      // Formatear la fecha de nacimiento para MySQL (YYYY-MM-DD)
+      if (pacienteData.fechaNacimiento) {
+        const fecha = new Date(pacienteData.fechaNacimiento);
+        pacienteData.fechaNacimiento = fecha.toISOString().split('T')[0];
+      }
       
       this.pacienteService.insertarPaciente(pacienteData).subscribe({
         next: (response) => {

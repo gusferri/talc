@@ -56,7 +56,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
+
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // FormsModule: Para formularios reactivos y template-driven
@@ -70,6 +70,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 // Componente de diálogo para adjuntar archivos
 import { AdjuntarArchivoDialogComponent } from './adjuntar-archivo-dialog.component';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * Componente principal para gestión de pacientes
@@ -90,7 +91,6 @@ import { AdjuntarArchivoDialogComponent } from './adjuntar-archivo-dialog.compon
     MatFormFieldModule,
     MatInputModule,
     MatTooltipModule,
-    MatChipsModule,
     MatProgressSpinnerModule,
     FormsModule,
     RouterModule
@@ -104,15 +104,21 @@ export class PacientesComponent implements OnInit, AfterViewInit {
   pacientes: MatTableDataSource<any> = new MatTableDataSource<any>();
   
   /** Columnas que se muestran en la tabla de pacientes */
-  displayedColumns: string[] = ['dni', 'nombre', 'apellido', 'edad', 'acciones'];
+  displayedColumns: string[] = ['dni', 'nombre', 'apellido', 'edad', 'estado', 'acciones'];
   
   /** Término de búsqueda para filtrar pacientes */
   searchTerm: string = '';
   
+  // Propiedades para filtros y autocompletado
+  provinciasFiltradas: any[] = [];
+  ciudadesFiltradas: any[] = [];
+  escuelasFiltradas: any[] = [];
+  obrasSocialesFiltradas: any[] = [];
+
   /** Flag para controlar el estado de carga de datos */
   isLoading: boolean = false;
-  
-  /** Array que mantiene una copia de los datos originales para ordenamiento */
+
+  // Datos originales para restaurar filtros
   datosOriginales: any[] = [];
   
   /** Variables para controlar el ordenamiento de la tabla */
@@ -133,6 +139,7 @@ export class PacientesComponent implements OnInit, AfterViewInit {
   constructor(
     public router: Router,                    // Servicio para navegación entre rutas
     private pacienteService: PacienteService, // Servicio para operaciones con pacientes
+    private authService: AuthService,         // Servicio de autenticación centralizado
     private dialog: MatDialog                 // Servicio para mostrar diálogos modales
   ) {}
 
@@ -156,30 +163,29 @@ export class PacientesComponent implements OnInit, AfterViewInit {
 
   /**
    * Verifica si el usuario es un profesional y carga los pacientes correspondientes
-   * Adapta la información mostrada según el rol del usuario:
+   * Implementa control de acceso granular basado en roles:
    * - Secretarias: Ven todos los pacientes del sistema
    * - Profesionales: Ven solo sus propios pacientes
    * 
-   * Este método implementa control de acceso granular basado en roles
+   * Este método utiliza el AuthService centralizado para optimizar la verificación
    */
   verificarProfesionalYcargarPacientes(): void {
-    const shortname = localStorage.getItem('username');  // Obtiene el nombre de usuario
+    const shortname = localStorage.getItem('username');
     if (shortname) {
-      // Verifica si el usuario es un profesional consultando el backend
-      this.pacienteService.esProfesionalPorShortname(shortname).subscribe({
-        next: (res: any) => {
-          this.esProfesional = res?.esProfesional === true;  // Actualiza el flag
-          localStorage.setItem('esProfesional', JSON.stringify(this.esProfesional));  // Guarda en localStorage
-          this.cargarPacientes();  // Carga los pacientes según el rol
+      // Usa el AuthService centralizado para verificación optimizada
+      this.authService.verificarProfesional(shortname).subscribe({
+        next: (esProf: boolean) => {
+          this.esProfesional = esProf;
+          this.cargarPacientes();
         },
         error: (error: any) => {
           console.error('Error al verificar profesional', error);
-          this.esProfesional = false;  // En caso de error, asume que no es profesional
+          this.esProfesional = false;
           this.cargarPacientes();
         }
       });
     } else {
-      this.cargarPacientes();  // Si no hay shortname, carga pacientes directamente
+      this.cargarPacientes();
     }
   }
 
@@ -194,13 +200,17 @@ export class PacientesComponent implements OnInit, AfterViewInit {
   cargarPacientes(): void {
     this.isLoading = true;  // Activa el indicador de carga
     
-    const rol = (localStorage.getItem('rol') || '').toLowerCase();  // Obtiene el rol del usuario
     const shortname = localStorage.getItem('username');             // Obtiene el nombre de usuario
     
-    if (rol === 'secretaria') {
+    // Verificar si es secretaria usando el servicio centralizado
+    const esSecretaria = this.authService.esSecretaria();
+    
+    if (esSecretaria) {
       // Las secretarias pueden ver todos los pacientes del sistema
       this.pacienteService.obtenerPacientes().subscribe({
         next: (pacientes: any[]) => {
+          console.log('🔍 Pacientes recibidos para secretaria:', pacientes);
+          console.log('🔍 Primer paciente (ejemplo):', pacientes[0]);
           this.datosOriginales = [...pacientes];  // Guarda copia de los datos originales
           this.pacientes.data = pacientes;        // Actualiza la tabla
           this.isLoading = false;                 // Desactiva el indicador de carga
@@ -405,12 +415,9 @@ export class PacientesComponent implements OnInit, AfterViewInit {
   /**
    * Aplica un filtro de búsqueda a la tabla de pacientes
    * Filtra por cualquier campo de texto y resetea la paginación
-   * 
-   * @param event - Evento del input de búsqueda
    */
-  aplicarFiltro(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;  // Obtiene el valor del input
-    this.pacientes.filter = filterValue.trim().toLowerCase();      // Aplica el filtro
+  aplicarFiltro(): void {
+    this.pacientes.filter = this.searchTerm.trim().toLowerCase();      // Aplica el filtro
 
     // Resetea la paginación a la primera página
     if (this.pacientes.paginator) {

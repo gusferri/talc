@@ -12,6 +12,7 @@ import { MaterialModule } from 'src/app/material.module';
 // Servicios para obtener datos de pacientes y turnos desde el backend
 import { PacienteService } from '../../services/paciente.service';
 import { TurnosService } from '../../services/turnos.service';
+import { AuthService } from '../../services/auth.service'; // Nuevo servicio para verificar roles
 
 /**
  * Interfaz que define la estructura de una tarjeta de estadísticas
@@ -132,7 +133,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,                    // Servicio para navegación entre rutas
     private pacienteService: PacienteService,  // Servicio para operaciones con pacientes
-    private turnosService: TurnosService       // Servicio para operaciones con turnos
+    private turnosService: TurnosService,       // Servicio para operaciones con turnos
+    private authService: AuthService          // Servicio para verificar roles
   ) {}
 
   /**
@@ -154,13 +156,14 @@ export class DashboardComponent implements OnInit {
   cargarDatos(): void {
     this.isLoading = true;  // Activa el indicador de carga
     
-    // Obtiene el rol del usuario desde el localStorage
-    const rol = (localStorage.getItem('rol') || '').toLowerCase();
     // Obtiene el nombre de usuario (shortname) para identificar al profesional
     const shortname = localStorage.getItem('username');
     
+    // Verificar si es secretaria usando el servicio centralizado
+    const esSecretaria = this.authService.esSecretaria();
+    
     // Lógica para cargar pacientes según el rol del usuario
-    if (rol === 'secretaria') {
+    if (esSecretaria) {
       // Las secretarias pueden ver todos los pacientes del sistema
       this.pacienteService.obtenerPacientes().subscribe({
         next: (pacientes: any[]) => {
@@ -216,7 +219,7 @@ export class DashboardComponent implements OnInit {
         let turnosHoy: any[] = [];
         
         // Filtra los turnos según el rol del usuario
-        if (rol === 'secretaria') {
+        if (esSecretaria) {
           // Las secretarias ven todos los turnos de hoy de todas las profesionales
           turnosHoy = data.filter((turno: any) => turno.Fecha && turno.Fecha.substring(0, 10) === hoyStr);
         } else {
