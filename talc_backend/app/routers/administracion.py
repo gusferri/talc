@@ -737,8 +737,8 @@ def crear_usuario(usuario: UsuarioCreate):
         
         # Crear usuario
         cursor.execute("""
-            INSERT INTO Usuario (Username, Contraseña, Nombre, Apellido, Email, Activo)
-            VALUES (%s, %s, %s, %s, %s, 1)
+            INSERT INTO Usuario (Username, Contraseña, Nombre, Apellido, Email, Activo, DebeCambiarContrasena)
+            VALUES (%s, %s, %s, %s, %s, 1, 1)
         """, (usuario.Username, hashed_password, nombre, apellido, usuario.Email))
         
         usuario_id = cursor.lastrowid

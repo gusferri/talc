@@ -101,7 +101,10 @@ export class LoginComponent {
             const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
               width: '400px',
               disableClose: true,  // No permite cerrar el diálogo sin cambiar contraseña
-              data: { idUsuario: respuesta.ID }
+              data: { 
+                idUsuario: respuesta.ID,
+                username: respuesta.Username 
+              }
             });
 
             // Maneja el resultado del diálogo de cambio de contraseña
@@ -159,8 +162,9 @@ export class LoginComponent {
   actualizarContrasena(currentPassword: string, newPassword: string) {
     // Realiza petición POST para cambiar la contraseña
     this.http.post(`${environment.apiBaseUrl}/cambiar-contrasena`, {
-      currentPassword: currentPassword,
-      newPassword: newPassword
+      username: this.username,
+      contrasena_actual: currentPassword,
+      nueva_contrasena: newPassword
     }).subscribe({
       next: () => {
         // Si el cambio fue exitoso, navega al dashboard
