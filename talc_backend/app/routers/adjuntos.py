@@ -1,7 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Query
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
 import mysql.connector
 from app.database import get_connection
+from app.utils.auditoria import (
+    auditar_creacion_adjunto, auditar_modificacion_adjunto, auditar_eliminacion_adjunto,
+    obtener_usuario_logueado, obtener_usuario_por_defecto
+)
 import shutil
 import os
 from datetime import datetime
@@ -20,6 +24,7 @@ async def subir_archivo(
     id_paciente: int = Form(...),
     username: str = Form(...),
     id_especialidad: int = Form(None),
+    request: Request = None,
 ):
     extension = archivo.filename.split(".")[-1]
     nombre_archivo = f"{int(datetime.utcnow().timestamp())}.{extension}"
@@ -57,6 +62,30 @@ async def subir_archivo(
         ))
         conn.commit()
         documento_id = cursor.lastrowid
+        
+        # Registrar auditoría de creación
+        try:
+            datos_adjunto = {
+                "ID_Paciente": id_paciente,
+                "Titulo": titulo,
+                "NombreArchivo": nombre_archivo,
+                "RutaArchivo": ruta_archivo,
+                "ID_Usuario": id_usuario,
+                "ID_Especialidad": id_especialidad,
+                "FechaSubida": datetime.utcnow().isoformat()
+            }
+            
+            username_creador = obtener_usuario_logueado(request) or username or obtener_usuario_por_defecto()
+            
+            auditar_creacion_adjunto(
+                username_creador=username_creador,
+                id_adjunto_creado=documento_id,
+                datos_adjunto=datos_adjunto
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de creación de adjunto: {audit_error}")
+            # NO fallar la operación principal
+        
         cursor.close()
         conn.close()
     except mysql.connector.Error as db_err:
@@ -169,13 +198,14 @@ async def visualizar_adjunto(documento_id: int):
         raise HTTPException(status_code=500, detail=f"Error de base de datos: {str(db_err)}")
 
 @router.delete("/adjuntos/{documento_id}")
-async def eliminar_adjunto(documento_id: int):
+async def eliminar_adjunto(documento_id: int, request: Request):
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         
+        # Obtener datos del documento antes de eliminarlo para auditoría
         cursor.execute("""
-            SELECT RutaArchivo
+            SELECT ID, ID_Paciente, Titulo, FechaSubida, NombreArchivo, RutaArchivo, ID_Usuario, ID_Especialidad
             FROM Paciente_Documentos
             WHERE ID = %s
         """, (documento_id,))
@@ -196,6 +226,31 @@ async def eliminar_adjunto(documento_id: int):
             raise HTTPException(status_code=404, detail="Documento no encontrado")
         
         conn.commit()
+        
+        # Registrar auditoría de eliminación
+        try:
+            datos_adjunto = {
+                "ID": documento['ID'],
+                "ID_Paciente": documento['ID_Paciente'],
+                "Titulo": documento['Titulo'],
+                "NombreArchivo": documento['NombreArchivo'],
+                "RutaArchivo": documento['RutaArchivo'],
+                "ID_Usuario": documento['ID_Usuario'],
+                "ID_Especialidad": documento['ID_Especialidad'],
+                "FechaSubida": documento['FechaSubida'].isoformat() if documento['FechaSubida'] else None
+            }
+            
+            username_eliminador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            auditar_eliminacion_adjunto(
+                username_eliminador=username_eliminador,
+                id_adjunto_eliminado=documento_id,
+                datos_adjunto=datos_adjunto
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de eliminación de adjunto: {audit_error}")
+            # NO fallar la operación principal
+        
         cursor.close()
         conn.close()
         

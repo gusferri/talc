@@ -65,6 +65,17 @@ export class InformesService {
     constructor(private http: HttpClient) {}
 
     /**
+     * Obtiene los headers con el usuario logueado para auditoría
+     * @returns Objeto con headers incluyendo X-User-Username
+     */
+    private getHeadersWithUser(): { [key: string]: string } {
+        const username = localStorage.getItem('username');
+        return {
+            'X-User-Username': username || 'sistema'
+        };
+    }
+
+    /**
      * Obtiene todos los informes asociados a un paciente específico
      * Utilizado para mostrar el historial de informes del paciente
      * 
@@ -84,7 +95,8 @@ export class InformesService {
      * @returns Observable con respuesta de la actualización
      */
     actualizarInforme(id: number, texto: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/actualizar-informe/${id}`, { texto });
+        const headers = this.getHeadersWithUser();
+        return this.http.post(`${this.apiUrl}/actualizar-informe/${id}`, { texto }, { headers });
     }
 
     /**
@@ -95,12 +107,25 @@ export class InformesService {
      * @returns Observable con el resumen generado por la IA
      */
     createInformeIA(payload: GenerarInformeRequest): Observable<GenerarInformeResponse> {
-      return this.http.post<GenerarInformeResponse>(`${this.apiUrl}/generar-informe`, payload)
+        const headers = this.getHeadersWithUser();
+        return this.http.post<GenerarInformeResponse>(`${this.apiUrl}/generar-informe`, payload, { headers })
         .pipe(
           catchError(err => {
             console.error('❌ Error al generar informe:', err);
             return throwError(() => err);
           })
         );
+    }
+
+    /**
+     * Elimina un informe específico del sistema
+     * Remueve permanentemente el informe y su contenido
+     * 
+     * @param id - ID del informe a eliminar
+     * @returns Observable con respuesta de la eliminación
+     */
+    eliminarInforme(id: number): Observable<any> {
+        const headers = this.getHeadersWithUser();
+        return this.http.delete(`${this.apiUrl}/eliminar-informe/${id}`, { headers });
     }
 } 

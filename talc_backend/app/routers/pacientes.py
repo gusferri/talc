@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Query, HTTPException, Form
+from fastapi import APIRouter, Query, HTTPException, Form, Request
 from app.database import get_connection
 from pydantic import BaseModel
 from typing import List
 from datetime import date, time, datetime, timedelta
+from app.utils.auditoria import (
+    auditar_creacion_paciente, auditar_modificacion_paciente, 
+    auditar_cambio_estado_paciente, auditar_eliminacion_paciente,
+    obtener_usuario_logueado, obtener_usuario_por_defecto
+)
 
 router = APIRouter(
     prefix="/pacientes",
@@ -190,7 +195,7 @@ def buscar_escuelas_por_ciudad(query: str = Query(..., min_length=1), id: int = 
     return resultados
 
 @router.post("/grabarPaciente")
-def grabar_paciente(paciente: dict):
+def grabar_paciente(paciente: dict, request: Request):
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -219,7 +224,39 @@ def grabar_paciente(paciente: dict):
             paciente.get("activo", 1)  # Activo por defecto (1 = activo, 0 = inactivo)
         ))
         conn.commit()
-        return {"message": "Paciente grabado con éxito", "id": cursor.lastrowid}
+        
+        paciente_id = cursor.lastrowid
+        
+        # Registrar auditoría de creación
+        try:
+            datos_paciente = {
+                "DNI": paciente["dni"],
+                "Apellido": paciente["apellido"],
+                "Nombre": paciente["nombre"],
+                "FechaNacimiento": paciente["fechaNacimiento"],
+                "ID_Genero": paciente.get("idGenero"),
+                "ID_Ciudad": paciente.get("idCiudad"),
+                "Telefono": paciente.get("telefono"),
+                "Email": paciente.get("email"),
+                "ID_ObraSocial": paciente.get("idObraSocial"),
+                "ID_Escuela": paciente.get("idEscuela"),
+                "Observaciones": paciente.get("observaciones"),
+                "Activo": paciente.get("activo", 1)
+            }
+            
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            username_creador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            auditar_creacion_paciente(
+                username_creador=username_creador,
+                id_paciente_creado=paciente_id,
+                datos_paciente=datos_paciente
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de creación de paciente: {audit_error}")
+            # NO fallar la operación principal
+        
+        return {"message": "Paciente grabado con éxito", "id": paciente_id}
     except Exception as e:
         conn.rollback()
         print(f"❌ Error al grabar el paciente: {e}")
@@ -269,11 +306,23 @@ def obtenerEscuelas():
     return resultados
 
 @router.put("/actualizarPaciente/{dni}")
-def actualizar_paciente(dni: str, paciente: dict):
+def actualizar_paciente(dni: str, paciente: dict, request: Request):
     conn = get_connection()
     cursor = conn.cursor()
 
     try:
+        # Obtener datos actuales del paciente para auditoría
+        cursor.execute("""
+            SELECT DNI, Apellido, Nombre, FechaNacimiento, ID_Genero, ID_Ciudad, 
+                   Telefono, Email, ID_ObraSocial, ID_Escuela, Observaciones, Activo
+            FROM Paciente
+            WHERE DNI = %s
+        """, (dni,))
+        
+        paciente_actual = cursor.fetchone()
+        if not paciente_actual:
+            raise HTTPException(status_code=404, detail="Paciente no encontrado")
+        
         # Debug: Imprimir los datos recibidos
         print(f"🔄 Actualizando paciente con DNI: {dni}")
         print("📦 Datos completos recibidos para actualizar:", paciente)
@@ -322,6 +371,62 @@ def actualizar_paciente(dni: str, paciente: dict):
             print(f"❌ No se encontró paciente con DNI: {dni}")
             raise HTTPException(status_code=404, detail="Paciente no encontrado")
 
+        # Registrar auditoría de modificaciones
+        try:
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            username_modificador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            # Auditoría de cambios en campos básicos
+            if paciente["apellido"] != paciente_actual[1]:  # Apellido
+                auditar_modificacion_paciente(
+                    username_modificador=username_modificador,
+                    id_paciente_modificado=paciente_actual[0],  # DNI como ID
+                    campo_modificado="Apellido",
+                    valor_anterior=paciente_actual[1],
+                    valor_nuevo=paciente["apellido"]
+                )
+            
+            if paciente["nombre"] != paciente_actual[2]:  # Nombre
+                auditar_modificacion_paciente(
+                    username_modificador=username_modificador,
+                    id_paciente_modificado=paciente_actual[0],
+                    campo_modificado="Nombre",
+                    valor_anterior=paciente_actual[2],
+                    valor_nuevo=paciente["nombre"]
+                )
+            
+            if paciente.get("email") != paciente_actual[7]:  # Email
+                auditar_modificacion_paciente(
+                    username_modificador=username_modificador,
+                    id_paciente_modificado=paciente_actual[0],
+                    campo_modificado="Email",
+                    valor_anterior=paciente_actual[7],
+                    valor_nuevo=paciente.get("email")
+                )
+            
+            if paciente.get("telefono") != paciente_actual[6]:  # Telefono
+                auditar_modificacion_paciente(
+                    username_modificador=username_modificador,
+                    id_paciente_modificado=paciente_actual[0],
+                    campo_modificado="Telefono",
+                    valor_anterior=paciente_actual[6],
+                    valor_nuevo=paciente.get("telefono")
+                )
+            
+            # Auditoría de cambio de estado
+            nuevo_activo = paciente.get("activo", 1)
+            if nuevo_activo != paciente_actual[11]:  # Activo
+                auditar_cambio_estado_paciente(
+                    username_modificador=username_modificador,
+                    id_paciente_modificado=paciente_actual[0],
+                    estado_anterior=bool(paciente_actual[11]),
+                    estado_nuevo=bool(nuevo_activo)
+                )
+                
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de actualización de paciente: {audit_error}")
+            # NO fallar la operación principal
+
         print(f"✅ Paciente actualizado exitosamente. Filas afectadas: {cursor.rowcount}")
         return {"message": "Paciente actualizado con éxito"}
     except Exception as e:
@@ -333,7 +438,7 @@ def actualizar_paciente(dni: str, paciente: dict):
         conn.close()
 
 @router.put("/pacientes/{dni}/estado")
-def actualizar_estado_paciente(dni: str, estado: dict):
+def actualizar_estado_paciente(dni: str, estado: dict, request: Request):
     """
     Actualiza el estado activo/inactivo de un paciente específico
     """
@@ -341,6 +446,12 @@ def actualizar_estado_paciente(dni: str, estado: dict):
     cursor = conn.cursor()
     
     try:
+        # Obtener estado actual del paciente para auditoría
+        cursor.execute("SELECT Activo FROM Paciente WHERE DNI = %s", (dni,))
+        paciente_actual = cursor.fetchone()
+        if not paciente_actual:
+            raise HTTPException(status_code=404, detail="Paciente no encontrado")
+        
         # Validar que el estado sea válido (0 o 1)
         activo = estado.get("activo")
         if activo not in [0, 1]:
@@ -356,6 +467,24 @@ def actualizar_estado_paciente(dni: str, estado: dict):
             raise HTTPException(status_code=404, detail="Paciente no encontrado")
         
         conn.commit()
+        
+        # Registrar auditoría de cambio de estado
+        try:
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            username_modificador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            # Solo auditar si el estado realmente cambió
+            if activo != paciente_actual[0]:
+                auditar_cambio_estado_paciente(
+                    username_modificador=username_modificador,
+                    id_paciente_modificado=dni,  # Usar DNI como ID
+                    estado_anterior=bool(paciente_actual[0]),
+                    estado_nuevo=bool(activo)
+                )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de cambio de estado de paciente: {audit_error}")
+            # NO fallar la operación principal
+        
         return {"mensaje": "Estado de paciente actualizado exitosamente"}
     except Exception as e:
         conn.rollback()

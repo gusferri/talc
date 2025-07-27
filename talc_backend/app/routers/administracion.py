@@ -12,12 +12,21 @@ Autor: Sistema TALC
 Fecha: 2024
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional
 import mysql.connector
 from app.database import get_connection
 import bcrypt
+from app.utils.auditoria import (
+    auditar_creacion_usuario, auditar_modificacion_usuario, auditar_cambio_estado_usuario,
+    auditar_creacion_profesional, auditar_modificacion_profesional, auditar_cambio_estado_profesional, auditar_eliminacion_profesional,
+    auditar_creacion_paciente, auditar_modificacion_paciente, auditar_cambio_estado_paciente, auditar_eliminacion_paciente,
+    auditar_creacion_turno, auditar_modificacion_turno, auditar_cambio_estado_turno, auditar_eliminacion_turno,
+    auditar_creacion_adjunto, auditar_modificacion_adjunto, auditar_eliminacion_adjunto,
+    auditar_creacion_nota_voz, auditar_modificacion_nota_voz, auditar_eliminacion_nota_voz,
+    auditar_creacion_informe_ia, auditar_modificacion_informe_ia, auditar_eliminacion_informe_ia
+)
 
 # Crear router para administración
 router = APIRouter(prefix="/administracion", tags=["Administración"])
@@ -455,7 +464,7 @@ def obtener_profesionales():
         conn.close()
 
 @router.post("/profesionales", response_model=Profesional)
-def crear_profesional(profesional: ProfesionalCreate):
+def crear_profesional(profesional: ProfesionalCreate, request: Request):
     """
     Crea un nuevo profesional
     """
@@ -496,6 +505,38 @@ def crear_profesional(profesional: ProfesionalCreate):
                     VALUES (%s, %s)
                 """, (profesional_id, especialidad_id))
             conn.commit()
+        
+        # Registrar auditoría de creación
+        try:
+            datos_profesional = {
+                "Nombre": profesional.Nombre,
+                "Apellido": profesional.Apellido,
+                "Email": profesional.Email,
+                "Telefono": profesional.Telefono,
+                "DNI": profesional.DNI,
+                "Matricula": profesional.Matricula,
+                "FechaNacimiento": profesional.FechaNacimiento,
+                "Genero": profesional.Genero,
+                "Domicilio": profesional.Domicilio,
+                "ID_Ciudad": profesional.ID_Ciudad,
+                "Observaciones": profesional.Observaciones,
+                "UsaIntegracionCalendar": profesional.UsaIntegracionCalendar,
+                "Especialidades": profesional.Especialidades,
+                "Activo": True
+            }
+            
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            from app.utils.auditoria import obtener_usuario_logueado, obtener_usuario_por_defecto
+            username_creador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            auditar_creacion_profesional(
+                username_creador=username_creador,
+                id_profesional_creado=profesional_id,
+                datos_profesional=datos_profesional
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de creación de profesional: {audit_error}")
+            # NO fallar la operación principal
         
         # Obtener el profesional creado con todos sus datos
         cursor.execute("""
@@ -556,7 +597,7 @@ def crear_profesional(profesional: ProfesionalCreate):
         conn.close()
 
 @router.put("/profesionales/{profesional_id}", response_model=Profesional)
-def actualizar_profesional(profesional_id: int, profesional: ProfesionalUpdate):
+def actualizar_profesional(profesional_id: int, profesional: ProfesionalUpdate, request: Request):
     """
     Actualiza un profesional existente
     """
@@ -564,6 +605,21 @@ def actualizar_profesional(profesional_id: int, profesional: ProfesionalUpdate):
     cursor = conn.cursor(dictionary=True)
 
     try:
+        # Obtener datos actuales del profesional para auditoría
+        cursor.execute("""
+            SELECT p.ID, p.Nombre, p.Apellido, p.Email, p.Telefono, 
+                   p.DNI, p.Matricula, p.FechaNacimiento, p.Genero, p.Domicilio, 
+                   p.ID_Ciudad, p.Observaciones, p.UsaIntegracionCalendar, p.Activo,
+                   g.Genero as NombreGenero
+            FROM Profesional p
+            LEFT JOIN Genero g ON p.Genero = g.ID
+            WHERE p.ID = %s
+        """, (profesional_id,))
+        
+        profesional_actual = cursor.fetchone()
+        if not profesional_actual:
+            raise HTTPException(status_code=404, detail="Profesional no encontrado")
+        
         # Construir query dinámicamente basado en los campos proporcionados
         campos = []
         valores = []
@@ -627,18 +683,79 @@ def actualizar_profesional(profesional_id: int, profesional: ProfesionalUpdate):
         cursor.execute(query, valores)
         conn.commit()
         
-        # Actualizar especialidades si se proporcionan
-        if profesional.Especialidades is not None:
-            # Eliminar especialidades existentes
-            cursor.execute("DELETE FROM Profesional_Especialidad WHERE ID_Profesional = %s", (profesional_id,))
+        # Registrar auditoría de modificaciones
+        try:
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            from app.utils.auditoria import obtener_usuario_logueado, obtener_usuario_por_defecto
+            username_modificador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
             
-            # Insertar nuevas especialidades
-            for especialidad_id in profesional.Especialidades:
-                cursor.execute("""
-                    INSERT INTO Profesional_Especialidad (ID_Profesional, ID_Especialidad)
-                    VALUES (%s, %s)
-                """, (profesional_id, especialidad_id))
-            conn.commit()
+            # Auditoría de cambios en campos básicos
+            if profesional.Nombre is not None and profesional.Nombre != profesional_actual['Nombre']:
+                auditar_modificacion_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    campo_modificado="Nombre",
+                    valor_anterior=profesional_actual['Nombre'],
+                    valor_nuevo=profesional.Nombre
+                )
+            
+            if profesional.Apellido is not None and profesional.Apellido != profesional_actual['Apellido']:
+                auditar_modificacion_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    campo_modificado="Apellido",
+                    valor_anterior=profesional_actual['Apellido'],
+                    valor_nuevo=profesional.Apellido
+                )
+            
+            if profesional.Email is not None and profesional.Email != profesional_actual['Email']:
+                auditar_modificacion_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    campo_modificado="Email",
+                    valor_anterior=profesional_actual['Email'],
+                    valor_nuevo=profesional.Email
+                )
+            
+            if profesional.Telefono is not None and profesional.Telefono != profesional_actual['Telefono']:
+                auditar_modificacion_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    campo_modificado="Telefono",
+                    valor_anterior=profesional_actual['Telefono'],
+                    valor_nuevo=profesional.Telefono
+                )
+            
+            if profesional.DNI is not None and profesional.DNI != profesional_actual['DNI']:
+                auditar_modificacion_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    campo_modificado="DNI",
+                    valor_anterior=profesional_actual['DNI'],
+                    valor_nuevo=profesional.DNI
+                )
+            
+            if profesional.Matricula is not None and profesional.Matricula != profesional_actual['Matricula']:
+                auditar_modificacion_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    campo_modificado="Matricula",
+                    valor_anterior=profesional_actual['Matricula'],
+                    valor_nuevo=profesional.Matricula
+                )
+            
+            # Auditoría de cambio de estado
+            if profesional.Activo is not None and profesional.Activo != profesional_actual['Activo']:
+                auditar_cambio_estado_profesional(
+                    username_modificador=username_modificador,
+                    id_profesional_modificado=profesional_id,
+                    estado_anterior=profesional_actual['Activo'],
+                    estado_nuevo=profesional.Activo
+                )
+                
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de actualización de profesional: {audit_error}")
+            # NO fallar la operación principal
         
         # Obtener el profesional actualizado con información completa
         cursor.execute("""
@@ -719,7 +836,7 @@ def obtener_usuarios():
         conn.close()
 
 @router.post("/usuarios", response_model=Usuario)
-def crear_usuario(usuario: UsuarioCreate):
+def crear_usuario(usuario: UsuarioCreate, request: Request):
     """
     Crea un nuevo usuario con rol
     """
@@ -754,6 +871,29 @@ def crear_usuario(usuario: UsuarioCreate):
         
         conn.commit()
         
+        # Registrar auditoría de creación
+        try:
+            datos_usuario = {
+                "Username": usuario.Username,
+                "NombreCompleto": usuario.NombreCompleto,
+                "Email": usuario.Email,
+                "Rol": usuario.Rol,
+                "Activo": True
+            }
+            
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            from app.utils.auditoria import obtener_usuario_logueado, obtener_usuario_por_defecto
+            username_creador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            auditar_creacion_usuario(
+                username_creador=username_creador,
+                id_usuario_creado=usuario_id,
+                datos_usuario=datos_usuario
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de creación de usuario: {audit_error}")
+            # NO fallar la operación principal
+        
         return Usuario(
             ID=usuario_id,
             Username=usuario.Username,
@@ -771,7 +911,7 @@ def crear_usuario(usuario: UsuarioCreate):
         conn.close()
 
 @router.put("/usuarios/{usuario_id}", response_model=Usuario)
-def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate):
+def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate, request: Request):
     """
     Actualiza un usuario existente
     """
@@ -779,6 +919,21 @@ def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate):
     cursor = conn.cursor(dictionary=True)
 
     try:
+        # Obtener datos actuales del usuario para auditoría
+        cursor.execute("""
+            SELECT u.ID, u.Username, u.Nombre, u.Apellido, u.Email, u.Activo,
+                   GROUP_CONCAT(g.Grupo) as Rol
+            FROM Usuario u
+            LEFT JOIN Usuario_Grupo ug ON u.ID = ug.ID_Usuario
+            LEFT JOIN Grupo g ON ug.ID_Grupo = g.ID
+            WHERE u.ID = %s
+            GROUP BY u.ID
+        """, (usuario_id,))
+        
+        usuario_actual = cursor.fetchone()
+        if not usuario_actual:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
         # Construir query de actualización
         campos = []
         valores = []
@@ -831,6 +986,63 @@ def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate):
                 """, (usuario_id, grupo['ID']))
         
         conn.commit()
+        
+        # Registrar auditoría de modificaciones
+        try:
+            # Obtener usuario logueado desde el header o usar valor por defecto
+            from app.utils.auditoria import obtener_usuario_logueado, obtener_usuario_por_defecto
+            username_modificador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            # Auditoría de cambios en campos básicos
+            if usuario.Username is not None and usuario.Username != usuario_actual['Username']:
+                auditar_modificacion_usuario(
+                    username_modificador=username_modificador,
+                    id_usuario_modificado=usuario_id,
+                    campo_modificado="Username",
+                    valor_anterior=usuario_actual['Username'],
+                    valor_nuevo=usuario.Username
+                )
+            
+            if usuario.Email is not None and usuario.Email != usuario_actual['Email']:
+                auditar_modificacion_usuario(
+                    username_modificador=username_modificador,
+                    id_usuario_modificado=usuario_id,
+                    campo_modificado="Email",
+                    valor_anterior=usuario_actual['Email'],
+                    valor_nuevo=usuario.Email
+                )
+            
+            if usuario.Password is not None:
+                auditar_modificacion_usuario(
+                    username_modificador=username_modificador,
+                    id_usuario_modificado=usuario_id,
+                    campo_modificado="Password",
+                    valor_anterior="[OCULTO]",
+                    valor_nuevo="[OCULTO]"
+                )
+            
+            # Auditoría de cambio de estado
+            if usuario.Activo is not None and usuario.Activo != usuario_actual['Activo']:
+                auditar_cambio_estado_usuario(
+                    username_modificador=username_modificador,
+                    id_usuario_modificado=usuario_id,
+                    estado_anterior=usuario_actual['Activo'],
+                    estado_nuevo=usuario.Activo
+                )
+            
+            # Auditoría de cambio de rol
+            if usuario.Rol is not None and usuario.Rol != usuario_actual['Rol']:
+                auditar_modificacion_usuario(
+                    username_modificador=username_modificador,
+                    id_usuario_modificado=usuario_id,
+                    campo_modificado="Rol",
+                    valor_anterior=usuario_actual['Rol'],
+                    valor_nuevo=usuario.Rol
+                )
+                
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de actualización de usuario: {audit_error}")
+            # NO fallar la operación principal
         
         # Obtener usuario actualizado
         cursor.execute("""
@@ -1148,7 +1360,77 @@ def eliminar_escuela(escuela_id: int):
         conn.close()
 
 # =============================================================================
-# ENDPOINTS DE DEBUGGING
+# ENDPOINTS DE AUDITORÍA
+# =============================================================================
+
+@router.get("/auditoria")
+def obtener_auditoria(
+    tabla: Optional[str] = None,
+    accion: Optional[str] = None,
+    usuario: Optional[str] = None,
+    fecha_desde: Optional[str] = None,
+    fecha_hasta: Optional[str] = None,
+    limite: int = 100
+):
+    """
+    Obtiene registros de auditoría con filtros opcionales
+    """
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Construir query base
+        query = """
+            SELECT a.ID, a.FechaHora, a.ID_Usuario, a.Username, a.Accion, 
+                   a.Tabla, a.ID_Registro, a.Campo_Modificado, a.Valor_Anterior, 
+                   a.Valor_Nuevo, a.IP_Address, a.User_Agent, a.Comentario
+            FROM Auditoria a
+            WHERE 1=1
+        """
+        valores = []
+        
+        # Aplicar filtros
+        if tabla:
+            query += " AND a.Tabla = %s"
+            valores.append(tabla)
+        
+        if accion:
+            query += " AND a.Accion = %s"
+            valores.append(accion)
+        
+        if usuario:
+            query += " AND a.Username = %s"
+            valores.append(usuario)
+        
+        if fecha_desde:
+            query += " AND DATE(a.FechaHora) >= %s"
+            valores.append(fecha_desde)
+        
+        if fecha_hasta:
+            query += " AND DATE(a.FechaHora) <= %s"
+            valores.append(fecha_hasta)
+        
+        # Ordenar por fecha más reciente y limitar resultados
+        query += " ORDER BY a.FechaHora DESC LIMIT %s"
+        valores.append(limite)
+        
+        cursor.execute(query, valores)
+        registros = cursor.fetchall()
+        
+        return {
+            "total": len(registros),
+            "registros": registros
+        }
+        
+    except Exception as e:
+        print(f"❌ Error al obtener auditoría: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener auditoría")
+    finally:
+        cursor.close()
+        conn.close()
+
+# =============================================================================
+# ENDPOINTS DE DEBUG
 # =============================================================================
 
 @router.get("/debug-tablas")

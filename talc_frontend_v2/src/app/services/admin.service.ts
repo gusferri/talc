@@ -97,6 +97,45 @@ export interface Escuela {
   Provincia?: string;
 }
 
+/**
+ * Interfaz para un registro de auditoría
+ */
+export interface RegistroAuditoria {
+  ID: number;
+  FechaHora: string;
+  ID_Usuario: number;
+  Username: string;
+  Accion: string;
+  Tabla: string;
+  ID_Registro: number;
+  Campo_Modificado: string;
+  Valor_Anterior: string;
+  Valor_Nuevo: string;
+  IP_Address: string;
+  User_Agent: string;
+  Comentario: string;
+}
+
+/**
+ * Interfaz para la respuesta de auditoría
+ */
+export interface AuditoriaResponse {
+  total: number;
+  registros: RegistroAuditoria[];
+}
+
+/**
+ * Interfaz para los parámetros de filtro de auditoría
+ */
+export interface AuditoriaParams {
+  tabla?: string;
+  accion?: string;
+  usuario?: string;
+  fecha_desde?: string;
+  fecha_hasta?: string;
+  limite?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -198,7 +237,8 @@ export class AdminService {
    * @returns Observable con el profesional creado
    */
   crearProfesional(profesional: Omit<Profesional, 'ID'>): Observable<Profesional> {
-    return this.http.post<Profesional>(`${this.apiUrl}/administracion/profesionales`, profesional);
+    const headers = this.getHeadersWithUser();
+    return this.http.post<Profesional>(`${this.apiUrl}/administracion/profesionales`, profesional, { headers });
   }
 
   /**
@@ -209,21 +249,24 @@ export class AdminService {
    * @returns Observable con el profesional actualizado
    */
   actualizarProfesional(id: number, profesional: Partial<Profesional>): Observable<Profesional> {
-    return this.http.put<Profesional>(`${this.apiUrl}/administracion/profesionales/${id}`, profesional);
+    const headers = this.getHeadersWithUser();
+    return this.http.put<Profesional>(`${this.apiUrl}/administracion/profesionales/${id}`, profesional, { headers });
   }
 
   /**
    * Crea un nuevo usuario
    */
   crearUsuario(usuario: Omit<Usuario, 'ID'>): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/administracion/usuarios`, usuario);
+    const headers = this.getHeadersWithUser();
+    return this.http.post<Usuario>(`${this.apiUrl}/administracion/usuarios`, usuario, { headers });
   }
 
   /**
    * Actualiza un usuario existente
    */
   actualizarUsuario(id: number, usuario: Partial<Usuario>): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/administracion/usuarios/${id}`, usuario);
+    const headers = this.getHeadersWithUser();
+    return this.http.put<Usuario>(`${this.apiUrl}/administracion/usuarios/${id}`, usuario, { headers });
   }
 
   /**
@@ -293,5 +336,35 @@ export class AdminService {
    */
   eliminarEscuela(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/administracion/escuelas/${id}`);
+  }
+
+  /**
+   * Obtiene el historial de auditoría con filtros opcionales
+   * 
+   * @param params - Parámetros de filtro para la auditoría
+   * @returns Observable con la respuesta de auditoría
+   */
+  obtenerAuditoria(params: AuditoriaParams): Observable<AuditoriaResponse> {
+    const queryParams = new URLSearchParams();
+    
+    if (params.tabla) queryParams.append('tabla', params.tabla);
+    if (params.accion) queryParams.append('accion', params.accion);
+    if (params.usuario) queryParams.append('usuario', params.usuario);
+    if (params.fecha_desde) queryParams.append('fecha_desde', params.fecha_desde);
+    if (params.fecha_hasta) queryParams.append('fecha_hasta', params.fecha_hasta);
+    if (params.limite) queryParams.append('limite', params.limite.toString());
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `${this.apiUrl}/administracion/auditoria?${queryString}` : `${this.apiUrl}/administracion/auditoria`;
+    
+    return this.http.get<AuditoriaResponse>(url);
+  }
+
+  private getHeadersWithUser(): { [key: string]: string } {
+    const username = localStorage.getItem('username');
+    return {
+      'Content-Type': 'application/json',
+      'X-User-Username': username || 'sistema'
+    };
   }
 } 

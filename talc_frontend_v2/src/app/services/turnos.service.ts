@@ -44,6 +44,18 @@ export class TurnosService {
   constructor(private http: HttpClient) {}
 
   /**
+   * Obtiene los headers con el usuario logueado para auditoría
+   * @returns Objeto con headers incluyendo X-User-Username
+   */
+  private getHeadersWithUser(): { [key: string]: string } {
+    const username = localStorage.getItem('username');
+    return {
+      'Content-Type': 'application/json',
+      'X-User-Username': username || 'sistema'
+    };
+  }
+
+  /**
    * Obtiene todos los turnos del sistema con información detallada
    * Incluye datos de pacientes, profesionales y especialidades
    * 
@@ -62,9 +74,10 @@ export class TurnosService {
    * @returns Observable con la respuesta del servidor
    */
   actualizarEstadoTurno(turnoID: number, nuevoEstado: number) {
+    const headers = this.getHeadersWithUser();
     return this.http.put(`${environment.apiBaseUrl}/turnos/${turnoID}/estado`, { 
       ID_EstadoTurno: nuevoEstado 
-    });
+    }, { headers });
   }
 
   /**
@@ -75,7 +88,8 @@ export class TurnosService {
    * @returns Observable con la respuesta del servidor
    */
   registrarAsistencia(turnoID: number) {
-    return this.http.post(`${environment.apiBaseUrl}/turnos/${turnoID}/asistencia`, {});
+    const headers = this.getHeadersWithUser();
+    return this.http.post(`${environment.apiBaseUrl}/turnos/${turnoID}/asistencia`, {}, { headers });
   }
 
   /**
@@ -107,7 +121,8 @@ export class TurnosService {
    * @returns Observable con la respuesta del servidor
    */
   crearTurno(turno: any) {
-    return this.http.post(`${environment.apiBaseUrl}/turnos`, turno);
+    const headers = this.getHeadersWithUser();
+    return this.http.post(`${environment.apiBaseUrl}/turnos`, turno, { headers });
   }
 
   /**
@@ -130,6 +145,7 @@ export class TurnosService {
    * @returns Observable con la respuesta del servidor
    */
   actualizarTurno(id: number, turno: any) {
-    return this.http.put(`${environment.apiBaseUrl}/turnos/${id}`, turno);
+    const headers = this.getHeadersWithUser();
+    return this.http.put(`${environment.apiBaseUrl}/turnos/${id}`, turno, { headers });
   }
 } 

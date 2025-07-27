@@ -1,0 +1,163 @@
+<div class="auditoria-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">security</mat-icon>
+          Auditoría del Sistema
+        </h1>
+        <p class="page-subtitle">Registro de cambios y acciones realizadas en el sistema</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <mat-card class="filtros-card">
+    <mat-card-content>
+      <div class="filtros-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Tabla</mat-label>
+          <mat-select [(ngModel)]="filtroTabla">
+            <mat-option value="">Todas las tablas</mat-option>
+            <mat-option *ngFor="let tabla of opcionesTablas" [value]="tabla">
+              {{tabla}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Acción</mat-label>
+          <mat-select [(ngModel)]="filtroAccion">
+            <mat-option value="">Todas las acciones</mat-option>
+            <mat-option *ngFor="let accion of opcionesAcciones" [value]="accion">
+              {{accion}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Usuario</mat-label>
+          <input matInput [(ngModel)]="filtroUsuario" placeholder="Filtrar por usuario">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fecha-field">
+          <mat-label>Fecha desde</mat-label>
+          <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="filtroFechaDesde">
+          <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+          <mat-datepicker #pickerDesde></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fecha-field">
+          <mat-label>Fecha hasta</mat-label>
+          <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="filtroFechaHasta">
+          <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+          <mat-datepicker #pickerHasta></mat-datepicker>
+        </mat-form-field>
+
+        <div class="botones-filtros">
+          <button mat-raised-button color="primary" (click)="aplicarFiltros()">
+            <mat-icon>search</mat-icon>
+            Aplicar Filtros
+          </button>
+          <button mat-raised-button color="warn" (click)="limpiarFiltros()">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabla de Auditoría -->
+  <mat-card class="tabla-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" class="auditoria-table">
+          <!-- Fecha/Hora -->
+          <ng-container matColumnDef="FechaHora">
+            <th mat-header-cell *matHeaderCellDef>Fecha/Hora</th>
+            <td mat-cell *matCellDef="let registro">{{formatearFecha(registro.FechaHora)}}</td>
+          </ng-container>
+
+          <!-- Usuario -->
+          <ng-container matColumnDef="Username">
+            <th mat-header-cell *matHeaderCellDef>Usuario</th>
+            <td mat-cell *matCellDef="let registro">{{registro.Username}}</td>
+          </ng-container>
+
+          <!-- Acción -->
+          <ng-container matColumnDef="Accion">
+            <th mat-header-cell *matHeaderCellDef>Acción</th>
+            <td mat-cell *matCellDef="let registro">
+              <span class="accion-badge" [class]="'accion-' + registro.Accion.toLowerCase()">
+                {{registro.Accion}}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Tabla -->
+          <ng-container matColumnDef="Tabla">
+            <th mat-header-cell *matHeaderCellDef>Tabla</th>
+            <td mat-cell *matCellDef="let registro">{{registro.Tabla}}</td>
+          </ng-container>
+
+          <!-- ID Registro -->
+          <ng-container matColumnDef="ID_Registro">
+            <th mat-header-cell *matHeaderCellDef>ID Registro</th>
+            <td mat-cell *matCellDef="let registro">{{registro.ID_Registro}}</td>
+          </ng-container>
+
+          <!-- Campo Modificado -->
+          <ng-container matColumnDef="Campo_Modificado">
+            <th mat-header-cell *matHeaderCellDef>Campo</th>
+            <td mat-cell *matCellDef="let registro">{{registro.Campo_Modificado || '-'}}</td>
+          </ng-container>
+
+          <!-- Valor Anterior -->
+          <ng-container matColumnDef="Valor_Anterior">
+            <th mat-header-cell *matHeaderCellDef>Valor Anterior</th>
+            <td mat-cell *matCellDef="let registro">{{truncarTexto(registro.Valor_Anterior)}}</td>
+          </ng-container>
+
+          <!-- Valor Nuevo -->
+          <ng-container matColumnDef="Valor_Nuevo">
+            <th mat-header-cell *matHeaderCellDef>Valor Nuevo</th>
+            <td mat-cell *matCellDef="let registro">{{truncarTexto(registro.Valor_Nuevo)}}</td>
+          </ng-container>
+
+          <!-- Comentario -->
+          <ng-container matColumnDef="Comentario">
+            <th mat-header-cell *matHeaderCellDef>Comentario</th>
+            <td mat-cell *matCellDef="let registro">{{truncarTexto(registro.Comentario)}}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Loading -->
+        <div *ngIf="isLoading" class="loading-container">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Cargando auditoría...</p>
+        </div>
+
+        <!-- Sin datos -->
+        <div *ngIf="!isLoading && dataSource.length === 0" class="no-data">
+          <mat-icon>info</mat-icon>
+          <p>No se encontraron registros de auditoría</p>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <mat-paginator 
+        [length]="totalRegistros"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[25, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div> 

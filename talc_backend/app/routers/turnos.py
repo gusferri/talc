@@ -9,6 +9,11 @@ from calendar_sync import sincronizar_turno_en_google_calendar
 from calendar_sync import eliminar_evento_google_calendar
 from calendar_sync import actualizar_evento_google_calendar
 from twilio.rest import Client
+from app.utils.auditoria import (
+    auditar_creacion_turno, auditar_modificacion_turno, 
+    auditar_cambio_estado_turno, auditar_eliminacion_turno,
+    obtener_usuario_logueado, obtener_usuario_por_defecto
+)
 
 import os
 
@@ -71,7 +76,7 @@ def obtener_cliente_twilio():
 
 # Crea un nuevo turno
 @router.post("/")
-async def crear_turno(data: TurnoIn):
+async def crear_turno(data: TurnoIn, request: Request):
     conn = get_connection()
     cursor = conn.cursor()
     try:
@@ -88,6 +93,28 @@ async def crear_turno(data: TurnoIn):
         ))
         conn.commit()
         id_turno = cursor.lastrowid
+        
+        # Registrar auditoría de creación
+        try:
+            datos_turno = {
+                "ID_Paciente": data.ID_Paciente,
+                "ID_Profesional": data.ID_Profesional,
+                "ID_Especialidad": data.ID_Especialidad,
+                "Fecha": str(data.Fecha),
+                "Hora": str(data.Hora),
+                "ID_EstadoTurno": data.ID_EstadoTurno
+            }
+            
+            username_creador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            auditar_creacion_turno(
+                username_creador=username_creador,
+                id_turno_creado=id_turno,
+                datos_turno=datos_turno
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de creación de turno: {audit_error}")
+            # NO fallar la operación principal
         
         # Obtener el teléfono del paciente
         cursor.execute("SELECT Telefono FROM Paciente WHERE ID = %s", (data.ID_Paciente,))
@@ -252,10 +279,20 @@ def obtener_turno_por_id(turno_id: int):
 
 #Actualiza un turno existente
 @router.put("/{turno_id}")
-def actualizar_turno(turno_id: int, data: TurnoIn):
+def actualizar_turno(turno_id: int, data: TurnoIn, request: Request):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)  # Usamos un solo cursor con dictionary=True
     try:
+        # Obtener datos actuales del turno para auditoría
+        cursor.execute("""
+            SELECT ID_Paciente, ID_Profesional, ID_Especialidad, Fecha, Hora, ID_EstadoTurno
+            FROM Turno
+            WHERE ID = %s
+        """, (turno_id,))
+        turno_actual = cursor.fetchone()
+        if not turno_actual:
+            return JSONResponse(content={"error": "Turno no encontrado"}, status_code=404)
+        
         cursor.execute("""
             UPDATE Turno
             SET ID_Paciente = %s,
@@ -275,6 +312,78 @@ def actualizar_turno(turno_id: int, data: TurnoIn):
             turno_id
         ))
         conn.commit()
+
+        # Registrar auditoría de modificaciones
+        try:
+            username_modificador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            # Audit individual field changes
+            if data.ID_Paciente != turno_actual['ID_Paciente']:
+                auditar_modificacion_turno(
+                    username_modificador=username_modificador,
+                    id_turno_modificado=turno_id,
+                    campo_modificado="ID_Paciente",
+                    valor_anterior=turno_actual['ID_Paciente'],
+                    valor_nuevo=data.ID_Paciente
+                )
+            
+            if data.ID_Profesional != turno_actual['ID_Profesional']:
+                auditar_modificacion_turno(
+                    username_modificador=username_modificador,
+                    id_turno_modificado=turno_id,
+                    campo_modificado="ID_Profesional",
+                    valor_anterior=turno_actual['ID_Profesional'],
+                    valor_nuevo=data.ID_Profesional
+                )
+            
+            if data.ID_Especialidad != turno_actual['ID_Especialidad']:
+                auditar_modificacion_turno(
+                    username_modificador=username_modificador,
+                    id_turno_modificado=turno_id,
+                    campo_modificado="ID_Especialidad",
+                    valor_anterior=turno_actual['ID_Especialidad'],
+                    valor_nuevo=data.ID_Especialidad
+                )
+            
+            if data.Fecha != turno_actual['Fecha']:
+                auditar_modificacion_turno(
+                    username_modificador=username_modificador,
+                    id_turno_modificado=turno_id,
+                    campo_modificado="Fecha",
+                    valor_anterior=str(turno_actual['Fecha']),
+                    valor_nuevo=str(data.Fecha)
+                )
+            
+            if data.Hora != turno_actual['Hora']:
+                auditar_modificacion_turno(
+                    username_modificador=username_modificador,
+                    id_turno_modificado=turno_id,
+                    campo_modificado="Hora",
+                    valor_anterior=str(turno_actual['Hora']),
+                    valor_nuevo=str(data.Hora)
+                )
+            
+            # Audit status change
+            if data.ID_EstadoTurno != turno_actual['ID_EstadoTurno']:
+                # Obtener nombres de estados para auditoría
+                cursor.execute("SELECT Descripcion FROM Turno_Estado WHERE ID = %s", (turno_actual['ID_EstadoTurno'],))
+                estado_anterior_result = cursor.fetchone()
+                estado_anterior = estado_anterior_result['Descripcion'] if estado_anterior_result else str(turno_actual['ID_EstadoTurno'])
+                
+                cursor.execute("SELECT Descripcion FROM Turno_Estado WHERE ID = %s", (data.ID_EstadoTurno,))
+                estado_nuevo_result = cursor.fetchone()
+                estado_nuevo = estado_nuevo_result['Descripcion'] if estado_nuevo_result else str(data.ID_EstadoTurno)
+                
+                auditar_cambio_estado_turno(
+                    username_modificador=username_modificador,
+                    id_turno_modificado=turno_id,
+                    estado_anterior=estado_anterior,
+                    estado_nuevo=estado_nuevo
+                )
+                
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de actualización de turno: {audit_error}")
+            # NO fallar la operación principal
 
         cursor.execute("SELECT UsaIntegracionCalendar FROM Profesional WHERE ID = %s", (data.ID_Profesional,))
         profesional_info = cursor.fetchone()
@@ -362,12 +471,43 @@ def eliminar_turno(turno_id: int, estado: dict, request: Request):
     conn = get_connection()
     cursor = conn.cursor()
     try:
+        # Obtener estado actual del turno para auditoría
+        cursor.execute("SELECT ID_EstadoTurno FROM Turno WHERE ID = %s", (turno_id,))
+        turno_actual = cursor.fetchone()
+        if not turno_actual:
+            return JSONResponse(content={"error": "Turno no encontrado"}, status_code=404)
+        
+        estado_anterior_id = turno_actual[0]
+        
         cursor.execute("""
             UPDATE Turno
             SET ID_EstadoTurno = %s
             WHERE ID = %s
         """, (estado["ID_EstadoTurno"], turno_id))
         conn.commit()
+
+        # Registrar auditoría de cambio de estado
+        try:
+            username_modificador = obtener_usuario_logueado(request) or obtener_usuario_por_defecto()
+            
+            # Obtener nombres de estados para auditoría
+            cursor.execute("SELECT Descripcion FROM Turno_Estado WHERE ID = %s", (estado_anterior_id,))
+            estado_anterior_result = cursor.fetchone()
+            estado_anterior = estado_anterior_result[0] if estado_anterior_result else str(estado_anterior_id)
+            
+            cursor.execute("SELECT Descripcion FROM Turno_Estado WHERE ID = %s", (estado["ID_EstadoTurno"],))
+            estado_nuevo_result = cursor.fetchone()
+            estado_nuevo = estado_nuevo_result[0] if estado_nuevo_result else str(estado["ID_EstadoTurno"])
+            
+            auditar_cambio_estado_turno(
+                username_modificador=username_modificador,
+                id_turno_modificado=turno_id,
+                estado_anterior=estado_anterior,
+                estado_nuevo=estado_nuevo
+            )
+        except Exception as audit_error:
+            print(f"⚠️ Error en auditoría de cambio de estado de turno: {audit_error}")
+            # NO fallar la operación principal
 
         # Obtener los datos del turno
         cursor.execute("""

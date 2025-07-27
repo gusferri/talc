@@ -110,26 +110,27 @@ export class PacienteService {
 
     /**
      * Inserta un nuevo paciente en el sistema
+     * Envía los datos del paciente al backend para su creación
      * 
-     * @param paciente - Objeto con los datos del paciente a insertar
-     * @returns Observable con la respuesta del servidor
+     * @param paciente - Objeto con todos los datos del paciente a crear
+     * @returns Observable con la respuesta del backend
      */
     insertarPaciente(paciente: any): Observable<any> {
-        return this.http.post(`${this.apiUrl}/grabarPaciente`, paciente);
+        const headers = this.getHeadersWithUser();
+        return this.http.post(`${this.apiUrl}/grabarPaciente`, paciente, { headers });
     }
 
     /**
      * Actualiza los datos de un paciente existente
-     * Envía una petición PUT al servidor con los datos actualizados
+     * Envía los datos actualizados al backend
      * 
      * @param dni - DNI del paciente a actualizar
      * @param paciente - Objeto con los datos actualizados del paciente
-     * @returns Observable con la respuesta del servidor
+     * @returns Observable con la respuesta del backend
      */
     actualizarPaciente(dni: any, paciente: any): Observable<any> {
-        console.log('🔍 Servicio - DNI a actualizar:', dni);
-        console.log('🔍 Servicio - Datos del paciente a enviar:', paciente);
-        return this.http.put(`${this.apiUrl}/actualizarPaciente/${dni}`, paciente);
+        const headers = this.getHeadersWithUser();
+        return this.http.put(`${this.apiUrl}/actualizarPaciente/${dni}`, paciente, { headers });
     }
 
     /**
@@ -245,17 +246,15 @@ export class PacienteService {
     }
 
     /**
-     * Actualiza el estado activo/inactivo de un paciente específico
-     * Permite activar o desactivar pacientes del sistema
+     * Actualiza el estado activo/inactivo de un paciente
      * 
-     * @param dni - DNI del paciente a actualizar
-     * @param activo - Nuevo estado (1 = activo, 0 = inactivo)
-     * @returns Observable con la respuesta del servidor
+     * @param dni - DNI del paciente
+     * @param activo - Estado (1 = activo, 0 = inactivo)
+     * @returns Observable con la respuesta del backend
      */
     actualizarEstadoPaciente(dni: string, activo: number): Observable<any> {
-        return this.http.put(`${this.apiUrl}/pacientes/${dni}/estado`, {
-            activo: activo
-        });
+        const headers = this.getHeadersWithUser();
+        return this.http.put(`${this.apiUrl}/pacientes/${dni}/estado`, { activo }, { headers });
     }
 
     /**
@@ -269,5 +268,16 @@ export class PacienteService {
             { id: 1, nombre: 'Activo', descripcion: 'Paciente activo en el sistema' },
             { id: 0, nombre: 'Inactivo', descripcion: 'Paciente inactivo en el sistema' }
         ];
+    }
+
+    /**
+     * Obtiene headers con el usuario logueado para auditoría
+     */
+    private getHeadersWithUser(): { [key: string]: string } {
+        const username = localStorage.getItem('username');
+        return {
+            'Content-Type': 'application/json',
+            'X-User-Username': username || 'sistema'
+        };
     }
 } 

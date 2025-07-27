@@ -345,4 +345,23 @@ export const PagesRoutes: Routes = [
     },
     canActivate: [AdminGuard], // Proteger la ruta con el guard
   },
+
+  /**
+   * Auditoría: Registro de cambios y acciones del sistema
+   * Solo accesible para usuarios con rol de administrador
+   * Permite consultar el historial de cambios realizados en el sistema
+   */
+  {
+    path: 'administracion/auditoria',
+    loadComponent: () => import('./administracion/auditoria/auditoria.component').then(m => m.AuditoriaComponent),
+    data: {
+      title: 'Auditoría del Sistema',
+      urls: [
+        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Administración', url: '/administracion' },
+        { title: 'Auditoría' }
+      ],
+    },
+    canActivate: [AdminGuard], // Proteger la ruta con el guard
+  },
 ];

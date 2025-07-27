@@ -113,6 +113,13 @@ export class AdministracionComponent implements OnInit {
       icon: 'psychology',
       color: '#e91e63',
       route: '/administracion/especialidades'
+    },
+    {
+      title: 'Auditoría',
+      description: 'Consultar historial de cambios y acciones del sistema',
+      icon: 'history',
+      color: '#607d8b',
+      route: '/administracion/auditoria'
     }
   ];
 

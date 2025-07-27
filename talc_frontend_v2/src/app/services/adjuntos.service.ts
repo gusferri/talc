@@ -66,6 +66,17 @@ export class AdjuntosService {
   constructor(private http: HttpClient) {}
 
   /**
+   * Obtiene los headers con el usuario logueado para auditoría
+   * @returns Objeto con headers incluyendo X-User-Username
+   */
+  private getHeadersWithUser(): { [key: string]: string } {
+    const username = localStorage.getItem('username');
+    return {
+      'X-User-Username': username || 'sistema'
+    };
+  }
+
+  /**
    * Obtiene todos los archivos adjuntos de un paciente específico
    * Retorna la lista de documentos asociados al paciente
    * 
@@ -124,6 +135,7 @@ export class AdjuntosService {
    * @returns Observable con la respuesta del servidor
    */
   eliminarAdjunto(documentoId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/pacientes/adjuntos/${documentoId}`);
+    const headers = this.getHeadersWithUser();
+    return this.http.delete(`${this.baseUrl}/pacientes/adjuntos/${documentoId}`, { headers });
   }
 } 

@@ -47,6 +47,17 @@ export class NotasVozService {
     constructor(private http: HttpClient) {}
 
     /**
+     * Obtiene los headers con el usuario logueado para auditoría
+     * @returns Objeto con headers incluyendo X-User-Username
+     */
+    private getHeadersWithUser(): { [key: string]: string } {
+        const username = localStorage.getItem('username');
+        return {
+            'X-User-Username': username || 'sistema'
+        };
+    }
+
+    /**
      * Graba una nueva nota de voz en el sistema
      * Sube el archivo de audio y metadatos asociados al turno
      * 
@@ -54,7 +65,8 @@ export class NotasVozService {
      * @returns Observable con la respuesta del servidor
      */
     grabarNotaVoz(formData: FormData): Observable<any> {
-        return this.http.post(`${this.apiUrl}notas-voz`, formData);
+        const headers = this.getHeadersWithUser();
+        return this.http.post(`${this.apiUrl}notas-voz`, formData, { headers });
     }
 
     /**
@@ -77,6 +89,19 @@ export class NotasVozService {
      * @returns Observable con la respuesta del servidor
      */
     actualizarNotaVoz(id: number, texto: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}actualizar-notas-voz/${id}`, { texto });
+        const headers = this.getHeadersWithUser();
+        return this.http.post(`${this.apiUrl}actualizar-notas-voz/${id}`, { texto }, { headers });
+    }
+
+    /**
+     * Elimina una nota de voz específica del sistema
+     * Remueve permanentemente la nota de voz y su transcripción
+     * 
+     * @param turnoId - ID del turno asociado a la nota de voz
+     * @returns Observable con la respuesta del servidor
+     */
+    eliminarNotaVoz(turnoId: number): Observable<any> {
+        const headers = this.getHeadersWithUser();
+        return this.http.delete(`${this.apiUrl}eliminar-notas-voz/${turnoId}`, { headers });
     }
 } 
